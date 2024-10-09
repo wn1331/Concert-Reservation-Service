@@ -59,7 +59,7 @@ erDiagram
 
     user {
         long id PK "사용자 PK"
-        String name "사용자 명 (not null)"
+        String name "사용자 명"
     }
     user_detail {
         long id PK "유저상세 PK"
@@ -77,7 +77,6 @@ erDiagram
         datetime concert_datetime "콘서트 일시"
         decimal price "결제 금액"
         datetime created_at "생성일자"
-        datetime create_datetime "생성일시"
     }
 
     reservation {
@@ -95,8 +94,8 @@ erDiagram
         long user_id "유저 PK"
         String token UK "대기열 토큰(UUID)"
         String status "대기열 상태"
-        datetime created_at "생성일시"
-        datetime modified_at "수정일시"
+        datetime created_at "생성일자"
+        datetime modified_at "수정일자"
     }
 
 ```
