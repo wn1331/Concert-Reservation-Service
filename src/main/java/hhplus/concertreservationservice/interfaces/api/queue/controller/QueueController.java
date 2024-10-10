@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class QueueController {
 
 
+    // 대기열 생성 API
     @PostMapping("/enqueue/{userId}")
     public ResponseEntity<EnqueueResponse> enqueue(
         @PathVariable(name = "userId") Long userId
@@ -29,6 +30,7 @@ public class QueueController {
         return ok(new EnqueueResponse(UUID.randomUUID().toString()));
     }
 
+    // 대기열 순번 API
     @GetMapping("/poll")
     public ResponseEntity<QueuePollResponse> poll(
         @RequestHeader(name = "token") String token
