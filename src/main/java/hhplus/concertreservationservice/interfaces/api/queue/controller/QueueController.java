@@ -2,12 +2,10 @@ package hhplus.concertreservationservice.interfaces.api.queue.controller;
 
 import static org.springframework.http.ResponseEntity.ok;
 
-import hhplus.concertreservationservice.interfaces.api.queue.dto.EnqueueResponse;
-import hhplus.concertreservationservice.interfaces.api.queue.dto.QueuePollResponse;
+import hhplus.concertreservationservice.interfaces.api.queue.dto.Enqueue;
+import hhplus.concertreservationservice.interfaces.api.queue.dto.QueuePoll;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,18 +22,18 @@ public class QueueController {
 
     // 대기열 생성 API
     @PostMapping("/enqueue/{userId}")
-    public ResponseEntity<EnqueueResponse> enqueue(
+    public ResponseEntity<Enqueue.Response> enqueue(
         @PathVariable(name = "userId") Long userId
     ){
-        return ok(new EnqueueResponse(UUID.randomUUID().toString()));
+        return ok(new Enqueue.Response(UUID.randomUUID().toString()));
     }
 
     // 대기열 순번 API
     @GetMapping("/poll")
-    public ResponseEntity<QueuePollResponse> poll(
+    public ResponseEntity<QueuePoll.Response> poll(
         @RequestHeader(name = "token") String token
     ){
-        return ok(new QueuePollResponse(1L,token,1L));
+        return ok(new QueuePoll.Response(1L,token,1L));
     }
 
 }

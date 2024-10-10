@@ -4,9 +4,9 @@ import static org.springframework.http.ResponseEntity.ok;
 
 import hhplus.concertreservationservice.interfaces.api.concert.dto.ConcertPay;
 import hhplus.concertreservationservice.interfaces.api.concert.dto.ConcertReservation;
-import hhplus.concertreservationservice.interfaces.api.concert.dto.ConcertSchedulesResponse;
-import hhplus.concertreservationservice.interfaces.api.concert.dto.ConcertSchedulesResponse.ConcertScheduleResponse;
-import hhplus.concertreservationservice.interfaces.api.concert.dto.ConcertSeatsResponse;
+import hhplus.concertreservationservice.interfaces.api.concert.dto.ConcertSchedules;
+
+import hhplus.concertreservationservice.interfaces.api.concert.dto.ConcertSeats;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -31,36 +31,36 @@ public class ConcertController {
 
     // 콘서트 스케줄(날짜) 조회 API
     @GetMapping("/{concertId}/schedules")
-    public ResponseEntity<ConcertSchedulesResponse> getConcertSchedules(
+    public ResponseEntity<ConcertSchedules.Response> getConcertSchedules(
         @PathVariable(name = "concertId") Long concertScheduleId,
         @RequestHeader(name = "token") String token
 
     ){
-        List<ConcertScheduleResponse> mockSchedules = Arrays.asList(
-            new ConcertScheduleResponse(1L, LocalDate.of(2024, 10, 1), "매진됨"),
-            new ConcertScheduleResponse(2L, LocalDate.of(2024, 10, 2), "예약가능"),
-            new ConcertScheduleResponse(3L, LocalDate.of(2024, 10, 3), "예약가능")
+        List<ConcertSchedules.Response.ConcertScheduleResponse> mockSchedules = Arrays.asList(
+            new ConcertSchedules.Response.ConcertScheduleResponse(1L, LocalDate.of(2024, 10, 1), "매진됨"),
+            new ConcertSchedules.Response.ConcertScheduleResponse(2L, LocalDate.of(2024, 10, 2), "예약가능"),
+            new ConcertSchedules.Response.ConcertScheduleResponse(3L, LocalDate.of(2024, 10, 3), "예약가능")
         );
 
-        return ok(new ConcertSchedulesResponse(mockSchedules));
+        return ok(new ConcertSchedules.Response(mockSchedules));
     }
 
     // 콘서트 좌석 조회 API
     @GetMapping("/schedule/{concertScheduleId}/seats")
-    public ResponseEntity<ConcertSeatsResponse> getConcertSeats(
+    public ResponseEntity<ConcertSeats.Response> getConcertSeats(
         @PathVariable(name = "concertScheduleId") Long concertScheduleId,
         @RequestHeader(name = "token") String token
 
     ){
-        List<ConcertSeatsResponse.ConcertSeatResponse> mockSeats = Arrays.asList(
-            new ConcertSeatsResponse.ConcertSeatResponse(1L, 101, "예약가능"),
-            new ConcertSeatsResponse.ConcertSeatResponse(2L, 102, "예약가능"),
-            new ConcertSeatsResponse.ConcertSeatResponse(3L, 103, "예약가능"),
-            new ConcertSeatsResponse.ConcertSeatResponse(4L, 104, "예약불가")
+        List<ConcertSeats.Response.ConcertSeatResponse> mockSeats = Arrays.asList(
+            new ConcertSeats.Response.ConcertSeatResponse(1L, 101, "예약가능"),
+            new ConcertSeats.Response.ConcertSeatResponse(2L, 102, "예약가능"),
+            new ConcertSeats.Response.ConcertSeatResponse(3L, 103, "예약가능"),
+            new ConcertSeats.Response.ConcertSeatResponse(4L, 104, "예약불가")
         );
 
         // ConcertSeatsResponse 객체 반환
-        return ok(new ConcertSeatsResponse(mockSeats));
+        return ok(new ConcertSeats.Response(mockSeats));
     }
 
     // 콘서트 예약 API
