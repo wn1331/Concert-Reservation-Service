@@ -102,7 +102,15 @@ erDiagram
 
 </details>
 
+<details><summary>API 명세서</summary>
 
+[콘서트 예약 서비스 API 명세서](docs%2FAPISPECS.md)
+
+</details>
+
+<details><summary>패키지 구조 및 기술 스택 선정</summary>
+
+</details>
 
 
 
