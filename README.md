@@ -125,21 +125,30 @@ erDiagram
 │             └── /dto
 ├── /application
 │    ├── /concert
-│    │    ├── /service
-│    │    └── /dto
+│    │    ├── /service 
 │    ├── /queue
 │    │    ├── /service
-│    │    └── /dto
 │    └── /user
-│         ├── /service
-│         └── /dto
+│         └── /service 
 ├── /domain
 │    ├── /concert
+│    │    ├── /repository
+│    │    └── /entity
 │    ├── /queue
+│    │    ├── /repository
+│    │    └── /entity
 │    └── /user
+│         ├── /repository
+│         └── /entity
 └── /infra
      ├── /persistence
+     │    ├── /concert
+     │    ├── /queue
+     │    └── /user
      └── /external
+
+
+Service 클래스 내부에 inner class로 Command/Info를 구현 예정입니다.
 
 
 ```
