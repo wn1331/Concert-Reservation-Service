@@ -110,6 +110,50 @@ erDiagram
 
 <details><summary>패키지 구조 및 기술 스택 선정</summary>
 
+### 패키지 구조
+```bash
+├── /interfaces
+│    └── /api
+│        ├── /concert
+│        │    ├── /controller
+│        │    └── /dto
+│        ├── /queue
+│        │    ├── /controller
+│        │    └── /dto
+│        └── /user
+│             ├── /controller
+│             └── /dto
+├── /application
+│    ├── /concert
+│    │    ├── /service
+│    │    └── /dto
+│    ├── /queue
+│    │    ├── /service
+│    │    └── /dto
+│    └── /user
+│         ├── /service
+│         └── /dto
+├── /domain
+│    ├── /concert
+│    ├── /queue
+│    └── /user
+└── /infra
+     ├── /persistence
+     └── /external
+
+
+```
+
+### 기술 스택 선정
+
+- **자바 버전**: 17
+- **스프링 부트 버전**: 3.3.4
+- **Gradle 버전**: 8.10.2
+- **외부 라이브러리**: JPA, Redis
+- **사용할 RDBMS**: H2
+- **Test RDBMS**: H2
+- **테스트 도구**: JUnit, AssertJ
+
 </details>
 
 
