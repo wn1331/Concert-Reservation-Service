@@ -82,7 +82,6 @@ erDiagram
     reservation {
         long id PK "예약 PK"
         long user_id "사용자 PK"
-        long id PK "예약 좌석 PK"
         long concert_seat_id "콘서트 좌석 PK"
         String status "예약 상태 (예약, 결제완료)"
         datetime created_at "생성일자"
