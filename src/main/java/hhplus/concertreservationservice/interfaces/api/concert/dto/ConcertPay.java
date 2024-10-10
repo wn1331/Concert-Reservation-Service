@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 public record ConcertPay() {
 
     public record Request(
-        @NotBlank Long userId
+        Long userId
     ) {
 
     }

@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     // 유저 잔액 조회 API
-    @GetMapping("/balance/{userId}")
+    @GetMapping("/{userId}/balance")
     public ResponseEntity<CheckBalance.Response> checkBalance(
         @PathVariable(name = "userId") Long userId,
         @RequestHeader(name = "token") String token
@@ -34,7 +34,7 @@ public class UserController {
     }
 
     // 유저 잔액 충전 API
-    @PostMapping("/balance/{userId}")
+    @PostMapping("/{userId}/balance")
     public ResponseEntity<ChargeBalance.Response> chargeBalance(
         @RequestHeader(name = "token") String token,
         @PathVariable(name = "userId") Long userId,
