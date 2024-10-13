@@ -1,20 +1,20 @@
 package hhplus.concertreservationservice.domain.user.entity;
-
-import hhplus.concertreservationservice.domain.entity.BaseTimeEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class UserDetail extends BaseTimeEntity {
+public class UserPointHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,11 +22,11 @@ public class UserDetail extends BaseTimeEntity {
 
     private Long userId;
 
-    private BigDecimal balance;
+    @Enumerated(EnumType.STRING)
+    private UserPointHistoryType type;
 
-    @Builder
-    public UserDetail(Long userId, BigDecimal balance) {
-        this.userId = userId;
-        this.balance = balance;
-    }
+    private BigDecimal requestPoint;
+
+    private LocalDateTime createdAt;
+
 }

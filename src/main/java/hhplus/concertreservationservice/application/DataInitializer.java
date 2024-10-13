@@ -8,8 +8,7 @@ import hhplus.concertreservationservice.domain.concert.repository.ConcertReposit
 import hhplus.concertreservationservice.domain.concert.repository.ConcertScheduleRepository;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertSeatRepository;
 import hhplus.concertreservationservice.domain.user.entity.User;
-import hhplus.concertreservationservice.domain.user.entity.UserDetail;
-import hhplus.concertreservationservice.domain.user.repository.UserDetailRepository;
+import hhplus.concertreservationservice.domain.user.repository.UserPointHistoryRepository;
 import hhplus.concertreservationservice.domain.user.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
@@ -29,7 +28,7 @@ public class DataInitializer {
     private final ConcertScheduleRepository concertScheduleRepository;
     private final ConcertSeatRepository concertSeatRepository;
     private final UserRepository userRepository;
-    private final UserDetailRepository userDetailRepository;
+    private final UserPointHistoryRepository userPointHistoryRepository;
 
     @PostConstruct
     public void initializeData() {
@@ -55,17 +54,13 @@ public class DataInitializer {
                 concertSeatRepository.saveAll(seats);  // 한번에 저장
             });
 
-        User user1 = new User("주종훈");
+        User user1 = new User("주종훈",BigDecimal.valueOf(1000000));
         userRepository.save(user1);
 
-        UserDetail userDetail1 = new UserDetail(user1.getId(), BigDecimal.valueOf(300000));
-        userDetailRepository.save(userDetail1);
 
-        User user2 = new User("김영한");
+        User user2 = new User("김영한",BigDecimal.valueOf(1000000));
         userRepository.save(user2);
 
-        UserDetail userDetail2 = new UserDetail(user2.getId(), BigDecimal.valueOf(500000));
-        userDetailRepository.save(userDetail2);
 
     }
 }

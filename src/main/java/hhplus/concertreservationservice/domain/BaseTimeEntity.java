@@ -1,4 +1,4 @@
-package hhplus.concertreservationservice.domain.entity;
+package hhplus.concertreservationservice.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

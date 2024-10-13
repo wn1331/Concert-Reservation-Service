@@ -33,14 +33,14 @@ erDiagram
     concert ||--|{ concert_schedule: "1:N"
     concert_schedule ||--|{ concert_seat: "1:N"
     concert_seat ||--|{ reservation: "1:N"
-    user ||--|| user_detail: "1:1"
+    user ||--|{ user_point_history: "1:N"
     user ||--|{ reservation: "1:N"
     user ||--|| Queue: "1:1"
     reservation ||--|| payment: "1:1"
 
     concert {
         long id PK "콘서트 PK"
-        String name "콘서트 이름"
+        VARCHAR name "콘서트 이름"
     }
     concert_schedule {
         long id PK "콘서트 스케줄 PK"
@@ -50,30 +50,32 @@ erDiagram
     concert_seat {
         long id PK "콘서트 좌석 PK"
         long concert_schedule_id "콘서트 스케줄 PK"
-        String seatNum "좌석번호"
+        VARCHAR seat_num "좌석번호"
         decimal price "좌석 가격"
-        String status "좌석 상태"
-        datetime created_at "생성일시"
-        datetime modified_at "수정일시"
+        VARCHAR status "좌석 상태(비어있음, 예약됨, 사용불가)"
+        datetime created_at "생성일자"
+        datetime modified_at "수정일자"
     }
 
     user {
         long id PK "사용자 PK"
-        String name "사용자 명"
+        VARCHAR name "사용자 명"
+        Decimal point "잔액"
     }
-    user_detail {
-        long id PK "유저상세 PK"
-        long userId "사용자 PK"
-        decimal amount "잔액"
-        datetime create_at "생성일시"
-        datetime modified_at "수정일시"
+
+    user_point_history {
+        long id PK "포인트 사용내역 PK"
+        long user_id "사용자 PK"
+        VARCHAR point_history_type "포인트 사용 타입"
+        Decimal point "요청된 포인트"
+        datetime created_at "생성일자"
     }
 
     payment {
         long id PK "결제 PK"
         long reservation_id "예약 PK"
-        String seat_num "좌석 번호"
-        String concert_name "콘서트 이름"
+        VARCHAR seat_num "좌석 번호"
+        VARCHAR concert_name "콘서트 이름"
         datetime concert_datetime "콘서트 일시"
         decimal price "결제 금액"
         datetime created_at "생성일자"
@@ -82,9 +84,8 @@ erDiagram
     reservation {
         long id PK "예약 PK"
         long user_id "사용자 PK"
-        long id PK "예약 좌석 PK"
         long concert_seat_id "콘서트 좌석 PK"
-        String status "예약 상태 (예약, 결제완료)"
+        VARCHAR status "예약 상태 (예약, 결제완료)"
         datetime created_at "생성일자"
         datetime modified_at "수정일자"
     }
@@ -92,8 +93,8 @@ erDiagram
     Queue {
         long id PK "대기열 PK"
         long user_id "유저 PK"
-        String token UK "대기열 토큰(UUID)"
-        String status "대기열 상태"
+        VARCHAR token UK "대기열 토큰(UUID)"
+        VARCHAR status "대기열 상태"
         datetime created_at "생성일자"
         datetime modified_at "수정일자"
     }

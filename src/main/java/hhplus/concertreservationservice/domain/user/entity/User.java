@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,9 +22,12 @@ public class User {
 
     private String name;
 
+    private BigDecimal point;
+
 
     @Builder
-    public User(String name) {
+    public User(String name, BigDecimal point) {
         this.name = name;
+        this.point = point;
     }
 }

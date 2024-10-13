@@ -1,7 +1,7 @@
 package hhplus.concertreservationservice.domain.concert.entity;
 
 
-import hhplus.concertreservationservice.domain.entity.BaseTimeEntity;
+import hhplus.concertreservationservice.domain.BaseTimeEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
