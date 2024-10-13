@@ -28,7 +28,6 @@ public class DataInitializer {
     private final ConcertScheduleRepository concertScheduleRepository;
     private final ConcertSeatRepository concertSeatRepository;
     private final UserRepository userRepository;
-    private final UserPointHistoryRepository userPointHistoryRepository;
 
     @PostConstruct
     public void initializeData() {
