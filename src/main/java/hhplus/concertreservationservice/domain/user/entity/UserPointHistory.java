@@ -1,33 +1,32 @@
 package hhplus.concertreservationservice.domain.user.entity;
-
-
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class User {
+public class UserPointHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private Long userId;
 
-    private BigDecimal point;
+    @Enumerated(EnumType.STRING)
+    private UserPointHistoryType type;
 
+    private BigDecimal requestPoint;
 
-    @Builder
-    public User(String name, BigDecimal point) {
-        this.name = name;
-        this.point = point;
-    }
+    private LocalDateTime createdAt;
+
 }

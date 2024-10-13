@@ -1,5 +1,13 @@
 package hhplus.concertreservationservice.infra.persistence.queue;
 
-public class QueueRepositoryImpl {
+import hhplus.concertreservationservice.domain.queue.repository.QueueRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
+@Repository
+@RequiredArgsConstructor
+public class QueueRepositoryImpl implements QueueRepository {
+
+    private final QueueJpaRepository jpaRepository;
 
 }

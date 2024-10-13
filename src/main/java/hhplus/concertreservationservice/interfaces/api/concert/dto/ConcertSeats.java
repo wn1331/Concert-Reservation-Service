@@ -1,5 +1,6 @@
 package hhplus.concertreservationservice.interfaces.api.concert.dto;
 
+import hhplus.concertreservationservice.domain.concert.entity.SeatStatusType;
 import java.util.List;
 
 public record ConcertSeats() {
@@ -12,7 +13,7 @@ public record ConcertSeats() {
         public record ConcertSeatResponse(
             Long seatId,
             Integer seatNo,
-            String status // 추후 Enum으로 변경 예정
+            SeatStatusType status
         ){
 
         }

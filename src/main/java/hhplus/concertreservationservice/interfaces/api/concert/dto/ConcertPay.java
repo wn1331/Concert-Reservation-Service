@@ -1,10 +1,12 @@
 package hhplus.concertreservationservice.interfaces.api.concert.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import hhplus.concertreservationservice.domain.concert.entity.PaymentStatusType;
+import jakarta.validation.constraints.NotNull;
 
 public record ConcertPay() {
 
     public record Request(
+        @NotNull
         Long userId
     ) {
 
@@ -12,7 +14,7 @@ public record ConcertPay() {
 
     public record Response(
         Long reservationId,
-        String paymentStatus // 추후, Enum으로 변경
+        PaymentStatusType status // 추후, Enum으로 변경
     ) {
 
     }

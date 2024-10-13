@@ -1,5 +1,6 @@
 package hhplus.concertreservationservice.domain.user.entity;
 
-public class UserDetail {
-
+public enum UserPointHistoryType {
+    CHARGE,
+    USE
 }

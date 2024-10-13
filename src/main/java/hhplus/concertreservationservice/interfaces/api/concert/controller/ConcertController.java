@@ -2,6 +2,9 @@ package hhplus.concertreservationservice.interfaces.api.concert.controller;
 
 import static org.springframework.http.ResponseEntity.ok;
 
+import hhplus.concertreservationservice.domain.concert.entity.PaymentStatusType;
+import hhplus.concertreservationservice.domain.concert.entity.ScheduleStatusType;
+import hhplus.concertreservationservice.domain.concert.entity.SeatStatusType;
 import hhplus.concertreservationservice.interfaces.api.concert.dto.ConcertPay;
 import hhplus.concertreservationservice.interfaces.api.concert.dto.ConcertReservation;
 import hhplus.concertreservationservice.interfaces.api.concert.dto.ConcertSchedules;
@@ -12,8 +15,6 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,9 +38,9 @@ public class ConcertController {
 
     ){
         List<ConcertSchedules.Response.ConcertScheduleResponse> mockSchedules = Arrays.asList(
-            new ConcertSchedules.Response.ConcertScheduleResponse(1L, LocalDate.of(2024, 10, 1), "매진됨"),
-            new ConcertSchedules.Response.ConcertScheduleResponse(2L, LocalDate.of(2024, 10, 2), "예약가능"),
-            new ConcertSchedules.Response.ConcertScheduleResponse(3L, LocalDate.of(2024, 10, 3), "예약가능")
+            new ConcertSchedules.Response.ConcertScheduleResponse(1L, LocalDate.of(2024, 10, 1), ScheduleStatusType.SOLD_OUT),
+            new ConcertSchedules.Response.ConcertScheduleResponse(2L, LocalDate.of(2024, 10, 2), ScheduleStatusType.AVAILABLE),
+            new ConcertSchedules.Response.ConcertScheduleResponse(3L, LocalDate.of(2024, 10, 3), ScheduleStatusType.AVAILABLE)
         );
 
         return ok(new ConcertSchedules.Response(mockSchedules));
@@ -53,10 +54,10 @@ public class ConcertController {
 
     ){
         List<ConcertSeats.Response.ConcertSeatResponse> mockSeats = Arrays.asList(
-            new ConcertSeats.Response.ConcertSeatResponse(1L, 101, "예약가능"),
-            new ConcertSeats.Response.ConcertSeatResponse(2L, 102, "예약가능"),
-            new ConcertSeats.Response.ConcertSeatResponse(3L, 103, "예약가능"),
-            new ConcertSeats.Response.ConcertSeatResponse(4L, 104, "예약불가")
+            new ConcertSeats.Response.ConcertSeatResponse(1L, 101, SeatStatusType.EMPTY),
+            new ConcertSeats.Response.ConcertSeatResponse(2L, 102, SeatStatusType.RESERVED),
+            new ConcertSeats.Response.ConcertSeatResponse(3L, 103, SeatStatusType.EMPTY),
+            new ConcertSeats.Response.ConcertSeatResponse(4L, 104, SeatStatusType.SOLD)
         );
 
         // ConcertSeatsResponse 객체 반환
@@ -80,7 +81,7 @@ public class ConcertController {
         @RequestHeader(name = "token") String token,
         @RequestBody @Valid ConcertPay.Request request
     ){
-        return ok(new ConcertPay.Response(1L,"결제성공"));
+        return ok(new ConcertPay.Response(1L, PaymentStatusType.SUCCEED));
     }
 
 
