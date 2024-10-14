@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,5 +28,12 @@ public class Queue extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private QueueStatusType status;
 
+
+    @Builder
+    public Queue(Long userId, String token, QueueStatusType status) {
+        this.userId = userId;
+        this.token = token;
+        this.status = status;
+    }
 
 }

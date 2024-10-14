@@ -1,9 +1,9 @@
-package hhplus.concertreservationservice.interfaces.api.user.controller;
+package hhplus.concertreservationservice.presentation.api.user.controller;
 
 import static org.springframework.http.ResponseEntity.ok;
 
-import hhplus.concertreservationservice.interfaces.api.user.dto.ChargeBalance;
-import hhplus.concertreservationservice.interfaces.api.user.dto.CheckBalance;
+import hhplus.concertreservationservice.presentation.api.user.dto.UserRequest;
+import hhplus.concertreservationservice.presentation.api.user.dto.UserResponse;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
@@ -19,26 +19,26 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
 
     // 유저 잔액 조회 API
     @GetMapping("/{userId}/balance")
-    public ResponseEntity<CheckBalance.Response> checkBalance(
+    public ResponseEntity<UserResponse.CheckBalance> checkBalance(
         @PathVariable(name = "userId") Long userId,
         @RequestHeader(name = "token") String token
     ) { // 헤더에서 token을 받음
-        return ok(new CheckBalance.Response(userId, BigDecimal.valueOf(100000)));
+        return ok(null);
     }
 
     // 유저 잔액 충전 API
     @PostMapping("/{userId}/balance")
-    public ResponseEntity<ChargeBalance.Response> chargeBalance(
+    public ResponseEntity<UserResponse.ChargeBalance> chargeBalance(
         @RequestHeader(name = "token") String token,
         @PathVariable(name = "userId") Long userId,
-        @RequestBody @Valid ChargeBalance.Request request
+        @RequestBody @Valid UserRequest.ChargeBalance request
     ) {
-        return ok(new ChargeBalance.Response(userId, request.amount().add(BigDecimal.valueOf(10000))));
+        return ok(null);
     }
 
 }
