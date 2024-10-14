@@ -19,20 +19,22 @@ public class QueueFacade {
     @Transactional
     public QueueResult.Enqueue enqueue(QueueCriteria.Enqueue criteria) throws Exception {
 
-        // 해당 유저아이디가 유효한지 확인
-        userService.findUserValidation(criteria.toCommand());
+//        // 해당 유저아이디가 유효한지 확인
+//        userService.findUserValidation(criteria.toCommand());
+//
+//        // 이미 대기열에 등록되어있는지 확인
+//        boolean isExistsInQueue = queueService.existsByUserID(criteria.toCommand());
+//
+//        if (isExistsInQueue) {
+//            // 이미 대기열에 등록되어 있으면, 해당 대기열의 토큰을 바로 반환.(멱등성)
+//            return QueueResult.Enqueue.fromInfo(queueService.findByUserId(criteria.toCommand()));
+//        }
+//
+//
+//        // 대기열 등록, Result객체로 캡슐화 후 return
+//        return QueueResult.Enqueue.fromInfo(queueService.enqueue(criteria.toCommand()));
 
-        // 이미 대기열에 등록되어있는지 확인
-        boolean isExistsInQueue = queueService.existsByUserID(criteria.toCommand());
-
-        if (isExistsInQueue) {
-            // 이미 대기열에 등록되어 있으면, 해당 대기열의 토큰을 바로 반환.(멱등성)
-            return QueueResult.Enqueue.fromInfo(queueService.findByUserId(criteria.toCommand()));
-        }
-
-
-        // 대기열 등록, Result객체로 캡슐화 후 return
-        return QueueResult.Enqueue.fromInfo(queueService.enqueue(criteria.toCommand()));
+        return null;
     }
 
 
