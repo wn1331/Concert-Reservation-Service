@@ -96,8 +96,8 @@ public class ConcertService {
         // 예약 상태 검증 및 변경
         reservation.confirmPayment();
 
-        // 유저 조회, 유저 잔액 검증-차감 (비관락 적용)
-        User user = userRepository.findById(command.userId())
+        // 유저 조회, 유저 잔액 검증-차감 (비관락 적용 + 유저의 잔액조회랑 다른 메서드 사용.)
+        User user = userRepository.findByIdForUsePoint(command.userId())
             .orElseThrow(() -> new CustomGlobalException(ErrorCode.USER_NOT_FOUND));
 
         if (user.getPoint().compareTo(reservation.getPrice()) > 0) {
