@@ -17,29 +17,23 @@ public class QueueFacade {
     private final UserService userService;
     // 대기열 토큰 발급
     @Transactional
-    public QueueResult.Enqueue enqueue(QueueCriteria.Enqueue criteria) throws Exception {
+    public QueueResult.Enqueue enqueue(QueueCriteria.Enqueue criteria){
 
-//        // 해당 유저아이디가 유효한지 확인
-//        userService.findUserValidation(criteria.toCommand());
-//
-//        // 이미 대기열에 등록되어있는지 확인
-//        boolean isExistsInQueue = queueService.existsByUserID(criteria.toCommand());
-//
-//        if (isExistsInQueue) {
-//            // 이미 대기열에 등록되어 있으면, 해당 대기열의 토큰을 바로 반환.(멱등성)
-//            return QueueResult.Enqueue.fromInfo(queueService.findByUserId(criteria.toCommand()));
-//        }
-//
-//
-//        // 대기열 등록, Result객체로 캡슐화 후 return
-//        return QueueResult.Enqueue.fromInfo(queueService.enqueue(criteria.toCommand()));
+        // 해당 유저아이디가 유효한지 확인
+        userService.existCheckUser(criteria.userId());
 
-        return null;
+        // 대기열 등록및 폴링 분기처리
+        return QueueResult.Enqueue.fromInfo(queueService.enqueueOrPoll(criteria.toCommand()));
+
     }
 
+    @Transactional
+    public void activateProcess() {
+        queueService.activateProcess();
+    }
 
-    // 대기열 순번 조회
-
-
-
+    @Transactional
+    public void expireProcess() {
+        queueService.expireProcess();
+    }
 }

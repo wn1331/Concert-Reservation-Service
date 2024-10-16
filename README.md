@@ -93,7 +93,7 @@ erDiagram
     Queue {
         long id PK "대기열 PK"
         long user_id "유저 PK"
-        VARCHAR token UK "대기열 토큰(UUID)"
+        VARCHAR queueToken UK "대기열 토큰(UUID)"
         VARCHAR status "대기열 상태"
         datetime created_at "생성일자"
         datetime modified_at "수정일자"

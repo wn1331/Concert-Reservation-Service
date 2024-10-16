@@ -1,5 +1,6 @@
 package hhplus.concertreservationservice.infra.persistence.user;
 
+import hhplus.concertreservationservice.domain.user.entity.UserPointHistory;
 import hhplus.concertreservationservice.domain.user.repository.UserPointHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -10,4 +11,8 @@ public class UserPointHistoryRepositoryImpl implements UserPointHistoryRepositor
     private final UserPointHistoryJpaRepository jpaRepository;
 
 
+    @Override
+    public void save(UserPointHistory userPointHistory) {
+        jpaRepository.save(userPointHistory);
+    }
 }

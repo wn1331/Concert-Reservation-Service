@@ -23,17 +23,21 @@ public class Queue extends BaseTimeEntity {
 
     private Long userId;
 
-    private String token;
+    private String queueToken;
 
     @Enumerated(EnumType.STRING)
     private QueueStatusType status;
 
 
     @Builder
-    public Queue(Long userId, String token, QueueStatusType status) {
+    public Queue(Long userId, String queueToken, QueueStatusType status) {
         this.userId = userId;
-        this.token = token;
+        this.queueToken = queueToken;
         this.status = status;
+    }
+
+    public void pass(){
+        this.status = QueueStatusType.PASS;
     }
 
 }

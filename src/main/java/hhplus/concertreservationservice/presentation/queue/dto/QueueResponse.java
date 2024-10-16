@@ -1,29 +1,22 @@
-package hhplus.concertreservationservice.presentation.api.queue.dto;
+package hhplus.concertreservationservice.presentation.queue.dto;
 
 import hhplus.concertreservationservice.application.queue.dto.QueueResult;
-import hhplus.concertreservationservice.application.queue.dto.QueueResult.Enqueue;
 import lombok.Builder;
 
 public record QueueResponse() {
 
     @Builder
     public record Enqueue(
-        String token
+        String token,
+        Long order
     ){
 
         public static Enqueue fromResult(QueueResult.Enqueue enqueue) {
             return Enqueue.builder()
-                .token(enqueue.token())
+                .token(enqueue.queueToken())
+                .order(enqueue.order())
                 .build();
         }
-    }
-
-    public record Poll(
-        Long userId,
-        String token,
-        Long order
-    ) {
-
     }
 
 

@@ -1,4 +1,4 @@
-package hhplus.concertreservationservice.application;
+package hhplus.concertreservationservice.domain;
 
 import hhplus.concertreservationservice.domain.concert.entity.Concert;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertSchedule;
@@ -8,7 +8,6 @@ import hhplus.concertreservationservice.domain.concert.repository.ConcertReposit
 import hhplus.concertreservationservice.domain.concert.repository.ConcertScheduleRepository;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertSeatRepository;
 import hhplus.concertreservationservice.domain.user.entity.User;
-import hhplus.concertreservationservice.domain.user.repository.UserPointHistoryRepository;
 import hhplus.concertreservationservice.domain.user.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
@@ -36,7 +35,7 @@ public class DataInitializer {
         List<ConcertSchedule> schedules = Arrays.asList(
             new ConcertSchedule(1L, LocalDate.of(2024, 12, 1)),
             new ConcertSchedule(1L, LocalDate.of(2024, 12, 2)),
-            new ConcertSchedule(1L, LocalDate.of(2024, 12, 3)),
+            new ConcertSchedule(1L, LocalDate.of(2023, 12, 3)),
             new ConcertSchedule(2L, LocalDate.of(2024, 12, 10)),
             new ConcertSchedule(2L, LocalDate.of(2024, 12, 11)),
             new ConcertSchedule(2L, LocalDate.of(2024, 12, 12))
