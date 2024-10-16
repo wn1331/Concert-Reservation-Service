@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/concerts")
-public class ConcertController {
+public class ConcertController implements IConcertController{
 
     private final ConcertFacade concertFacade;
 
