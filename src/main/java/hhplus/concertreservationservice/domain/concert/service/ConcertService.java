@@ -17,6 +17,8 @@ import hhplus.concertreservationservice.domain.concert.repository.ConcertPayment
 import hhplus.concertreservationservice.domain.concert.repository.ConcertReservationRepository;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertScheduleRepository;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertSeatRepository;
+import hhplus.concertreservationservice.domain.queue.entity.Queue;
+import hhplus.concertreservationservice.domain.queue.repository.QueueRepository;
 import hhplus.concertreservationservice.domain.user.entity.User;
 import hhplus.concertreservationservice.domain.user.entity.UserPointHistory;
 import hhplus.concertreservationservice.domain.user.entity.UserPointHistoryType;
@@ -43,6 +45,7 @@ public class ConcertService {
     private final ConcertReservationRepository concertReservationRepository;
     private final ConcertPaymentRepository concertPaymentRepository;
     private final UserRepository userRepository;
+    private final QueueRepository queueRepository;
     private final UserPointHistoryRepository userPointHistoryRepository;
 
     @Transactional(readOnly = true)
@@ -64,15 +67,18 @@ public class ConcertService {
 
 
     public ConcertInfo.ReserveSeat reserveSeat(ReserveSeat command) {
+        // 좌석 조회( 낙관락 적용 )
         ConcertSeat concertSeat = concertSeatRepository.findById(command.concertSeatId())
             .orElseThrow(() -> new CustomGlobalException(ErrorCode.CONCERT_SEAT_NOT_FOUND));
 
+        // 좌석 상태 변경
         switch (concertSeat.getStatus()) {
             case EMPTY -> concertSeat.reserveSeat();
             case RESERVED -> throw new CustomGlobalException(ErrorCode.ALREADY_RESERVED_SEAT);
             case SOLD -> throw new CustomGlobalException(ErrorCode.ALREADY_SOLD_SEAT);
         }
 
+        // 예약 생성
         return ConcertInfo.ReserveSeat.builder()
             .reservationId(concertReservationRepository.save(
                     ConcertReservation.builder()
@@ -135,23 +141,33 @@ public class ConcertService {
             .build();
     }
 
+    @Transactional
     public void expireReservationProcess() {
+
+        // 만료된 예약 조회
         List<ConcertReservation> expiredReservations = concertReservationRepository.findExpiredReservations(
             ReservationStatusType.RESERVED,
             LocalDateTime.now().minusMinutes(5));
         log.info("expired reservation & seat size : {}, time : {}", expiredReservations.size(),
             LocalDateTime.now());
 
+        // 만료된 예약 for루프 돌기
         expiredReservations.forEach(reservation -> {
+            Queue queue = queueRepository.findByUserId(reservation.getUserId())
+                .orElseThrow(() -> new CustomGlobalException(ErrorCode.USER_NOT_FOUND));
 
-            // 변경감지!! 예약 상태 변경 (RESERVED -> CANCELED)
+            // 대기열 제거
+            queueRepository.delete(queue);
+
+            //예약 취소 (RESERVED -> CANCELED)
             reservation.cancelReservation();
 
+            //좌석 점유 해제
             ConcertSeat reservedSeat = concertSeatRepository.findByIdAndStatus(
                     reservation.getConcertSeatId(), SeatStatusType.RESERVED)
                 .orElseThrow(() -> new CustomGlobalException(ErrorCode.CONCERT_SEAT_NOT_FOUND));
 
-            // 변경감지!! 좌석 상태 변경 (RESERVED -> EMPTY)
+            // 좌석 상태 변경 (RESERVED -> EMPTY)
             reservedSeat.cancelSeatByReservation();
 
             log.info("expired reservation & seat id : {}, {}, time : {}", reservation.getId(),

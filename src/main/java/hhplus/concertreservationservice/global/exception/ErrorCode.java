@@ -16,9 +16,10 @@ public enum ErrorCode {
     QUEUE_NOT_FOUND("E07", HttpStatus.BAD_REQUEST, "대기열을 찾을 수 없습니다."),
     QUEUE_STILL_WAITING("E08", HttpStatus.CONFLICT, "대기열이 아직 처리 중입니다."),
     ALREADY_PAID_OR_CANCELLED("E09", HttpStatus.CONFLICT, "이미 결제된 상태이거나 예약 취소된 상태입니다."),
-    RESERVATION_NOT_RESERVED("E10", HttpStatus.CONFLICT, "예약되어 있는 상태가 아닙니다."), SEAT_NOT_EMPTY("E11",HttpStatus.CONFLICT
-        ,"좌석이 비어있는 상태가 아닙니다." ),
-    SEAT_NOT_RESERVED("E12",HttpStatus.CONFLICT,"좌석이 예약중인 상태가 아닙니다.");
+    RESERVATION_NOT_RESERVED("E10", HttpStatus.CONFLICT, "예약되어 있는 상태가 아닙니다."),
+    SEAT_NOT_EMPTY("E11",HttpStatus.CONFLICT,"좌석이 비어있는 상태가 아닙니다." ),
+    SEAT_NOT_RESERVED("E12",HttpStatus.CONFLICT,"좌석이 예약중인 상태가 아닙니다."),
+    RESERVATION_TIMEOUT("E13",HttpStatus.GONE,"예약의 시간이 만료되었습니다." );
 
 
     private final String code;

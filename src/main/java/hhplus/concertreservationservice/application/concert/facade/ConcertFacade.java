@@ -6,6 +6,8 @@ import hhplus.concertreservationservice.application.concert.dto.ConcertResult.Av
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult.AvailableSeats;
 import hhplus.concertreservationservice.domain.concert.service.ConcertService;
 import hhplus.concertreservationservice.domain.queue.service.QueueService;
+import hhplus.concertreservationservice.global.exception.CustomGlobalException;
+import hhplus.concertreservationservice.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,13 +46,16 @@ public class ConcertFacade {
     }
 
     public ConcertResult.Pay pay(ConcertCriteria.Pay criteria){
-        // 아래 두 개의 서비스 트랜잭션 분리. (멘토링 반영) + 퍼사드에서 트랜잭션 제거.
 
+        // 대기열 검증 및 PASS된지 5분이 지났다면 제거 (변경감지를 위한 트랜잭션 적용)
+        boolean isException = queueService.verifyQueueForPay(criteria.toVerifyQueueCommand());
 
-        // 대기열 검증 및 PASS된지 5분이 지났다면 제거
-        queueService.verifyQueueForPay(criteria.toVerifyQueueCommand());
+        // 어쩔 수 없는 Exception (위 서비스에서 예외 터져버리면 롤백됨. transactional을 제거하면 더티체킹 사용 불가)
+        if(isException){
+            throw new CustomGlobalException(ErrorCode.RESERVATION_TIMEOUT);
+        }
 
-        // 예약내용 결제
+        // 예약내용 결제 (트랜잭션 적용. 위 서비스와 아래 서비스를 분리 - 멘토링 반영)
         return ConcertResult.Pay.fromInfo(concertService.payReservation(criteria.toCommand()));
     }
 

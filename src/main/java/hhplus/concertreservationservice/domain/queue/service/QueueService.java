@@ -95,7 +95,7 @@ public class QueueService {
     }
 
     @Transactional
-    public void verifyQueueForPay(VerifyQueue command) {
+    public boolean verifyQueueForPay(VerifyQueue command) {
         // 요청받은 토큰의 대기열이 존재하지 않으면
         Queue queue = queueRepository.findByQueueToken(command.queueToken())
             .orElseThrow(() -> new CustomGlobalException(ErrorCode.QUEUE_NOT_FOUND));
@@ -111,7 +111,7 @@ public class QueueService {
             .orElseThrow(() -> new CustomGlobalException(ErrorCode.CONCERT_RESERVATION_NOT_FOUND));
 
         // 예약정보가 5분 지났으면
-        if(LocalDateTime.now().isAfter(reservation.getCreatedAt().plusMinutes(5))){
+        if(LocalDateTime.now().isAfter(reservation.getCreatedAt().plusMinutes(5))) {
             // 대기열 삭제
             queueRepository.delete(queue);
 
@@ -123,7 +123,11 @@ public class QueueService {
             // 예약정보 update
             reservation.cancelReservation();
 
+            // true를 리턴하면 Exception 발생
+            return true;
         }
+        // false를 리턴하면 모든 검증에 통과.
+        return false;
 
     }
 }
