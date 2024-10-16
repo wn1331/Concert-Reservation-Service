@@ -130,5 +130,17 @@ public class QueueService {
         return false;
 
     }
+
+    @Transactional
+    public void expireToken(String queueToken) {
+
+        // 토큰 조회
+        Queue queue = queueRepository.findByQueueToken(queueToken)
+            .orElseThrow(() -> new CustomGlobalException(ErrorCode.QUEUE_NOT_FOUND));
+
+        // 토큰 삭제
+        queueRepository.delete(queue);
+
+    }
 }
 

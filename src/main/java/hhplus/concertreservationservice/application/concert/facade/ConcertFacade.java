@@ -4,6 +4,8 @@ import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult.AvailableSchedules;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult.AvailableSeats;
+import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo;
+import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo.Pay;
 import hhplus.concertreservationservice.domain.concert.service.ConcertService;
 import hhplus.concertreservationservice.domain.queue.service.QueueService;
 import hhplus.concertreservationservice.global.exception.CustomGlobalException;
@@ -55,8 +57,13 @@ public class ConcertFacade {
             throw new CustomGlobalException(ErrorCode.RESERVATION_TIMEOUT);
         }
 
-        // 예약내용 결제 (트랜잭션 적용. 위 서비스와 아래 서비스를 분리 - 멘토링 반영)
-        return ConcertResult.Pay.fromInfo(concertService.payReservation(criteria.toCommand()));
+        // 예약내용 결제 (트랜잭션 적용. 위 서비스와 아래 서비스를 트랜잭션 분리 - 멘토링 반영)
+        ConcertInfo.Pay pay = concertService.payReservation(criteria.toCommand());
+
+        // 요구사항 : 결제가 완료되면 대기열 토큰을 만료시킵니다.
+        queueService.expireToken(criteria.queueToken());
+
+        return ConcertResult.Pay.fromInfo(pay);
     }
 
 
