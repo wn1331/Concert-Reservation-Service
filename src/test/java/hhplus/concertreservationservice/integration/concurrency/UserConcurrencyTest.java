@@ -1,4 +1,4 @@
-package hhplus.concertreservationservice.integration;
+package hhplus.concertreservationservice.integration.concurrency;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -6,17 +6,10 @@ import hhplus.concertreservationservice.application.user.dto.UserCriteria;
 import hhplus.concertreservationservice.application.user.dto.UserCriteria.ChargeBalance;
 import hhplus.concertreservationservice.application.user.dto.UserResult;
 import hhplus.concertreservationservice.application.user.facade.UserFacade;
-import hhplus.concertreservationservice.domain.queue.entity.Queue;
-import hhplus.concertreservationservice.domain.queue.entity.QueueStatusType;
-import hhplus.concertreservationservice.domain.queue.repository.QueueRepository;
-import hhplus.concertreservationservice.domain.user.entity.User;
-import hhplus.concertreservationservice.domain.user.repository.UserRepository;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.LongStream;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -32,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @DisplayName("[통합 테스트] UserFacade 테스트")
 @TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
-class UserFacadeIntegrationTest {
+class UserConcurrencyTest {
 
 
     @Autowired
