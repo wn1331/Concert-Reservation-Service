@@ -40,12 +40,12 @@ erDiagram
 
     concert {
         long id PK "콘서트 PK"
-        VARCHAR name "콘서트 이름"
+        VARCHAR title "콘서트 이름"
     }
     concert_schedule {
         long id PK "콘서트 스케줄 PK"
         long concert_id "콘서트 PK"
-        datetime concert_datetime "날짜"
+        datetime concert_date "날짜"
     }
     concert_seat {
         long id PK "콘서트 좌석 PK"
@@ -66,19 +66,18 @@ erDiagram
     user_point_history {
         long id PK "포인트 사용내역 PK"
         long user_id "사용자 PK"
-        VARCHAR point_history_type "포인트 사용 타입"
-        Decimal point "요청된 포인트"
+        VARCHAR type "포인트 사용 타입"
+        Decimal request_point "요청된 포인트"
         datetime created_at "생성일자"
     }
 
     payment {
         long id PK "결제 PK"
         long reservation_id "예약 PK"
-        VARCHAR seat_num "좌석 번호"
-        VARCHAR concert_name "콘서트 이름"
-        datetime concert_datetime "콘서트 일시"
         decimal price "결제 금액"
         datetime created_at "생성일자"
+        datetime modified_at "수정일자"
+        VARCHAR status "결제 상태(성공, 실패)"
     }
 
     reservation {

@@ -17,10 +17,12 @@ import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Profile("!test")
 public class DataInitializer {
 
     private final ConcertRepository concertRepository;
@@ -51,6 +53,7 @@ public class DataInitializer {
 
                 concertSeatRepository.saveAll(seats);  // 한번에 저장
             });
+
 
         User user1 = new User("주종훈",BigDecimal.valueOf(1000000));
         userRepository.save(user1);
