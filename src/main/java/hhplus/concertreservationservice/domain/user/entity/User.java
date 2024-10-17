@@ -30,4 +30,12 @@ public class User {
         this.name = name;
         this.point = point;
     }
+
+    public void pointCharge(BigDecimal amount){
+        this.point = this.point.add(amount);
+    }
+
+    public void pointUse(BigDecimal price) {
+        this.point = this.point.subtract(price);
+    }
 }

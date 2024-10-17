@@ -1,123 +1,236 @@
 package hhplus.concertreservationservice.controller;
 
-import static org.mockito.BDDMockito.given;
-import static org.springframework.http.ResponseEntity.ok;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import hhplus.concertreservationservice.interfaces.api.concert.controller.ConcertController;
-import hhplus.concertreservationservice.interfaces.api.concert.dto.ConcertPay;
-import hhplus.concertreservationservice.interfaces.api.concert.dto.ConcertReservation;
-import hhplus.concertreservationservice.interfaces.api.concert.dto.ConcertSchedules;
-import hhplus.concertreservationservice.interfaces.api.concert.dto.ConcertSchedules.Response.ConcertScheduleResponse;
-import hhplus.concertreservationservice.interfaces.api.concert.dto.ConcertSeats;
+import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
+import hhplus.concertreservationservice.application.concert.facade.ConcertFacade;
+import hhplus.concertreservationservice.domain.concert.entity.ScheduleStatusType;
+import hhplus.concertreservationservice.domain.concert.entity.SeatStatusType;
+import hhplus.concertreservationservice.presentation.concert.controller.ConcertController;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.MethodOrderer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
+
 @WebMvcTest(ConcertController.class)
-@DisplayName("ConcertController 테스트")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DisplayName("[단위 테스트] ConcertController")
 class ConcertControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private ConcertController concertController;
+    private ConcertFacade concertFacade;
 
     @Test
-    @DisplayName("[성공] 콘서트 날짜 조회 API")
-    void getConcertSchedulesTest() throws Exception {
-        List<ConcertScheduleResponse> mockSchedules = Arrays.asList(
-            new ConcertSchedules.Response.ConcertScheduleResponse(1L, LocalDate.of(2024, 10, 1), "매진됨"),
-            new ConcertSchedules.Response.ConcertScheduleResponse(2L, LocalDate.of(2024, 10, 2), "예약가능")
-        );
-        ConcertSchedules.Response mockResponse = new ConcertSchedules.Response(mockSchedules);
+    @Order(1)
+    @DisplayName("[성공] 콘서트 스케줄 조회 성공")
+    void getConcertSchedules_Success() throws Exception {
+        Long concertId = 1L;
+        String queueToken = "validToken";
 
-        given(concertController.getConcertSchedules(1L, "gmrqordyfltk")).willReturn(ok(mockResponse));
+        // Mocking the facade response
+        when(concertFacade.getAvailableSchedules(any())).thenReturn(ConcertResult.AvailableSchedules.builder()
+            .schedules(List.of(
+                ConcertResult.AvailableSchedules.ScheduleDetail.builder()
+                    .id(1L)
+                    .date(LocalDate.now())
+                    .status(ScheduleStatusType.AVAILABLE)
+                    .build()
+            ))
+            .build());
 
-        mockMvc.perform(get("/concert/1/schedules")
-                .header("token", "gmrqordyfltk"))
+        // JSON String 직접 작성
+        String expectedResponse = """
+        {
+            "schedules": [
+                {
+                    "id": 1,
+                    "date": "%s",
+                    "status": "AVAILABLE"
+                }
+            ]
+        }
+        """.formatted(LocalDate.now());  // date 부분에 동적인 날짜 값 처리
+
+        mockMvc.perform(get("/concerts/{concertId}/schedules", concertId)
+                .header("queueToken", queueToken))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.schedules[0].scheduleId").value(1))
-            .andExpect(jsonPath("$.schedules[0].status").value("매진됨"))
-            .andExpect(jsonPath("$.schedules[1].scheduleId").value(2))
-            .andExpect(jsonPath("$.schedules[1].status").value("예약가능"));
+            .andExpect(content().json(expectedResponse));  // JSON 응답 비교
+    }
+
+
+    @Test
+    @Order(2)
+    @DisplayName("[실패] 콘서트 스케줄 조회 실패 - 토큰 없음")
+    void getConcertSchedules_Fail_NoToken() throws Exception {
+        Long concertId = 1L;
+
+        mockMvc.perform(get("/concerts/{concertId}/schedules", concertId))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
-    @DisplayName("[성공] 콘서트 좌석 조회 API")
-    void getConcertSeatsTest() throws Exception {
-        List<ConcertSeats.Response.ConcertSeatResponse> mockSeats = Arrays.asList(
-            new ConcertSeats.Response.ConcertSeatResponse(1L, 101, "예약가능"),
-            new ConcertSeats.Response.ConcertSeatResponse(2L, 102, "예약가능")
-        );
-        ConcertSeats.Response mockResponse = new ConcertSeats.Response(mockSeats);
+    @Order(3)
+    @DisplayName("[성공] 콘서트 좌석 조회 성공")
+    void getConcertSeats_Success() throws Exception {
+        Long concertScheduleId = 1L;
+        String queueToken = "validToken";
 
-        given(concertController.getConcertSeats(1L, "gmrqordyfltk")).willReturn(ok(mockResponse));
+        when(concertFacade.getAvailableSeats(any())).thenReturn(ConcertResult.AvailableSeats.builder()
+            .seats(List.of(
+                ConcertResult.AvailableSeats.SeatDetail.builder()
+                    .id(1L)
+                    .seatNum("A1")
+                    .status(SeatStatusType.EMPTY)
+                    .build()
+            ))
+            .build());
 
-        mockMvc.perform(get("/concert/schedule/1/seats")
-                .header("token", "gmrqordyfltk"))
+        String expectedResponse = """
+            {
+                "seats": [
+                    {
+                        "id": 1,
+                        "seatNum": "A1",
+                        "status": "EMPTY"
+                    }
+                ]
+            }
+            """;
+
+        mockMvc.perform(get("/concerts/schedules/{concertScheduleId}/seats", concertScheduleId)
+                .header("queueToken", queueToken))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.concertSeats[0].seatId").value(1))
-            .andExpect(jsonPath("$.concertSeats[0].status").value("예약가능"))
-            .andExpect(jsonPath("$.concertSeats[1].seatId").value(2))
-            .andExpect(jsonPath("$.concertSeats[1].status").value("예약가능"));
+            .andExpect(content().json(expectedResponse));
     }
 
     @Test
-    @DisplayName("[성공] 콘서트 좌석 예약 API")
-    void reserveConcertTest() throws Exception {
-        ConcertReservation.Response mockResponse = new ConcertReservation.Response(1L);
+    @Order(4)
+    @DisplayName("[실패] 콘서트 좌석 조회 실패 - 토큰 없음")
+    void getConcertSeats_Fail_NoToken() throws Exception {
+        Long concertScheduleId = 1L;
+
+        mockMvc.perform(get("/concerts/schedules/{concertScheduleId}/seats", concertScheduleId))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Order(5)
+    @DisplayName("[성공] 콘서트 예약 성공")
+    void reserveConcert_Success() throws Exception {
+        String queueToken = "validToken";
+        Long userId = 1L;
+        Long concertSeatId = 1L;
+
+        when(concertFacade.reserveSeat(any())).thenReturn(ConcertResult.ReserveSeat.builder()
+            .reservationId(1L)
+            .build());
 
         String requestBody = """
             {
-                "userId": 1,
-                "concertScheduleId": 2,
-                "concertSeatId": 101
+                "userId": %d,
+                "concertSeatId": %d
             }
-        """;
-        ConcertReservation.Request mockRequest = new ConcertReservation.Request(1L, 2L, 101L);
+            """.formatted(userId, concertSeatId);
 
-        given(concertController.reserveConcert(mockRequest, "gmrqordyfltk")).willReturn(ok(mockResponse));
+        String expectedResponse = """
+            {
+                "reservationId": 1
+            }
+            """;
 
-        mockMvc.perform(post("/concert/reservation")
-                .header("token", "gmrqordyfltk")
-                .contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/concerts/reservation")
+                .header("queueToken", queueToken)
+                .contentType("application/json")
                 .content(requestBody))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.reservationId").value(1));
+            .andExpect(content().json(expectedResponse));
     }
-
     @Test
-    @DisplayName("[성공] 콘서트 좌석 결제 API")
-    void payConcertTest() throws Exception {
-        ConcertPay.Response mockResponse = new ConcertPay.Response(1L, "결제성공");
+    @Order(6)
+    @DisplayName("[실패] 콘서트 예약 실패 - 유효성 검증 실패 (userId null)")
+    void reserveConcert_Fail_InvalidRequest() throws Exception {
+        String queueToken = "validToken";
+        Long concertSeatId = 1L;
 
         String requestBody = """
             {
-                "userId": 1
+                "concertSeatId": %d
             }
-        """;
-        ConcertPay.Request mockRequest = new ConcertPay.Request(1L);
+            """.formatted(concertSeatId);
 
-        given(concertController.payConcert(1L, "gmrqordyfltk", mockRequest)).willReturn(ok(mockResponse));
+        mockMvc.perform(post("/concerts/reservation")
+                .header("queueToken", queueToken)
+                .contentType("application/json")
+                .content(requestBody))
+            .andExpect(status().isBadRequest());
+    }
 
-        mockMvc.perform(post("/concert/reservation/1/pay")
-                .header("token", "gmrqordyfltk")
-                .contentType(MediaType.APPLICATION_JSON)
+
+    @Test
+    @Order(7)
+    @DisplayName("[성공] 콘서트 결제 성공")
+    void payConcert_Success() throws Exception {
+        String queueToken = "validToken";
+        Long reservationId = 1L;
+        Long userId = 1L;
+
+        when(concertFacade.pay(any())).thenReturn(ConcertResult.Pay.builder()
+            .paymentId(1L)
+            .build());
+
+        String requestBody = """
+            {
+                "userId": %d
+            }
+            """.formatted(userId);
+
+        String expectedResponse = """
+            {
+                "paymentId": 1
+            }
+            """;
+
+        mockMvc.perform(post("/concerts/reservations/{reservationId}/pay", reservationId)
+                .header("queueToken", queueToken)
+                .contentType("application/json")
                 .content(requestBody))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.reservationId").value(1L))
-            .andExpect(jsonPath("$.paymentStatus").value("결제성공"));
+            .andExpect(content().json(expectedResponse));
     }
+
+    // 8. 콘서트 결제 실패 - 유효성 검증 실패 (userId null)
+    @Test
+    @Order(8)
+    @DisplayName("[실패] 콘서트 결제 실패 - 유효성 검증 실패 (userId null)")
+    void payConcert_Fail_InvalidRequest() throws Exception {
+        String queueToken = "validToken";
+        Long reservationId = 1L;
+
+        String requestBody = """
+            {}
+            """;
+
+        mockMvc.perform(post("/concerts/reservations/{reservationId}/pay", reservationId)
+                .header("queueToken", queueToken)
+                .contentType("application/json")
+                .content(requestBody))
+            .andExpect(status().isBadRequest());
+    }
+
 }
