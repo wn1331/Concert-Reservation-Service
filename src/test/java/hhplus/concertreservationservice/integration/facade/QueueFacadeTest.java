@@ -1,4 +1,4 @@
-package hhplus.concertreservationservice.integration;
+package hhplus.concertreservationservice.integration.facade;
 
 import hhplus.concertreservationservice.application.queue.dto.QueueCriteria;
 import hhplus.concertreservationservice.application.queue.dto.QueueResult;
