@@ -22,7 +22,7 @@ public interface IQueueController {
                 schema = @Schema(implementation = QueueResponse.Enqueue.class))),
         @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음 (USER_NOT_FOUND)",
             content = @Content(mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponse.class)))
+                schema = @Schema(implementation = ErrorResponse.class))),
     })
     @PostMapping("/enqueue")
     ResponseEntity<QueueResponse.Enqueue> enqueue(
@@ -33,5 +33,4 @@ public interface IQueueController {
                     + "}")))
         @Valid QueueRequest.Enqueue request
     );
-
 }

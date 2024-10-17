@@ -96,7 +96,7 @@ public class QueueService {
 
     @Transactional
     public boolean verifyQueueForPay(VerifyQueue command) {
-        // 요청받은 토큰의 대기열이 존재하지 않으면
+        // 요청받은 토큰의 대기열 확인
         Queue queue = queueRepository.findByQueueToken(command.queueToken())
             .orElseThrow(() -> new CustomGlobalException(ErrorCode.QUEUE_NOT_FOUND));
 
@@ -120,13 +120,13 @@ public class QueueService {
                 .orElseThrow(() -> new CustomGlobalException(ErrorCode.CONCERT_SEAT_NOT_FOUND));
             concertSeat.cancelSeatByReservation();
 
-            // 예약정보 update
+            // 예약정보 update 더티체킹 사용
             reservation.cancelReservation();
 
-            // true를 리턴하면 Exception 발생
+            // true를 리턴하면 퍼사드에서 Exception 발생
             return true;
         }
-        // false를 리턴하면 모든 검증에 통과.
+        // false를 리턴하면 대기열 + 예약 검증에 통과.
         return false;
 
     }
