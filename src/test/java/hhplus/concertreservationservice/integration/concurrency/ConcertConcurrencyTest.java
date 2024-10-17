@@ -5,6 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
 import hhplus.concertreservationservice.application.concert.facade.ConcertFacade;
+import hhplus.concertreservationservice.application.queue.dto.QueueCriteria.Enqueue;
+import hhplus.concertreservationservice.application.queue.dto.QueueResult;
+import hhplus.concertreservationservice.application.queue.facade.QueueFacade;
+import hhplus.concertreservationservice.application.user.dto.UserCriteria;
+import hhplus.concertreservationservice.application.user.facade.UserFacade;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -27,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 class ConcertConcurrencyTest {
 
     @Autowired
-    private ConcertFacade facade;
+    private ConcertFacade concertFacade;
 
     @Test
     @Order(1)
@@ -47,7 +53,7 @@ class ConcertConcurrencyTest {
                         .concertSeatId(concertSeatId)
                         .queueToken(queueToken)
                         .build();
-                    return facade.reserveSeat(reserveSeatCriteria);
+                    return concertFacade.reserveSeat(reserveSeatCriteria);
                 } catch (Exception e) {
                     return null;  // 예외 발생 시 null 반환
                 }
@@ -55,7 +61,8 @@ class ConcertConcurrencyTest {
             .toList();  // 스트림을 리스트로 변환
 
         // 모든 비동기 작업 완료 대기
-        CompletableFuture<Void> allTasks = CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0]));
+        CompletableFuture<Void> allTasks = CompletableFuture.allOf(
+            tasks.toArray(new CompletableFuture[0]));
         allTasks.join();  // 모든 예약 요청이 완료될 때까지 기다림
 
         // 성공적으로 예약된 좌석의 개수 확인
@@ -74,17 +81,46 @@ class ConcertConcurrencyTest {
         assertEquals(1, successCount);
     }
 
-//    @Test
-//    @Order(2)
-//    @DisplayName("[동시성 테스트] 100만원을 가진 사용자가 동시에 15만원짜리 결제요청을 6번 했을 시 10만원이 남는지 테스트")
-//    void pay_concurrency_test() {
-//        Long concertSeatId = 1L;
-//        String queueToken = "3b93aaaf-0ea8-49e4-be70-574a1813167c";  // 동일한 queueToken 사용
-//        Long userId = 2L;
-//        Long reservationId = 1L;
-//
-//
-//
-//    }
+    @Test
+    @Order(2)
+    @DisplayName("[동시성 테스트] 사용자가 동시에 결제요청을 6번 했을 시 1번만 성공하는지 테스트")
+    void pay_concurrency_test() {
+        String queueToken = "3b93aaaf-0ea8-49e4-be70-574a1813167c";  // 동일한 queueToken 사용
+        Long userId = 2L;
+        Long reservationId = 2L;
+
+        List<CompletableFuture<ConcertResult.Pay>> tasks = IntStream.rangeClosed(1, 6)
+            .mapToObj(i -> CompletableFuture.supplyAsync(() -> {
+                try {
+                    ConcertCriteria.Pay payCriteria = ConcertCriteria.Pay.builder()
+                        .userId(userId)
+                        .reservationId(reservationId)
+                        .queueToken(queueToken)
+                        .build();
+                    return concertFacade.pay(payCriteria);
+                }catch (Exception e) {
+                    return null;
+                }
+            }))
+            .toList();  // 스트림을 리스트로 변환
+        // 모든 비동기 작업 완료 대기
+        CompletableFuture<Void> allTasks = CompletableFuture.allOf(
+            tasks.toArray(new CompletableFuture[0]));
+        allTasks.join();  // 모든 결제 요청이 완료될 때까지 기다림
+
+
+        long successCount = tasks.stream()
+            .map(task -> {
+                try {
+                    return task.join();  // 비동기 작업의 결과를 기다림
+                } catch (Exception e) {
+                    return null;  // 예외 발생 시 null 반환
+                }
+            })
+            .filter(Objects::nonNull)  // 성공한 경우만 필터링
+            .count();
+
+        assertEquals(1, successCount);
+    }
 
 }
