@@ -54,12 +54,7 @@ public class DataInitializer {
                 concertSeatRepository.saveAll(seats);  // 한번에 저장
             });
 
-        User user1 = new User("주종훈",BigDecimal.valueOf(1000000));
-        userRepository.save(user1);
 
-
-        User user2 = new User("김영한",BigDecimal.valueOf(1000000));
-        userRepository.save(user2);
 
 
     }
