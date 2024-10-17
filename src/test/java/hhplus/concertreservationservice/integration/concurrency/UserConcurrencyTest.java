@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-@DisplayName("[통합 테스트] UserFacade 테스트")
+@DisplayName("[통합 테스트] User 동시성 테스트")
 @TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
 class UserConcurrencyTest {
 

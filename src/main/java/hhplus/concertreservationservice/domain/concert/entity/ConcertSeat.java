@@ -66,9 +66,6 @@ public class ConcertSeat extends BaseTimeEntity {
         if (this.status == SeatStatusType.RESERVED) {
             this.status = SeatStatusType.SOLD;
         } else {
-            System.out.println(this.id);
-            System.out.println(this.status);
-            System.out.println(this.getCreatedAt());
             throw new CustomGlobalException(ErrorCode.SEAT_NOT_RESERVED);
         }
     }

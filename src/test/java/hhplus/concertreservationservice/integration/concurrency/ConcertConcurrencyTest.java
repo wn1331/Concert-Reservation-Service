@@ -5,12 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
 import hhplus.concertreservationservice.application.concert.facade.ConcertFacade;
-import hhplus.concertreservationservice.application.queue.dto.QueueCriteria.Enqueue;
-import hhplus.concertreservationservice.application.queue.dto.QueueResult;
-import hhplus.concertreservationservice.application.queue.facade.QueueFacade;
-import hhplus.concertreservationservice.application.user.dto.UserCriteria;
-import hhplus.concertreservationservice.application.user.facade.UserFacade;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -28,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Transactional
 @ActiveProfiles("test")
-@DisplayName("[통합 테스트] ConcertFacade 테스트")
+@DisplayName("[통합 테스트] Concert 동시성 테스트")
 @TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
 class ConcertConcurrencyTest {
 
