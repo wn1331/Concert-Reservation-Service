@@ -56,10 +56,10 @@ public record ConcertCriteria() {
         Long userId
     ) {
 
-        public ConcertCommand.Pay toCommand() {
+        public ConcertCommand.Pay toCommand(BigDecimal price) {
             return ConcertCommand.Pay.builder()
                 .reservationId(reservationId)
-                .userId(userId)
+                .price(price)
                 .build();
         }
     }

@@ -34,18 +34,8 @@ public record ConcertCommand() {
     @Builder
     public record Pay(
         Long reservationId,
-        Long userId
+        BigDecimal price
     ) {
 
     }
-
-    @Builder
-    public record PayHistory(
-        Long userId,
-        UserPointHistoryType type,
-        BigDecimal amount
-    ) {
-
-    }
-
 }

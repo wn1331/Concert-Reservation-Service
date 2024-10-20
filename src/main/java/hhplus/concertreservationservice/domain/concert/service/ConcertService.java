@@ -2,36 +2,16 @@ package hhplus.concertreservationservice.domain.concert.service;
 
 import hhplus.concertreservationservice.domain.concert.dto.ConcertCommand;
 import hhplus.concertreservationservice.domain.concert.dto.ConcertCommand.GetAvailableSeats;
-import hhplus.concertreservationservice.domain.concert.dto.ConcertCommand.Pay;
-import hhplus.concertreservationservice.domain.concert.dto.ConcertCommand.ReserveSeat;
 import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo;
 import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo.AvailableSchedules;
 import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo.AvailableSeats;
-import hhplus.concertreservationservice.domain.concert.entity.ConcertPayment;
-import hhplus.concertreservationservice.domain.concert.entity.ConcertReservation;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertSeat;
-import hhplus.concertreservationservice.domain.concert.entity.PaymentStatusType;
-import hhplus.concertreservationservice.domain.concert.entity.ReservationStatusType;
-import hhplus.concertreservationservice.domain.concert.entity.SeatStatusType;
-import hhplus.concertreservationservice.domain.concert.repository.ConcertPaymentRepository;
-import hhplus.concertreservationservice.domain.concert.repository.ConcertReservationRepository;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertScheduleRepository;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertSeatRepository;
-import hhplus.concertreservationservice.domain.queue.entity.Queue;
-import hhplus.concertreservationservice.domain.queue.repository.QueueRepository;
-import hhplus.concertreservationservice.domain.user.entity.User;
-import hhplus.concertreservationservice.domain.user.entity.UserPointHistory;
-import hhplus.concertreservationservice.domain.user.entity.UserPointHistoryType;
-import hhplus.concertreservationservice.domain.user.repository.UserPointHistoryRepository;
-import hhplus.concertreservationservice.domain.user.repository.UserRepository;
 import hhplus.concertreservationservice.global.exception.CustomGlobalException;
 import hhplus.concertreservationservice.global.exception.ErrorCode;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,6 +52,14 @@ public class ConcertService {
 
         return concertSeat.getPrice();
     }
+
+    public void changeSeatStatusPaid(Long concertSeatId) {
+        ConcertSeat concertSeat = concertSeatRepository.findById(concertSeatId)
+            .orElseThrow(() -> new CustomGlobalException(ErrorCode.CONCERT_SEAT_NOT_FOUND));
+
+        concertSeat.confirmSeatByPayment();
+    }
+
 
 
 

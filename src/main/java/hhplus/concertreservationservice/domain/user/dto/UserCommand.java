@@ -29,4 +29,12 @@ public record UserCommand() {
     ){
 
     }
+
+    @Builder
+    public record UserPay(
+        Long userId,
+        BigDecimal price
+    ){
+
+    }
 }

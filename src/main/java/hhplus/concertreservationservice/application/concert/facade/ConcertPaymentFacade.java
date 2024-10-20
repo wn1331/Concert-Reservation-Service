@@ -3,25 +3,44 @@ package hhplus.concertreservationservice.application.concert.facade;
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
 import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo;
+import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo.ReservationStatus;
 import hhplus.concertreservationservice.domain.concert.service.ConcertPaymentService;
+import hhplus.concertreservationservice.domain.concert.service.ConcertReservationService;
 import hhplus.concertreservationservice.domain.concert.service.ConcertService;
-import hhplus.concertreservationservice.domain.queue.service.QueueService;
-import hhplus.concertreservationservice.global.exception.CustomGlobalException;
-import hhplus.concertreservationservice.global.exception.ErrorCode;
+import hhplus.concertreservationservice.domain.user.dto.UserCommand;
+import hhplus.concertreservationservice.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
 public class ConcertPaymentFacade {
 
-    private final QueueService queueService;
+    private final ConcertService concertService;
+    private final ConcertReservationService concertReservationService;
     private final ConcertPaymentService concertPaymentService;
+    private final UserService userService;
 
-    public ConcertResult.Pay pay(ConcertCriteria.Pay criteria){
+    @Transactional
+    public ConcertResult.Pay pay(ConcertCriteria.Pay criteria) {
 
-        // 예약내용 결제 (트랜잭션 적용. 위 서비스와 아래 서비스를 트랜잭션 분리 - 멘토링 반영)
-        ConcertInfo.Pay pay = concertPaymentService.payReservation(criteria.toCommand());
+        // 예약 상태 변경.
+        ReservationStatus reservationStatus = concertReservationService.changeReservationStatusPaid(
+            criteria.reservationId());
+
+        // 유저 잔액 차감 및 히스토리 저장.
+        userService.userPayReservation(UserCommand.UserPay.builder()
+            .userId(criteria.userId())
+            .price(reservationStatus.price())
+            .build()
+        );
+
+        // 좌석 상태 변경.
+        concertService.changeSeatStatusPaid(reservationStatus.concertSeatId());
+
+        // 예약내용 결제
+        ConcertInfo.Pay pay = concertPaymentService.payReservation(criteria.toCommand(reservationStatus.price()));
 
         return ConcertResult.Pay.fromInfo(pay);
     }
