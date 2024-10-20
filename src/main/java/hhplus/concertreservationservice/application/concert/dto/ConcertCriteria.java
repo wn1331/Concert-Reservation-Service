@@ -62,12 +62,6 @@ public record ConcertCriteria() {
                 .userId(userId)
                 .build();
         }
-        public ConcertCommand.VerifyQueue toVerifyQueueCommand(){
-            return ConcertCommand.VerifyQueue.builder()
-               .queueToken(queueToken)
-               .reservationId(reservationId)
-               .build();
-        }
     }
 
 }

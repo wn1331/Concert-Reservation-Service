@@ -1,11 +1,12 @@
 package hhplus.concertreservationservice.domain.queue.service;
 
-import hhplus.concertreservationservice.domain.concert.dto.ConcertCommand.VerifyQueue;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertReservation;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertSeat;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertReservationRepository;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertSeatRepository;
+import hhplus.concertreservationservice.domain.queue.dto.QueueCommand;
 import hhplus.concertreservationservice.domain.queue.dto.QueueCommand.Enqueue;
+import hhplus.concertreservationservice.domain.queue.dto.QueueCommand.VerifyQueueForPay;
 import hhplus.concertreservationservice.domain.queue.dto.QueueInfo;
 import hhplus.concertreservationservice.domain.queue.entity.Queue;
 import hhplus.concertreservationservice.domain.queue.entity.QueueStatusType;
@@ -37,9 +38,9 @@ public class QueueService {
     private final ConcertReservationRepository concertReservationRepository;
     private final ConcertSeatRepository concertSeatRepository;
 
-    public void verifyQueue(String queueToken){
+    public void verifyQueue(QueueCommand.VerifyQueue command){
         // 요청받은 토큰의 대기열이 존재하지 않으면
-        Queue queue = queueRepository.findByQueueToken(queueToken)
+        Queue queue = queueRepository.findByQueueToken(command.queueToken())
             .orElseThrow(() -> new CustomGlobalException(ErrorCode.QUEUE_NOT_FOUND));
 
         // 아직 대기열에 WAITING으로 있다면 Exception
@@ -95,7 +96,7 @@ public class QueueService {
     }
 
     @Transactional
-    public boolean verifyQueueForPay(VerifyQueue command) {
+    public boolean verifyQueueForPay(VerifyQueueForPay command) {
         // 요청받은 토큰의 대기열 확인
         Queue queue = queueRepository.findByQueueToken(command.queueToken())
             .orElseThrow(() -> new CustomGlobalException(ErrorCode.QUEUE_NOT_FOUND));

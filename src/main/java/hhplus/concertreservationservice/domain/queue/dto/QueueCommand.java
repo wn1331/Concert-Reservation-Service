@@ -10,4 +10,19 @@ public record QueueCommand(
     ){
     }
 
+    @Builder
+    public record VerifyQueue(
+        String queueToken
+    ) {
+
+    }
+
+    @Builder
+    public record VerifyQueueForPay(
+        String queueToken,
+        Long reservationId
+    ) {
+
+    }
+
 }

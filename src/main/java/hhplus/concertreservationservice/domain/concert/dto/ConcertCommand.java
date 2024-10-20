@@ -48,11 +48,4 @@ public record ConcertCommand() {
 
     }
 
-    @Builder
-    public record VerifyQueue(
-        String queueToken,
-        Long reservationId
-    ) {
-
-    }
 }

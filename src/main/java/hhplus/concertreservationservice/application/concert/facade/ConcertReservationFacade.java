@@ -16,16 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ConcertReservationFacade {
 
-    private final QueueService queueService;
     private final ConcertReservationService concertReservationService;
     private final ConcertService concertService;
 
 
     @Transactional
     public ConcertResult.ReserveSeat reserveSeat(ConcertCriteria.ReserveSeat criteria) {
-        // 대기열 검증
-        queueService.verifyQueue(criteria.queueToken());
-
         // 좌석 관련 로직 서비스 호출
         BigDecimal seatPrice = concertService.changeSeatStatusAndReturnPrice(criteria.concertSeatId());
 
