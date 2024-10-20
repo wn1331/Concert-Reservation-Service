@@ -24,7 +24,8 @@ public record ConcertCommand() {
     @Builder
     public record ReserveSeat(
         Long userId,
-        Long concertSeatId
+        Long concertSeatId,
+        BigDecimal price
     ){
 
     }

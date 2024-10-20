@@ -1,6 +1,7 @@
 package hhplus.concertreservationservice.application.concert.dto;
 
 import hhplus.concertreservationservice.domain.concert.dto.ConcertCommand;
+import java.math.BigDecimal;
 import lombok.Builder;
 
 public record ConcertCriteria() {
@@ -39,10 +40,11 @@ public record ConcertCriteria() {
         String queueToken
     ) {
 
-        public ConcertCommand.ReserveSeat toCommand() {
+        public ConcertCommand.ReserveSeat toCommand(BigDecimal price) {
             return ConcertCommand.ReserveSeat.builder()
                 .userId(userId)
                 .concertSeatId(concertSeatId)
+                .price(price)
                 .build();
         }
     }

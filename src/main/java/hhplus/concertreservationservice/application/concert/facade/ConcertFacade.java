@@ -14,8 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ConcertFacade {
 
-    private final ConcertService concertService;
     private final QueueService queueService;
+    private final ConcertService concertService;
 
     @Transactional(readOnly = true)
     public ConcertResult.AvailableSchedules getAvailableSchedules(ConcertCriteria.GetAvailableSchedules criteria) {
@@ -24,6 +24,7 @@ public class ConcertFacade {
         // 콘서트 스케줄 조회 (날짜가 지나지 않은 것들만)
         return AvailableSchedules.fromInfo(concertService.getAvailableSchedules(criteria.toCommand()));
     }
+
 
     @Transactional(readOnly = true)
     public ConcertResult.AvailableSeats getAvailableSeats(ConcertCriteria.GetAvailableSeats criteria) {
