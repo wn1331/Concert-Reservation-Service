@@ -6,6 +6,8 @@ import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria.GetAvailableSchedules;
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria.GetAvailableSeats;
 import hhplus.concertreservationservice.application.concert.facade.ConcertFacade;
+import hhplus.concertreservationservice.application.concert.facade.ConcertPaymentFacade;
+import hhplus.concertreservationservice.application.concert.facade.ConcertReservationFacade;
 import hhplus.concertreservationservice.presentation.concert.dto.ConcertRequest;
 import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse;
 import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse.AvailableSchedules;
@@ -30,6 +32,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConcertController implements IConcertController{
 
     private final ConcertFacade concertFacade;
+    private final ConcertReservationFacade concertReservationFacade;
+    private final ConcertPaymentFacade concertPaymentFacade;
 
 
     // 콘서트 스케줄(날짜) 조회 API
@@ -62,7 +66,7 @@ public class ConcertController implements IConcertController{
         @RequestBody @Valid ConcertRequest.ReserveSeat request,
         @RequestHeader(name = "queueToken") String queueToken) {
 
-        return ok(ConcertResponse.ReserveSeat.fromResult(concertFacade.reserveSeat(
+        return ok(ConcertResponse.ReserveSeat.fromResult(concertReservationFacade.reserveSeat(
             request.toCriteria(queueToken))));
 
     }
@@ -74,7 +78,7 @@ public class ConcertController implements IConcertController{
         @RequestHeader(name = "queueToken") String queueToken,
         @RequestBody @Valid ConcertRequest.Pay request
     ){
-        return ok(ConcertResponse.Pay.fromResult(concertFacade.pay(request.toCriteria(reservationId,queueToken))));
+        return ok(ConcertResponse.Pay.fromResult(concertPaymentFacade.pay(request.toCriteria(reservationId,queueToken))));
     }
 
 
