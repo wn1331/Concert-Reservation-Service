@@ -15,7 +15,6 @@ public interface ConcertSeatRepository {
 
     List<ConcertSeat> findByConcertScheduleIdAndStatus(Long concertScheduleId);
 
-    @Lock(LockModeType.OPTIMISTIC)
     Optional<ConcertSeat> findById(Long seatId);
 
     Optional<ConcertSeat> findByIdAndStatus(Long concertSeatId, SeatStatusType status);

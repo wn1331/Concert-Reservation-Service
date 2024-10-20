@@ -11,7 +11,6 @@ public interface UserRepository {
 
     Optional<User> findById(Long userId);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<User> findByIdForUsePoint(Long userId);
 
 
