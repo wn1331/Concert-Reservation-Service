@@ -14,6 +14,7 @@ import hhplus.concertreservationservice.global.exception.CustomGlobalException;
 import hhplus.concertreservationservice.global.exception.ErrorCode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,11 +61,15 @@ public class ConcertReservationService {
 
         // 만료된 예약 for루프 돌기
         expiredReservations.forEach(reservation -> {
-            Queue queue = queueRepository.findByUserId(reservation.getUserId())
-                .orElseThrow(() -> new CustomGlobalException(ErrorCode.USER_NOT_FOUND));
+            // 유저의 대기열 조회
+            Optional<Queue> optionalQueue = queueRepository.findByUserId(reservation.getUserId());
 
-            // 대기열 제거
-            queueRepository.delete(queue);
+            if (optionalQueue.isPresent()) {
+                // 대기열 제거
+                queueRepository.delete(optionalQueue.get());
+            } else {
+                log.warn("User not found for reservation id: {}. Skipping queue deletion.", reservation.getId());
+            }
 
             //예약 취소 (RESERVED -> CANCELED)
             reservation.cancelReservation();
