@@ -1,6 +1,5 @@
 package hhplus.concertreservationservice.application.queue.dto;
 
-import hhplus.concertreservationservice.domain.concert.dto.ConcertCommand;
 import hhplus.concertreservationservice.domain.queue.dto.QueueCommand;
 import lombok.Builder;
 

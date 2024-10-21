@@ -15,7 +15,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import hhplus.concertreservationservice.domain.concert.dto.ConcertCommand.VerifyQueue;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertReservation;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertSeat;
 import hhplus.concertreservationservice.domain.concert.entity.ReservationStatusType;

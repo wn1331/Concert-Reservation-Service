@@ -1,5 +1,6 @@
 package hhplus.concertreservationservice.global.exception;
 
+import java.util.Objects;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,7 +12,7 @@ class ApiControllerAdvice{
     public ResponseEntity<ErrorResponse> methodArgumentNotValidException(MethodArgumentNotValidException e) {
         return ResponseEntity
             .badRequest()
-            .body(new ErrorResponse("E00", e.getMessage()));
+            .body(new ErrorResponse("E00", Objects.requireNonNull(e.getFieldError()).getDefaultMessage()));
     }
 
     @ExceptionHandler(value = CustomGlobalException.class)
