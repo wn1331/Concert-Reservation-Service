@@ -61,7 +61,7 @@ public class QueueValidationForPayInterceptor implements HandlerInterceptor{
         ModelAndView modelAndView){
         log.info("QueueValidationInterceptor post 실행");
 
-        // preHandle에서 token 검증했으니 추가 검증 필요없다 판단.
+        // preHandle에서 token 검증했으니 추가 검증(null체크 등) 필요없다 판단.
         queueFacade.expireToken(request.getHeader(QUEUE_TOKEN_HEADER));
 
     }

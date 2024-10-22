@@ -3,8 +3,6 @@ package hhplus.concertreservationservice.application.user.facade;
 import hhplus.concertreservationservice.application.user.dto.UserCriteria.ChargeBalance;
 import hhplus.concertreservationservice.application.user.dto.UserCriteria.CheckBalance;
 import hhplus.concertreservationservice.application.user.dto.UserResult;
-import hhplus.concertreservationservice.domain.queue.service.QueueService;
-import hhplus.concertreservationservice.domain.queue.service.QueueVerifyType;
 import hhplus.concertreservationservice.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
