@@ -68,7 +68,7 @@ class ConcertControllerTest {
         """.formatted(LocalDate.now());  // date 부분에 동적인 날짜 값 처리
 
         mockMvc.perform(get("/concerts/{concertId}/schedules", concertId)
-                .header("queueToken", queueToken))
+                .header("X-Access-Token", queueToken))
             .andExpect(status().isOk())
             .andExpect(content().json(expectedResponse));  // JSON 응답 비교
     }
@@ -114,7 +114,7 @@ class ConcertControllerTest {
             """;
 
         mockMvc.perform(get("/concerts/schedules/{concertScheduleId}/seats", concertScheduleId)
-                .header("queueToken", queueToken))
+                .header("X-Access-Token", queueToken))
             .andExpect(status().isOk())
             .andExpect(content().json(expectedResponse));
     }
@@ -155,7 +155,7 @@ class ConcertControllerTest {
             """;
 
         mockMvc.perform(post("/concerts/reservation")
-                .header("queueToken", queueToken)
+                .header("X-Access-Token", queueToken)
                 .contentType("application/json")
                 .content(requestBody))
             .andExpect(status().isOk())
@@ -175,7 +175,7 @@ class ConcertControllerTest {
             """.formatted(concertSeatId);
 
         mockMvc.perform(post("/concerts/reservation")
-                .header("queueToken", queueToken)
+                .header("X-Access-Token", queueToken)
                 .contentType("application/json")
                 .content(requestBody))
             .andExpect(status().isBadRequest());
@@ -207,7 +207,7 @@ class ConcertControllerTest {
             """;
 
         mockMvc.perform(post("/concerts/reservations/{reservationId}/pay", reservationId)
-                .header("queueToken", queueToken)
+                .header("X-Access-Token", queueToken)
                 .contentType("application/json")
                 .content(requestBody))
             .andExpect(status().isOk())
@@ -227,7 +227,7 @@ class ConcertControllerTest {
             """;
 
         mockMvc.perform(post("/concerts/reservations/{reservationId}/pay", reservationId)
-                .header("queueToken", queueToken)
+                .header("X-Access-Token", queueToken)
                 .contentType("application/json")
                 .content(requestBody))
             .andExpect(status().isBadRequest());

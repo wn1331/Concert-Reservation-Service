@@ -16,7 +16,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @RequiredArgsConstructor
 public class QueueValidationInterceptor implements HandlerInterceptor {
 
-    private static final String QUEUE_TOKEN_HEADER = "queueToken";
+    private static final String QUEUE_TOKEN_HEADER = "X-Access-Token";
 
     private final QueueFacade queueFacade;
 

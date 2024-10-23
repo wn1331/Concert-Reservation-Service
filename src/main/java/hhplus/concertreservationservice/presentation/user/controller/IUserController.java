@@ -34,7 +34,7 @@ public interface IUserController {
     @GetMapping("/{userId}/balance")
     ResponseEntity<UserResponse.CheckBalance> checkBalance(
         @PathVariable(name = "userId") Long userId,
-        @RequestHeader(name = "queueToken") String token
+        @RequestHeader(name = "X-Access-Token") String token
     );
     @Operation(summary = "유저 잔액 충전", description = "특정 유저의 잔액을 충전합니다.")
     @ApiResponses(value = {
@@ -50,7 +50,7 @@ public interface IUserController {
     })
     @PutMapping("/{userId}/balance")
     ResponseEntity<UserResponse.ChargeBalance> chargeBalance(
-        @RequestHeader(name = "queueToken") String token,
+        @RequestHeader(name = "X-Access-Token") String token,
         @PathVariable(name = "userId") Long userId,
 
         @RequestBody(description = "잔액 충전 요청 정보", required = true,

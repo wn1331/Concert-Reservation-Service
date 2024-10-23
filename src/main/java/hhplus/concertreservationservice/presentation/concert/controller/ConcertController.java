@@ -40,7 +40,7 @@ public class ConcertController implements IConcertController{
     @GetMapping("/{concertId}/schedules")
     public ResponseEntity<ConcertResponse.AvailableSchedules> getConcertSchedules(
         @PathVariable(name = "concertId") Long concertId,
-        @RequestHeader(name = "queueToken") String queueToken
+        @RequestHeader(name = "X-Access-Token") String queueToken
 
     ) {
 
@@ -52,7 +52,7 @@ public class ConcertController implements IConcertController{
     @GetMapping("/schedules/{concertScheduleId}/seats")
     public ResponseEntity<AvailableSeats> getConcertSeats(
         @PathVariable(name = "concertScheduleId") Long concertScheduleId,
-        @RequestHeader(name = "queueToken") String queueToken
+        @RequestHeader(name = "X-Access-Token") String queueToken
 
     ) {
 
@@ -64,7 +64,7 @@ public class ConcertController implements IConcertController{
     @PostMapping("/reservation")
     public ResponseEntity<ReserveSeat> reserveConcert(
         @RequestBody @Valid ConcertRequest.ReserveSeat request,
-        @RequestHeader(name = "queueToken") String queueToken) {
+        @RequestHeader(name = "X-Access-Token") String queueToken) {
 
         return ok(ConcertResponse.ReserveSeat.fromResult(concertReservationFacade.reserveSeat(
             request.toCriteria(queueToken))));
@@ -75,7 +75,7 @@ public class ConcertController implements IConcertController{
     @PostMapping("/reservations/{reservationId}/pay")
     public ResponseEntity<ConcertResponse.Pay> payConcert(
         @PathVariable(name = "reservationId") Long reservationId,
-        @RequestHeader(name = "queueToken") String queueToken,
+        @RequestHeader(name = "X-Access-Token") String queueToken,
         @RequestBody @Valid ConcertRequest.Pay request
     ){
         return ok(ConcertResponse.Pay.fromResult(concertPaymentFacade.pay(request.toCriteria(reservationId,queueToken))));

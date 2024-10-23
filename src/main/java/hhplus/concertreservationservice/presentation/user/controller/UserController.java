@@ -31,7 +31,7 @@ public class UserController implements IUserController{
     @GetMapping("/{userId}/balance")
     public ResponseEntity<CheckBalance> checkBalance(
         @PathVariable(name = "userId") Long userId,
-        @RequestHeader(name = "queueToken") String token
+        @RequestHeader(name = "X-Access-Token") String token
     ) { // 헤더에서 token을 받음
         return ok(UserResponse.CheckBalance.fromResult(userFacade.checkBalance(
             UserCriteria.CheckBalance.builder()
@@ -44,7 +44,7 @@ public class UserController implements IUserController{
     // 유저 잔액 충전 API
     @PutMapping("/{userId}/balance")
     public ResponseEntity<UserResponse.ChargeBalance> chargeBalance(
-        @RequestHeader(name = "queueToken") String token,
+        @RequestHeader(name = "X-Access-Token") String token,
         @PathVariable(name = "userId") Long userId,
         @RequestBody @Valid UserRequest.ChargeBalance request
     ){
