@@ -26,7 +26,7 @@ public class QueueValidationForPayInterceptor implements HandlerInterceptor{
     @Override
     @SuppressWarnings("unchecked")
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler){
-        log.info("QueueValidationForPayInterceptor pre 실행");
+        log.info("QueueValidationForPayInterceptor preHandle processing...");
 
         String queueToken = request.getHeader(QUEUE_TOKEN_HEADER);
 
@@ -59,7 +59,7 @@ public class QueueValidationForPayInterceptor implements HandlerInterceptor{
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
         ModelAndView modelAndView){
-        log.info("QueueValidationInterceptor post 실행");
+        log.info("QueueValidationInterceptor postHandle processing...");
 
         // preHandle에서 token 검증했으니 추가 검증(null체크 등) 필요없다 판단.
         queueFacade.expireToken(request.getHeader(QUEUE_TOKEN_HEADER));

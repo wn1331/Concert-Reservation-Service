@@ -72,7 +72,7 @@ public class ConcertReservationService {
         List<ConcertReservation> expiredReservations = concertReservationRepository.findExpiredReservations(
             ReservationStatusType.RESERVED,
             LocalDateTime.now().minusMinutes(5));
-        log.info("expired reservation & seat size : {}, time : {}", expiredReservations.size(),
+        log.info("Expired reservation & seat size : {}, time : {}", expiredReservations.size(),
             LocalDateTime.now());
 
         // 만료된 예약 for루프 돌기
@@ -98,10 +98,13 @@ public class ConcertReservationService {
             // 좌석 상태 변경 (RESERVED -> EMPTY)
             reservedSeat.cancelSeatByReservation();
 
-            log.info("expired reservation & seat id : {}, {}, time : {}", reservation.getId(),
+            log.info("Expired reservation & seat id : {}, {}, time : {}", reservation.getId(),
                 reservedSeat.getId(), LocalDateTime.now());
 
         });
+
+        // 스케줄링 완료 로깅
+        log.info("Complete scheduled expire reservations. time : {}", LocalDateTime.now());
     }
 
 }

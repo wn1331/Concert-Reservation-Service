@@ -24,7 +24,7 @@ public class QueueValidationInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler){
         String queueToken = request.getHeader(QUEUE_TOKEN_HEADER);
 
-        log.info("QueueValidationInterceptor pre 실행");
+        log.info("QueueValidationInterceptor preHandle processing...");
 
         // api로 도달 전에 검증해야 한다.
         if (queueToken == null) {

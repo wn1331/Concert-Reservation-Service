@@ -79,6 +79,9 @@ public class QueueService {
 
         // 상태를 WAITING에서 PASS로 변경
         waitingQueues.forEach(Queue::pass);
+
+        // 스케줄링 완료 로깅
+        log.info("Complete scheduled activate queues. time : {}", LocalDateTime.now());
     }
 
     public void expireProcess() {
@@ -90,6 +93,9 @@ public class QueueService {
 
         // jpa Batch Delete 사용하기!
         queueRepository.deleteAllInBatch(expiredQueues);
+
+        // 스케줄링 완료 로깅
+        log.info("Complete scheduled expire queues. time : {}", LocalDateTime.now());
     }
 
     @Transactional
