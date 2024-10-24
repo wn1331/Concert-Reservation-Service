@@ -31,6 +31,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(queueValidationInterceptor)
             .addPathPatterns("/**")
             .excludePathPatterns("/concerts/reservations/*/pay")
+            .excludePathPatterns("/swagger-ui/**")
+            .excludePathPatterns("/v3/api-docs/**")
             .excludePathPatterns("/queues/**");
         registry.addInterceptor(queueValidationForPayInterceptor)
             .addPathPatterns("/concerts/reservations/*/pay");
