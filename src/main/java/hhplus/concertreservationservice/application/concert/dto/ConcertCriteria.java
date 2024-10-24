@@ -8,8 +8,7 @@ public record ConcertCriteria() {
 
     @Builder
     public record GetAvailableSchedules(
-        Long concertId,
-        String queueToken
+        Long concertId
     ) {
 
         public ConcertCommand.GetAvailableSchedules toCommand() {
@@ -22,8 +21,7 @@ public record ConcertCriteria() {
 
     @Builder
     public record GetAvailableSeats(
-        Long concertScheduleId,
-        String queueToken
+        Long concertScheduleId
     ) {
 
         public ConcertCommand.GetAvailableSeats toCommand() {
@@ -36,8 +34,7 @@ public record ConcertCriteria() {
     @Builder
     public record ReserveSeat(
         Long userId,
-        Long concertSeatId,
-        String queueToken
+        Long concertSeatId
     ) {
 
         public ConcertCommand.ReserveSeat toCommand(BigDecimal price) {
@@ -52,7 +49,6 @@ public record ConcertCriteria() {
     @Builder
     public record Pay(
         Long reservationId,
-        String queueToken,
         Long userId
     ) {
 

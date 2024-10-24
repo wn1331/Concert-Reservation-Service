@@ -30,13 +30,11 @@ public class UserController implements IUserController{
     // 유저 잔액 조회 API
     @GetMapping("/{userId}/balance")
     public ResponseEntity<CheckBalance> checkBalance(
-        @PathVariable(name = "userId") Long userId,
-        @RequestHeader(name = "X-Access-Token") String token
-    ) { // 헤더에서 token을 받음
+        @PathVariable(name = "userId") Long userId
+    ) {
         return ok(UserResponse.CheckBalance.fromResult(userFacade.checkBalance(
             UserCriteria.CheckBalance.builder()
                 .userId(userId)
-                .queueToken(token)
                 .build()
         )));
     }
@@ -44,7 +42,6 @@ public class UserController implements IUserController{
     // 유저 잔액 충전 API
     @PutMapping("/{userId}/balance")
     public ResponseEntity<UserResponse.ChargeBalance> chargeBalance(
-        @RequestHeader(name = "X-Access-Token") String token,
         @PathVariable(name = "userId") Long userId,
         @RequestBody @Valid UserRequest.ChargeBalance request
     ){
@@ -52,7 +49,6 @@ public class UserController implements IUserController{
             UserCriteria.ChargeBalance.builder()
                 .userId(userId)
                 .amount(request.amount())
-                .queueToken(token)
                 .build()
         )));
     }

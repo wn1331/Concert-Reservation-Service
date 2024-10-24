@@ -99,7 +99,6 @@ class ConcertFacadeTest {
         // Given
         ConcertCriteria.GetAvailableSchedules criteria = ConcertCriteria.GetAvailableSchedules.builder()
             .concertId(concert.getId())
-            .queueToken(queueToken)
             .build();
 
         // When
@@ -117,7 +116,6 @@ class ConcertFacadeTest {
         // Given
         ConcertCriteria.GetAvailableSeats criteria = ConcertCriteria.GetAvailableSeats.builder()
             .concertScheduleId(concertSchedule.getId())
-            .queueToken(queueToken)
             .build();
 
         // When

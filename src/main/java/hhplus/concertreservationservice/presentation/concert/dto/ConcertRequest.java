@@ -15,10 +15,9 @@ public record ConcertRequest() {
         Long concertSeatId
     ) {
 
-        public ConcertCriteria.ReserveSeat toCriteria(String queueToken) {
+        public ConcertCriteria.ReserveSeat toCriteria() {
             return ConcertCriteria.ReserveSeat.builder()
                 .userId(userId)
-                .queueToken(queueToken)
                 .concertSeatId(concertSeatId)
                 .build();
         }
@@ -30,10 +29,9 @@ public record ConcertRequest() {
         Long userId
     ) {
 
-        public ConcertCriteria.Pay toCriteria(Long reservationId, String queueToken) {
+        public ConcertCriteria.Pay toCriteria(Long reservationId) {
             return ConcertCriteria.Pay.builder()
                 .reservationId(reservationId)
-                .queueToken(queueToken)
                 .userId(userId)
                 .build();
         }

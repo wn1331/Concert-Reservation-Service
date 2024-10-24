@@ -118,7 +118,6 @@ class ConcertPaymentFacadeTest {
         ConcertCriteria.Pay criteria = ConcertCriteria.Pay.builder()
             .userId(user.getId())
             .reservationId(1L)
-            .queueToken(queueToken)
             .build();
         // When
         ConcertResult.Pay result = concertPaymentFacade.pay(criteria);
@@ -134,7 +133,6 @@ class ConcertPaymentFacadeTest {
         ConcertCriteria.Pay criteria = ConcertCriteria.Pay.builder()
             .userId(user.getId())
             .reservationId(999L)  // 존재하지 않는 예약 ID
-            .queueToken("queue-token")
             .build();
 
         // When / Then
@@ -156,7 +154,6 @@ class ConcertPaymentFacadeTest {
         ConcertCriteria.Pay criteria = ConcertCriteria.Pay.builder()
             .userId(user.getId())
             .reservationId(concertReservation.getId())
-            .queueToken("queue-token")
             .build();
 
         // When / Then
@@ -176,7 +173,6 @@ class ConcertPaymentFacadeTest {
         ConcertCriteria.Pay criteria = ConcertCriteria.Pay.builder()
             .userId(123L) // 없는 유저.
             .reservationId(concertReservation.getId())
-            .queueToken("queue-token")
             .build();
 
         // When / Then
@@ -202,7 +198,6 @@ class ConcertPaymentFacadeTest {
         ConcertCriteria.Pay criteria = ConcertCriteria.Pay.builder()
             .userId(user.getId())
             .reservationId(concertReservation.getId())
-            .queueToken("queue-token")
             .build();
 
         // When / Then
@@ -228,7 +223,6 @@ class ConcertPaymentFacadeTest {
         ConcertCriteria.Pay criteria = ConcertCriteria.Pay.builder()
             .userId(user.getId())
             .reservationId(concertReservation.getId())
-            .queueToken("queue-token")
             .build();
 
         // When / Then
@@ -249,7 +243,6 @@ class ConcertPaymentFacadeTest {
         ConcertCriteria.Pay criteria = ConcertCriteria.Pay.builder()
             .userId(user.getId())
             .reservationId(concertReservation.getId())
-            .queueToken("queue-token")
             .build();
 
         // When / Then

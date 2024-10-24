@@ -39,7 +39,6 @@ class ConcertConcurrencyTest {
     void reserveSeat_concurrency_test() {
 
         Long concertSeatId = 1L;
-        String queueToken = "3b93aaaf-0ea8-49e4-be70-574a1813167b";
         Long userId = 1L;
 
         // 사용자가 동시에 하나의 좌석을 100번 예약 시도 (IntStream 사용)
@@ -49,7 +48,6 @@ class ConcertConcurrencyTest {
                     ConcertCriteria.ReserveSeat reserveSeatCriteria = ConcertCriteria.ReserveSeat.builder()
                         .userId(userId)
                         .concertSeatId(concertSeatId)
-                        .queueToken(queueToken)
                         .build();
                     return concertReservationFacade.reserveSeat(reserveSeatCriteria);
                 } catch (Exception e) {
@@ -83,7 +81,6 @@ class ConcertConcurrencyTest {
     @Order(2)
     @DisplayName("[동시성 테스트] 사용자가 동시에 결제요청을 6번 했을 시 1번만 성공하는지 테스트")
     void pay_concurrency_test() {
-        String queueToken = "3b93aaaf-0ea8-49e4-be70-574a1813167c";  // 동일한 queueToken 사용
         Long userId = 2L;
         Long reservationId = 2L;
 
@@ -93,7 +90,6 @@ class ConcertConcurrencyTest {
                     ConcertCriteria.Pay payCriteria = ConcertCriteria.Pay.builder()
                         .userId(userId)
                         .reservationId(reservationId)
-                        .queueToken(queueToken)
                         .build();
                     return concertPaymentFacade.pay(payCriteria);
                 }catch (Exception e) {

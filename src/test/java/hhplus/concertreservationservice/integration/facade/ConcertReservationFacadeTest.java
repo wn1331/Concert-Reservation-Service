@@ -74,7 +74,7 @@ class ConcertReservationFacadeTest {
     private User user;
     private Concert concert;
     private ConcertSchedule concertSchedule;
-    private String queueToken = "3b93aaaf-0ea8-49e4-be70-574a1813167s";
+    private String queueToken = "exampleToken";
 
 
     @BeforeEach
@@ -122,7 +122,6 @@ class ConcertReservationFacadeTest {
         ConcertCriteria.ReserveSeat criteria = ConcertCriteria.ReserveSeat.builder()
             .userId(user.getId())
             .concertSeatId(1L)  // A1 좌석 ID
-            .queueToken(queueToken)
             .build();
 
         // When
@@ -140,7 +139,6 @@ class ConcertReservationFacadeTest {
         ConcertCriteria.ReserveSeat criteria = ConcertCriteria.ReserveSeat.builder()
             .userId(1L)
             .concertSeatId(999L)  // 존재하지 않는 좌석 ID
-            .queueToken("valid-token")
             .build();
 
         // When & Then
@@ -160,7 +158,6 @@ class ConcertReservationFacadeTest {
         ConcertCriteria.ReserveSeat criteria = ConcertCriteria.ReserveSeat.builder()
             .userId(1L)
             .concertSeatId(302L)  // (1~300번 좌석은 local 어플리케이션 실행할 때 생성합니다. 301(empty)~302(reserved)번 좌석은 test 어플리케이션 실행 시 생성합니다)
-            .queueToken("valid-token")
             .build();
 
         // When & Then
@@ -180,7 +177,6 @@ class ConcertReservationFacadeTest {
         ConcertCriteria.ReserveSeat criteria = ConcertCriteria.ReserveSeat.builder()
             .userId(1L)
             .concertSeatId(303L)  // A3 좌석 (SOLD 상태)
-            .queueToken("valid-token")
             .build();
 
         // When & Then
