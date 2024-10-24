@@ -10,8 +10,7 @@ public record UserCriteria(
 ) {
     @Builder
     public record CheckBalance(
-        Long userId,
-        String queueToken
+        Long userId
 
     ) {
         public UserCommand.CheckBalance toCommand(){
@@ -25,8 +24,7 @@ public record UserCriteria(
     @Builder
     public record ChargeBalance(
         Long userId,
-        BigDecimal amount,
-        String queueToken
+        BigDecimal amount
     ){
 
         public UserCommand.ChargeBalance toCommand(){

@@ -39,35 +39,31 @@ public class ConcertController implements IConcertController{
     // 콘서트 스케줄(날짜) 조회 API
     @GetMapping("/{concertId}/schedules")
     public ResponseEntity<ConcertResponse.AvailableSchedules> getConcertSchedules(
-        @PathVariable(name = "concertId") Long concertId,
-        @RequestHeader(name = "X-Access-Token") String queueToken
-
+        @PathVariable(name = "concertId") Long concertId
     ) {
 
         return ok(AvailableSchedules.fromResult(
-            concertFacade.getAvailableSchedules(new ConcertCriteria.GetAvailableSchedules(concertId, queueToken))));
+            concertFacade.getAvailableSchedules(new ConcertCriteria.GetAvailableSchedules(concertId))));
     }
 
     // 콘서트 좌석 조회 API
     @GetMapping("/schedules/{concertScheduleId}/seats")
     public ResponseEntity<AvailableSeats> getConcertSeats(
-        @PathVariable(name = "concertScheduleId") Long concertScheduleId,
-        @RequestHeader(name = "X-Access-Token") String queueToken
-
+        @PathVariable(name = "concertScheduleId") Long concertScheduleId
     ) {
 
         return ok(ConcertResponse.AvailableSeats.fromResult(
-            concertFacade.getAvailableSeats(new GetAvailableSeats(concertScheduleId, queueToken))));
+            concertFacade.getAvailableSeats(new GetAvailableSeats(concertScheduleId))));
     }
 
     // 콘서트 예약 API
     @PostMapping("/reservation")
     public ResponseEntity<ReserveSeat> reserveConcert(
-        @RequestBody @Valid ConcertRequest.ReserveSeat request,
-        @RequestHeader(name = "X-Access-Token") String queueToken) {
+        @RequestBody @Valid ConcertRequest.ReserveSeat request
+    ) {
 
         return ok(ConcertResponse.ReserveSeat.fromResult(concertReservationFacade.reserveSeat(
-            request.toCriteria(queueToken))));
+            request.toCriteria())));
 
     }
 
@@ -75,10 +71,9 @@ public class ConcertController implements IConcertController{
     @PostMapping("/reservations/{reservationId}/pay")
     public ResponseEntity<ConcertResponse.Pay> payConcert(
         @PathVariable(name = "reservationId") Long reservationId,
-        @RequestHeader(name = "X-Access-Token") String queueToken,
         @RequestBody @Valid ConcertRequest.Pay request
     ){
-        return ok(ConcertResponse.Pay.fromResult(concertPaymentFacade.pay(request.toCriteria(reservationId,queueToken))));
+        return ok(ConcertResponse.Pay.fromResult(concertPaymentFacade.pay(request.toCriteria(reservationId))));
     }
 
 

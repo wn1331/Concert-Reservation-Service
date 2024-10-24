@@ -35,11 +35,7 @@ class UserFacadeTest {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private QueueRepository queueRepository;
-
     private User user;
-    private String queueToken = "3b93aaaf-0ea8-49e4-be70-574a1813167s";
 
     @BeforeEach
     void setup() {
@@ -47,9 +43,6 @@ class UserFacadeTest {
         user = new User("테스트 유저", BigDecimal.valueOf(100000));  // 잔액 100,000원
         userRepository.save(user);
 
-        // 대기열 생성
-        Queue queue = new Queue(user.getId(), queueToken, QueueStatusType.PASS);
-        queueRepository.save(queue);
     }
 
     @Test
@@ -59,7 +52,6 @@ class UserFacadeTest {
         // Given
         UserCriteria.CheckBalance criteria = UserCriteria.CheckBalance.builder()
             .userId(user.getId())
-            .queueToken(queueToken)
             .build();
 
         // When
@@ -77,7 +69,6 @@ class UserFacadeTest {
         // Given
         UserCriteria.ChargeBalance criteria = UserCriteria.ChargeBalance.builder()
             .userId(user.getId())
-            .queueToken(queueToken)
             .amount(BigDecimal.valueOf(50000))  // 50,000원 충전
             .build();
 

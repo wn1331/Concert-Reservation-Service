@@ -3,8 +3,6 @@ package hhplus.concertreservationservice.integration.facade;
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
 import hhplus.concertreservationservice.application.concert.facade.ConcertFacade;
-import hhplus.concertreservationservice.domain.concert.entity.ConcertReservation;
-import hhplus.concertreservationservice.domain.concert.entity.ReservationStatusType;
 import hhplus.concertreservationservice.domain.concert.entity.SeatStatusType;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertReservationRepository;
 import hhplus.concertreservationservice.domain.queue.entity.Queue;
@@ -92,10 +90,6 @@ class ConcertFacadeTest {
         );
         concertSeatRepository.saveAll(seats);
 
-        ConcertReservation concertReservation = new ConcertReservation(user.getId(),
-            302L, BigDecimal.valueOf(150000),
-            ReservationStatusType.RESERVED);
-        concertReservationRepository.save(concertReservation);
     }
 
     @Test
@@ -105,7 +99,6 @@ class ConcertFacadeTest {
         // Given
         ConcertCriteria.GetAvailableSchedules criteria = ConcertCriteria.GetAvailableSchedules.builder()
             .concertId(concert.getId())
-            .queueToken(queueToken)
             .build();
 
         // When
@@ -123,7 +116,6 @@ class ConcertFacadeTest {
         // Given
         ConcertCriteria.GetAvailableSeats criteria = ConcertCriteria.GetAvailableSeats.builder()
             .concertScheduleId(concertSchedule.getId())
-            .queueToken(queueToken)
             .build();
 
         // When

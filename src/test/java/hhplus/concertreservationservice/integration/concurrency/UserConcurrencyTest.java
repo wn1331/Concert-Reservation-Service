@@ -38,7 +38,7 @@ class UserConcurrencyTest {
 
 
         ChargeBalance dto = ChargeBalance.builder().userId(1L).amount(BigDecimal.valueOf(10000))
-            .queueToken("3b93aaaf-0ea8-49e4-be70-574a1813167b").build();
+            .build();
 
         List<CompletableFuture<UserResult.ChargeBalance>> tasks = new ArrayList<>();
 
@@ -55,7 +55,6 @@ class UserConcurrencyTest {
         BigDecimal expectedTotalAmount = new BigDecimal(100000);  // 총 10만원 (기존에 0원 있던 User 1번)
         BigDecimal actualTotalAmount = facade.checkBalance(UserCriteria.CheckBalance.builder()
                 .userId(1L)
-                .queueToken("3b93aaaf-0ea8-49e4-be70-574a1813167b")
             .build()).balance();  // 최종 잔액 확인
 
         assertEquals(0, expectedTotalAmount.compareTo(actualTotalAmount));  // 최종 잔액 검증

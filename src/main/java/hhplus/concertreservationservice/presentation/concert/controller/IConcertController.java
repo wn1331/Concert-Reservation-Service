@@ -28,8 +28,7 @@ public interface IConcertController {
     })
     @GetMapping("/concerts/{concertId}/schedules")
     ResponseEntity<ConcertResponse.AvailableSchedules> getConcertSchedules(
-        @PathVariable(name = "concertId") Long concertId,
-        @RequestHeader(name = "X-Access-Token") String queueToken
+        @PathVariable(name = "concertId") Long concertId
     );
 
     @Operation(summary = "콘서트 좌석 조회", description = "특정 콘서트 스케줄의 예약 가능한 좌석을 조회합니다.")
@@ -46,8 +45,7 @@ public interface IConcertController {
     })
     @GetMapping("/schedules/{concertScheduleId}/seats")
     ResponseEntity<ConcertResponse.AvailableSeats> getConcertSeats(
-        @PathVariable(name = "concertScheduleId") Long concertScheduleId,
-        @RequestHeader(name = "X-Access-Token") String queueToken
+        @PathVariable(name = "concertScheduleId") Long concertScheduleId
     );
 
     @Operation(summary = "콘서트 좌석 예약", description = "콘서트 좌석을 예약합니다.")
@@ -70,8 +68,7 @@ public interface IConcertController {
                     + "  \"userId\": 1,\n"
                     + "  \"concertSeatId\": 11\n"
                     + "}")))
-        @Valid @RequestBody ConcertRequest.ReserveSeat request,
-        @RequestHeader(name = "X-Access-Token") String queueToken
+        @Valid @RequestBody ConcertRequest.ReserveSeat request
     );
 
     @Operation(summary = "콘서트 좌석 결제", description = "예약된 콘서트 좌석에 대한 결제를 진행합니다.")
@@ -89,7 +86,6 @@ public interface IConcertController {
     @PostMapping("/reservations/{reservationId}/pay")
     ResponseEntity<ConcertResponse.Pay> payConcert(
         @PathVariable(name = "reservationId") Long reservationId,
-        @RequestHeader(name = "X-Access-Token") String queueToken,
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "결제 요청 정보",
             content = @Content(mediaType = "application/json",
                 schema = @Schema(example = "{\n"
