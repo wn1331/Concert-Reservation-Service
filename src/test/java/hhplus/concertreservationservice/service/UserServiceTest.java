@@ -178,4 +178,61 @@ class UserServiceTest {
         verify(userPointHistoryRepository, never()).save(any(UserPointHistory.class));
     }
 
+    @Test
+    @Order(7)
+    @DisplayName("[성공] 유저 결제")
+    void testUserPayReservation_Success() {
+        // Given
+        User user = spy(User.builder().point(BigDecimal.valueOf(50000)).build());
+        UserCommand.UserPay command = new UserCommand.UserPay(USER_ID, BigDecimal.valueOf(30000));
+
+        when(userRepository.findByIdForUsePoint(USER_ID)).thenReturn(Optional.of(user));
+        when(user.getPoint()).thenReturn(BigDecimal.valueOf(50000));
+
+        // When
+        userService.userPayReservation(command);
+
+        // Then
+        verify(user, times(1)).pointUse(BigDecimal.valueOf(30000));
+        verify(userPointHistoryRepository, times(1)).save(any(UserPointHistory.class));
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("[실패] 유저 결제 - 잔액 부족")
+    void testUserPayReservation_NotEnoughBalance() {
+        // Given
+        User user = spy(User.builder().point(BigDecimal.valueOf(10000)).build());
+        UserCommand.UserPay command = new UserCommand.UserPay(USER_ID, BigDecimal.valueOf(30000));
+
+        when(userRepository.findByIdForUsePoint(USER_ID)).thenReturn(Optional.of(user));
+        when(user.getPoint()).thenReturn(BigDecimal.valueOf(10000));
+
+        // When & Then
+        CustomGlobalException exception = assertThrows(CustomGlobalException.class, () -> {
+            userService.userPayReservation(command);
+        });
+
+        assertEquals(ErrorCode.NOT_ENOUGH_BALANCE, exception.getErrorCode());
+        verify(user, never()).pointUse(any(BigDecimal.class));
+        verify(userPointHistoryRepository, never()).save(any(UserPointHistory.class));
+    }
+
+    @Test
+    @Order(9)
+    @DisplayName("[실패] 유저 결제 - 유저 없음")
+    void testUserPayReservation_UserNotFound() {
+        // Given
+        UserCommand.UserPay command = new UserCommand.UserPay(USER_ID, BigDecimal.valueOf(30000));
+        when(userRepository.findByIdForUsePoint(USER_ID)).thenReturn(Optional.empty());
+
+        // When & Then
+        CustomGlobalException exception = assertThrows(CustomGlobalException.class, () -> {
+            userService.userPayReservation(command);
+        });
+
+        assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode());
+        verify(userPointHistoryRepository, never()).save(any(UserPointHistory.class));
+    }
+
 }

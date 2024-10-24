@@ -8,6 +8,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
 import hhplus.concertreservationservice.application.concert.facade.ConcertFacade;
+import hhplus.concertreservationservice.application.concert.facade.ConcertPaymentFacade;
+import hhplus.concertreservationservice.application.concert.facade.ConcertReservationFacade;
 import hhplus.concertreservationservice.domain.concert.entity.ScheduleStatusType;
 import hhplus.concertreservationservice.domain.concert.entity.SeatStatusType;
 import hhplus.concertreservationservice.presentation.concert.controller.ConcertController;
@@ -18,6 +20,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.MethodOrderer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,6 +32,7 @@ import java.util.List;
 @WebMvcTest(ConcertController.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisplayName("[단위 테스트] ConcertController")
+@AutoConfigureWebMvc
 class ConcertControllerTest {
 
     @Autowired
@@ -35,6 +40,12 @@ class ConcertControllerTest {
 
     @MockBean
     private ConcertFacade concertFacade;
+
+    @MockBean
+    private ConcertPaymentFacade concertPaymentFacade;
+
+    @MockBean
+    private ConcertReservationFacade concertReservationFacade;
 
     @Test
     @Order(1)
@@ -137,7 +148,7 @@ class ConcertControllerTest {
         Long userId = 1L;
         Long concertSeatId = 1L;
 
-        when(concertFacade.reserveSeat(any())).thenReturn(ConcertResult.ReserveSeat.builder()
+        when(concertReservationFacade.reserveSeat(any())).thenReturn(ConcertResult.ReserveSeat.builder()
             .reservationId(1L)
             .build());
 
@@ -190,7 +201,7 @@ class ConcertControllerTest {
         Long reservationId = 1L;
         Long userId = 1L;
 
-        when(concertFacade.pay(any())).thenReturn(ConcertResult.Pay.builder()
+        when(concertPaymentFacade.pay(any())).thenReturn(ConcertResult.Pay.builder()
             .paymentId(1L)
             .build());
 

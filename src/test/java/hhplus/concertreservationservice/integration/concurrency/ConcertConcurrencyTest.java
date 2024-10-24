@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
 import hhplus.concertreservationservice.application.concert.facade.ConcertFacade;
+import hhplus.concertreservationservice.application.concert.facade.ConcertPaymentFacade;
+import hhplus.concertreservationservice.application.concert.facade.ConcertReservationFacade;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -27,7 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
 class ConcertConcurrencyTest {
 
     @Autowired
-    private ConcertFacade concertFacade;
+    private ConcertReservationFacade concertReservationFacade;
+
+    @Autowired
+    private ConcertPaymentFacade concertPaymentFacade;
 
     @Test
     @Order(1)
@@ -47,7 +52,7 @@ class ConcertConcurrencyTest {
                         .concertSeatId(concertSeatId)
                         .queueToken(queueToken)
                         .build();
-                    return concertFacade.reserveSeat(reserveSeatCriteria);
+                    return concertReservationFacade.reserveSeat(reserveSeatCriteria);
                 } catch (Exception e) {
                     return null;  // 예외 발생 시 null 반환
                 }
@@ -91,7 +96,7 @@ class ConcertConcurrencyTest {
                         .reservationId(reservationId)
                         .queueToken(queueToken)
                         .build();
-                    return concertFacade.pay(payCriteria);
+                    return concertPaymentFacade.pay(payCriteria);
                 }catch (Exception e) {
                     return null;
                 }

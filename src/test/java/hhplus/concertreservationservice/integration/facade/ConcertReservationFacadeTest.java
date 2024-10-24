@@ -1,49 +1,49 @@
 package hhplus.concertreservationservice.integration.facade;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
 import hhplus.concertreservationservice.application.concert.facade.ConcertFacade;
+import hhplus.concertreservationservice.application.concert.facade.ConcertReservationFacade;
+import hhplus.concertreservationservice.domain.concert.entity.Concert;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertReservation;
+import hhplus.concertreservationservice.domain.concert.entity.ConcertSchedule;
+import hhplus.concertreservationservice.domain.concert.entity.ConcertSeat;
 import hhplus.concertreservationservice.domain.concert.entity.ReservationStatusType;
 import hhplus.concertreservationservice.domain.concert.entity.SeatStatusType;
+import hhplus.concertreservationservice.domain.concert.repository.ConcertRepository;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertReservationRepository;
+import hhplus.concertreservationservice.domain.concert.repository.ConcertScheduleRepository;
+import hhplus.concertreservationservice.domain.concert.repository.ConcertSeatRepository;
 import hhplus.concertreservationservice.domain.queue.entity.Queue;
 import hhplus.concertreservationservice.domain.queue.entity.QueueStatusType;
 import hhplus.concertreservationservice.domain.queue.repository.QueueRepository;
 import hhplus.concertreservationservice.domain.user.entity.User;
 import hhplus.concertreservationservice.domain.user.repository.UserRepository;
-import hhplus.concertreservationservice.domain.concert.entity.Concert;
-import hhplus.concertreservationservice.domain.concert.entity.ConcertSchedule;
-import hhplus.concertreservationservice.domain.concert.entity.ConcertSeat;
-import hhplus.concertreservationservice.domain.concert.repository.ConcertRepository;
-import hhplus.concertreservationservice.domain.concert.repository.ConcertScheduleRepository;
-import hhplus.concertreservationservice.domain.concert.repository.ConcertSeatRepository;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.MethodOrderer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 @SpringBootTest
 @Transactional
-@DisplayName("[통합 테스트] ConcertFacade 테스트")
+@DisplayName("[통합 테스트] ConcertReservationFacade 테스트")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class ConcertFacadeTest {
+class ConcertReservationFacadeTest {
 
     @Autowired
-    private ConcertFacade concertFacade;
+    private ConcertReservationFacade concertReservationFacade;
 
     @Autowired
     private UserRepository userRepository;
@@ -67,6 +67,7 @@ class ConcertFacadeTest {
     private Concert concert;
     private ConcertSchedule concertSchedule;
     private String queueToken = "3b93aaaf-0ea8-49e4-be70-574a1813167s";
+
 
     @BeforeEach
     void setup() {
@@ -99,39 +100,21 @@ class ConcertFacadeTest {
     }
 
     @Test
-    @Order(1)
-    @DisplayName("[성공] 콘서트 스케줄 조회 테스트")
-    void getAvailableSchedules_success() {
+    @Order(3)
+    @DisplayName("[성공] 콘서트 좌석 예약 테스트")
+    void reserveSeat_success() {
         // Given
-        ConcertCriteria.GetAvailableSchedules criteria = ConcertCriteria.GetAvailableSchedules.builder()
-            .concertId(concert.getId())
+        ConcertCriteria.ReserveSeat criteria = ConcertCriteria.ReserveSeat.builder()
+            .userId(user.getId())
+            .concertSeatId(1L)  // A1 좌석 ID
             .queueToken(queueToken)
             .build();
 
         // When
-        ConcertResult.AvailableSchedules result = concertFacade.getAvailableSchedules(criteria);
+        ConcertResult.ReserveSeat result = concertReservationFacade.reserveSeat(criteria);
 
         // Then
-        assertEquals(1, result.schedules().size());
-        assertEquals(concertSchedule.getId(), result.schedules().get(0).id());
-    }
-
-    @Test
-    @Order(2)
-    @DisplayName("[성공] 콘서트 좌석 조회 테스트")
-    void getAvailableSeats_success() {
-        // Given
-        ConcertCriteria.GetAvailableSeats criteria = ConcertCriteria.GetAvailableSeats.builder()
-            .concertScheduleId(concertSchedule.getId())
-            .queueToken(queueToken)
-            .build();
-
-        // When
-        ConcertResult.AvailableSeats result = concertFacade.getAvailableSeats(criteria);
-
-        // Then
-        assertEquals(1, result.seats().size());  // 2개의 좌석이 있어야 함
-        assertEquals("A1", result.seats().get(0).seatNum());
+        assertEquals(2L, result.reservationId());
     }
 
 }
