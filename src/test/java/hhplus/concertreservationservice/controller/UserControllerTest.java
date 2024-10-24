@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import hhplus.concertreservationservice.application.queue.facade.QueueFacade;
 import hhplus.concertreservationservice.application.user.dto.UserCriteria;
 import hhplus.concertreservationservice.application.user.dto.UserResult;
 import hhplus.concertreservationservice.application.user.facade.UserFacade;
@@ -35,6 +36,9 @@ class UserControllerTest {
 
     @MockBean
     private UserFacade userFacade;
+
+    @MockBean
+    private QueueFacade queueFacade;
 
     @Test
     @Order(1)

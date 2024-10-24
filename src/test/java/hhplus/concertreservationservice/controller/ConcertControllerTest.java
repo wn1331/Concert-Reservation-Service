@@ -10,8 +10,10 @@ import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
 import hhplus.concertreservationservice.application.concert.facade.ConcertFacade;
 import hhplus.concertreservationservice.application.concert.facade.ConcertPaymentFacade;
 import hhplus.concertreservationservice.application.concert.facade.ConcertReservationFacade;
+import hhplus.concertreservationservice.application.queue.facade.QueueFacade;
 import hhplus.concertreservationservice.domain.concert.entity.ScheduleStatusType;
 import hhplus.concertreservationservice.domain.concert.entity.SeatStatusType;
+import hhplus.concertreservationservice.global.interceptor.QueueValidationInterceptor;
 import hhplus.concertreservationservice.presentation.concert.controller.ConcertController;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
@@ -46,6 +48,10 @@ class ConcertControllerTest {
 
     @MockBean
     private ConcertReservationFacade concertReservationFacade;
+
+    @MockBean
+    private QueueFacade queueFacade;
+
 
     @Test
     @Order(1)
