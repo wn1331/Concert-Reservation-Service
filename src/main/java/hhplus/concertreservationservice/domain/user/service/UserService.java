@@ -1,6 +1,9 @@
 package hhplus.concertreservationservice.domain.user.service;
 
+import hhplus.concertreservationservice.domain.concert.dto.ConcertCommand.Pay;
+import hhplus.concertreservationservice.domain.concert.entity.ConcertReservation;
 import hhplus.concertreservationservice.domain.user.dto.UserCommand;
+import hhplus.concertreservationservice.domain.user.dto.UserCommand.UserPay;
 import hhplus.concertreservationservice.domain.user.dto.UserInfo;
 import hhplus.concertreservationservice.domain.user.entity.User;
 import hhplus.concertreservationservice.domain.user.entity.UserPointHistory;
@@ -52,6 +55,26 @@ public class UserService {
             .build());
 
         return UserInfo.ChargeBalance.fromEntity(user);
+    }
+
+    public void userPayReservation(UserPay command) {
+        User user = userRepository.findByIdForUsePoint(command.userId())
+            .orElseThrow(() -> new CustomGlobalException(ErrorCode.USER_NOT_FOUND));
+
+        if (user.getPoint().compareTo(command.price()) > 0) {
+            // 변경감지. 포인트 사용
+            user.pointUse(command.price());
+
+        } else {
+            throw new CustomGlobalException(ErrorCode.NOT_ENOUGH_BALANCE);
+        }
+        // 포인트 사용내역 저장
+        userPointHistoryRepository.save(UserPointHistory.builder()
+            .userId(user.getId())
+            .requestPoint(command.price())
+            .type(UserPointHistoryType.PAY)
+            .build()
+        );
     }
 
 }

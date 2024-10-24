@@ -98,4 +98,13 @@ public record ConcertInfo() {
         }
 
     }
+
+    @Builder
+    public record ReservationStatus(
+        Long reservationId,
+        Long concertSeatId,
+        BigDecimal price
+    ){
+    }
+
 }

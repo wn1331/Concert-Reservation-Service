@@ -19,7 +19,12 @@ public enum ErrorCode {
     RESERVATION_NOT_RESERVED("E10", HttpStatus.CONFLICT, "예약되어 있는 상태가 아닙니다."),
     SEAT_NOT_EMPTY("E11",HttpStatus.CONFLICT,"좌석이 비어있는 상태가 아닙니다." ),
     SEAT_NOT_RESERVED("E12",HttpStatus.CONFLICT,"좌석이 예약중인 상태가 아닙니다."),
-    RESERVATION_TIMEOUT("E13",HttpStatus.GONE,"예약의 시간이 만료되었습니다." );
+    RESERVATION_TIMEOUT("E13",HttpStatus.GONE,"예약의 시간이 만료되었습니다." ),
+    INVALID_QUEUE_TOKEN("E14",HttpStatus.BAD_REQUEST ,"대기열 토큰 헤더가 누락되었거나 올바르지 않습니다." ),
+
+
+
+    BAD_REQUEST("E99",HttpStatus.NOT_FOUND ,"요청 오류입니다." );
 
 
     private final String code;

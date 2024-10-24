@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import hhplus.concertreservationservice.application.queue.facade.QueueFacade;
 import hhplus.concertreservationservice.application.user.dto.UserCriteria;
 import hhplus.concertreservationservice.application.user.dto.UserResult;
 import hhplus.concertreservationservice.application.user.facade.UserFacade;
@@ -36,6 +37,9 @@ class UserControllerTest {
     @MockBean
     private UserFacade userFacade;
 
+    @MockBean
+    private QueueFacade queueFacade;
+
     @Test
     @Order(1)
     @DisplayName("[상겅] 유저 잔액 조회 성공")
@@ -51,7 +55,7 @@ class UserControllerTest {
 
         // When & Then
         mockMvc.perform(get("/users/{userId}/balance", userId)
-                .header("queueToken", token))
+                .header("X-Access-Token", token))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.userId").value(userId))
             .andExpect(jsonPath("$.balance").value(balance));
@@ -91,7 +95,7 @@ class UserControllerTest {
 
         // When & Then
         mockMvc.perform(put("/users/{userId}/balance", userId)
-                .header("queueToken", token)
+                .header("X-Access-Token", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(validRequest))
             .andExpect(status().isOk())
@@ -109,7 +113,7 @@ class UserControllerTest {
 
         // When & Then
         mockMvc.perform(put("/users/{userId}/balance", userId)
-                .header("queueToken", token)
+                .header("X-Access-Token", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"amount\": -10.00}"))  // 유효성 검증 실패
             .andExpect(status().isBadRequest());  // HTTP 400을 기대
@@ -142,7 +146,7 @@ class UserControllerTest {
 
         // When & Then
         mockMvc.perform(put("/users/{userId}/balance", userId)
-                .header("queueToken", token)
+                .header("X-Access-Token", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 // 요청 본문이 없는 경우(null인 경우)
                 .content(""))

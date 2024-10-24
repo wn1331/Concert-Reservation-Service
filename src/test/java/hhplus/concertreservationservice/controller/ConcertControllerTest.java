@@ -8,8 +8,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
 import hhplus.concertreservationservice.application.concert.facade.ConcertFacade;
+import hhplus.concertreservationservice.application.concert.facade.ConcertPaymentFacade;
+import hhplus.concertreservationservice.application.concert.facade.ConcertReservationFacade;
+import hhplus.concertreservationservice.application.queue.facade.QueueFacade;
 import hhplus.concertreservationservice.domain.concert.entity.ScheduleStatusType;
 import hhplus.concertreservationservice.domain.concert.entity.SeatStatusType;
+import hhplus.concertreservationservice.global.interceptor.QueueValidationInterceptor;
 import hhplus.concertreservationservice.presentation.concert.controller.ConcertController;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +22,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.MethodOrderer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,6 +34,7 @@ import java.util.List;
 @WebMvcTest(ConcertController.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisplayName("[단위 테스트] ConcertController")
+@AutoConfigureWebMvc
 class ConcertControllerTest {
 
     @Autowired
@@ -35,6 +42,16 @@ class ConcertControllerTest {
 
     @MockBean
     private ConcertFacade concertFacade;
+
+    @MockBean
+    private ConcertPaymentFacade concertPaymentFacade;
+
+    @MockBean
+    private ConcertReservationFacade concertReservationFacade;
+
+    @MockBean
+    private QueueFacade queueFacade;
+
 
     @Test
     @Order(1)
@@ -68,7 +85,7 @@ class ConcertControllerTest {
         """.formatted(LocalDate.now());  // date 부분에 동적인 날짜 값 처리
 
         mockMvc.perform(get("/concerts/{concertId}/schedules", concertId)
-                .header("queueToken", queueToken))
+                .header("X-Access-Token", queueToken))
             .andExpect(status().isOk())
             .andExpect(content().json(expectedResponse));  // JSON 응답 비교
     }
@@ -114,7 +131,7 @@ class ConcertControllerTest {
             """;
 
         mockMvc.perform(get("/concerts/schedules/{concertScheduleId}/seats", concertScheduleId)
-                .header("queueToken", queueToken))
+                .header("X-Access-Token", queueToken))
             .andExpect(status().isOk())
             .andExpect(content().json(expectedResponse));
     }
@@ -137,7 +154,7 @@ class ConcertControllerTest {
         Long userId = 1L;
         Long concertSeatId = 1L;
 
-        when(concertFacade.reserveSeat(any())).thenReturn(ConcertResult.ReserveSeat.builder()
+        when(concertReservationFacade.reserveSeat(any())).thenReturn(ConcertResult.ReserveSeat.builder()
             .reservationId(1L)
             .build());
 
@@ -155,7 +172,7 @@ class ConcertControllerTest {
             """;
 
         mockMvc.perform(post("/concerts/reservation")
-                .header("queueToken", queueToken)
+                .header("X-Access-Token", queueToken)
                 .contentType("application/json")
                 .content(requestBody))
             .andExpect(status().isOk())
@@ -175,7 +192,7 @@ class ConcertControllerTest {
             """.formatted(concertSeatId);
 
         mockMvc.perform(post("/concerts/reservation")
-                .header("queueToken", queueToken)
+                .header("X-Access-Token", queueToken)
                 .contentType("application/json")
                 .content(requestBody))
             .andExpect(status().isBadRequest());
@@ -190,7 +207,7 @@ class ConcertControllerTest {
         Long reservationId = 1L;
         Long userId = 1L;
 
-        when(concertFacade.pay(any())).thenReturn(ConcertResult.Pay.builder()
+        when(concertPaymentFacade.pay(any())).thenReturn(ConcertResult.Pay.builder()
             .paymentId(1L)
             .build());
 
@@ -207,7 +224,7 @@ class ConcertControllerTest {
             """;
 
         mockMvc.perform(post("/concerts/reservations/{reservationId}/pay", reservationId)
-                .header("queueToken", queueToken)
+                .header("X-Access-Token", queueToken)
                 .contentType("application/json")
                 .content(requestBody))
             .andExpect(status().isOk())
@@ -227,7 +244,7 @@ class ConcertControllerTest {
             """;
 
         mockMvc.perform(post("/concerts/reservations/{reservationId}/pay", reservationId)
-                .header("queueToken", queueToken)
+                .header("X-Access-Token", queueToken)
                 .contentType("application/json")
                 .content(requestBody))
             .andExpect(status().isBadRequest());

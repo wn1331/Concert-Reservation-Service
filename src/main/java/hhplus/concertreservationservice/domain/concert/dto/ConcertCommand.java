@@ -24,7 +24,8 @@ public record ConcertCommand() {
     @Builder
     public record ReserveSeat(
         Long userId,
-        Long concertSeatId
+        Long concertSeatId,
+        BigDecimal price
     ){
 
     }
@@ -33,24 +34,7 @@ public record ConcertCommand() {
     @Builder
     public record Pay(
         Long reservationId,
-        Long userId
-    ) {
-
-    }
-
-    @Builder
-    public record PayHistory(
-        Long userId,
-        UserPointHistoryType type,
-        BigDecimal amount
-    ) {
-
-    }
-
-    @Builder
-    public record VerifyQueue(
-        String queueToken,
-        Long reservationId
+        BigDecimal price
     ) {
 
     }

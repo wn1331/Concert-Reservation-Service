@@ -15,7 +15,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import hhplus.concertreservationservice.domain.concert.dto.ConcertCommand.VerifyQueue;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertReservation;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertSeat;
 import hhplus.concertreservationservice.domain.concert.entity.ReservationStatusType;
@@ -23,6 +22,8 @@ import hhplus.concertreservationservice.domain.concert.entity.SeatStatusType;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertReservationRepository;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertSeatRepository;
 import hhplus.concertreservationservice.domain.queue.dto.QueueCommand;
+import hhplus.concertreservationservice.domain.queue.dto.QueueCommand.VerifyQueue;
+import hhplus.concertreservationservice.domain.queue.dto.QueueCommand.VerifyQueueForPay;
 import hhplus.concertreservationservice.domain.queue.dto.QueueInfo;
 import hhplus.concertreservationservice.domain.queue.entity.Queue;
 import hhplus.concertreservationservice.domain.queue.entity.QueueStatusType;
@@ -115,7 +116,7 @@ class QueueServiceTest {
 
 
         // When
-        queueService.verifyQueue(QUEUE_TOKEN);
+        queueService.verifyQueue(new VerifyQueue(QUEUE_TOKEN));
 
         // Then
         verify(queueRepository, times(1)).findByQueueToken(QUEUE_TOKEN);
@@ -130,7 +131,7 @@ class QueueServiceTest {
 
         // When & Then
         CustomGlobalException exception = assertThrows(CustomGlobalException.class, () -> {
-            queueService.verifyQueue(QUEUE_TOKEN);
+            queueService.verifyQueue(new VerifyQueue(QUEUE_TOKEN));
         });
 
         assertEquals(ErrorCode.QUEUE_STILL_WAITING, exception.getErrorCode());
@@ -305,7 +306,7 @@ class QueueServiceTest {
     void testVerifyQueueForPay_Success_Within5Minutes() {
         // Given
         queue.pass();
-        VerifyQueue command = new VerifyQueue(QUEUE_TOKEN, RESERVATION_ID);
+        VerifyQueueForPay command = new VerifyQueueForPay(QUEUE_TOKEN, RESERVATION_ID);
         when(queueRepository.findByQueueToken(QUEUE_TOKEN)).thenReturn(Optional.of(queue));
         when(concertReservationRepository.findById(RESERVATION_ID)).thenReturn(Optional.of(reservation));
         when(reservation.getCreatedAt()).thenReturn(now());
@@ -327,7 +328,7 @@ class QueueServiceTest {
         queue.pass();
         concertSeat.reserveSeat();
         when(reservation.getCreatedAt()).thenReturn(now().minusMinutes(6));// 예약 생성 시간이 5분을 초과
-        VerifyQueue command = new VerifyQueue(QUEUE_TOKEN, RESERVATION_ID);
+        VerifyQueueForPay command = new VerifyQueueForPay(QUEUE_TOKEN, RESERVATION_ID);
 
         when(queueRepository.findByQueueToken(QUEUE_TOKEN)).thenReturn(Optional.of(queue));
         when(concertReservationRepository.findById(RESERVATION_ID)).thenReturn(Optional.of(reservation));
@@ -354,7 +355,7 @@ class QueueServiceTest {
     void testVerifyQueueForPay_Failure_ReservationNotFound() {
         // Given
         queue.pass();
-        VerifyQueue command = new VerifyQueue(QUEUE_TOKEN, RESERVATION_ID);
+        VerifyQueueForPay command = new VerifyQueueForPay(QUEUE_TOKEN, RESERVATION_ID);
         when(queueRepository.findByQueueToken(QUEUE_TOKEN)).thenReturn(Optional.of(queue));
         when(concertReservationRepository.findById(RESERVATION_ID)).thenReturn(Optional.empty());
 
@@ -375,7 +376,7 @@ class QueueServiceTest {
         // Given
         queue.pass();
         when(reservation.getCreatedAt()).thenReturn(now().minusMinutes(6));// 예약 생성 시간이 5분을 초과
-        VerifyQueue command = new VerifyQueue(QUEUE_TOKEN, RESERVATION_ID);
+        VerifyQueueForPay command = new VerifyQueueForPay(QUEUE_TOKEN, RESERVATION_ID);
 
         when(queueRepository.findByQueueToken(QUEUE_TOKEN)).thenReturn(Optional.of(queue));
         when(concertReservationRepository.findById(RESERVATION_ID)).thenReturn(Optional.of(reservation));
@@ -392,7 +393,40 @@ class QueueServiceTest {
         verify(concertSeatRepository, times(1)).findById(1L);
     }
 
+    @Test
+    @Order(8)
+    @DisplayName("[성공] 대기열 토큰 만료 처리")
+    void expireToken_Success() {
+        // Given
+        when(queueRepository.findByQueueToken("testQueueToken"))
+            .thenReturn(Optional.of(queue));
 
+        // When
+        queueService.expireToken("testQueueToken");
+
+        // Then
+        verify(queueRepository, times(1)).findByQueueToken("testQueueToken");
+        verify(queueRepository, times(1)).delete(queue);
+    }
+
+    @Test
+    @Order(9)
+    @DisplayName("[실패] 대기열 토큰 만료 처리 - 토큰이 존재하지 않음")
+    void expireToken_TokenNotFound() {
+        // Given
+        when(queueRepository.findByQueueToken("invalidToken"))
+            .thenReturn(Optional.empty());
+
+        // When & Then
+        CustomGlobalException exception = assertThrows(
+            CustomGlobalException.class,
+            () -> queueService.expireToken("invalidToken")
+        );
+
+        assertEquals(ErrorCode.QUEUE_NOT_FOUND, exception.getErrorCode());
+        verify(queueRepository, times(1)).findByQueueToken("invalidToken");
+        verify(queueRepository, times(0)).delete(any(Queue.class));
+    }
 
 
 
