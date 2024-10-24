@@ -73,7 +73,7 @@ class QueueFacadeTest {
 
     @Test
     @Order(2)
-    @DisplayName("[성공] 대기열 활성화 테스트")
+    @DisplayName("[성공][스케줄러] 대기열 활성화 테스트")
     void activateProcess_success() {
         // Given: 대기열에 대기 상태의 유저 추가
         Queue queue = new Queue(user.getId(), "testQueueToken", QueueStatusType.WAITING);
@@ -89,7 +89,7 @@ class QueueFacadeTest {
 
     @Test
     @Order(3)
-    @DisplayName("[성공] 대기열 만료 처리 테스트")
+    @DisplayName("[성공][스케줄러] 대기열 만료 처리 테스트")
     void expireProcess_success() {
         // Given: 대기열에 대기 상태의 유저 추가
         Queue queue = new Queue(user.getId(), "expireQueueToken", QueueStatusType.PASS);

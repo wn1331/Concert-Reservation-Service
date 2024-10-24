@@ -1,10 +1,10 @@
 package hhplus.concertreservationservice.integration.facade;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
-import hhplus.concertreservationservice.application.concert.facade.ConcertFacade;
 import hhplus.concertreservationservice.application.concert.facade.ConcertPaymentFacade;
 import hhplus.concertreservationservice.domain.concert.entity.Concert;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertReservation;
@@ -21,6 +21,8 @@ import hhplus.concertreservationservice.domain.queue.entity.QueueStatusType;
 import hhplus.concertreservationservice.domain.queue.repository.QueueRepository;
 import hhplus.concertreservationservice.domain.user.entity.User;
 import hhplus.concertreservationservice.domain.user.repository.UserRepository;
+import hhplus.concertreservationservice.global.exception.CustomGlobalException;
+import hhplus.concertreservationservice.global.exception.ErrorCode;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -41,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ConcertPaymentFacadeTest {
+
     @Autowired
     private ConcertPaymentFacade concertPaymentFacade;
 
@@ -64,6 +67,8 @@ class ConcertPaymentFacadeTest {
 
     private User user;
     private Concert concert;
+    private ConcertSeat seat;
+    private ConcertReservation concertReservation;
     private ConcertSchedule concertSchedule;
     private String queueToken = "3b93aaaf-0ea8-49e4-be70-574a1813167s";
 
@@ -86,20 +91,26 @@ class ConcertPaymentFacadeTest {
         concertScheduleRepository.save(concertSchedule);
 
         // 콘서트 좌석 생성
+        ConcertSeat seat1 = new ConcertSeat(concertSchedule.getId(), "A1",
+            BigDecimal.valueOf(150000),
+            SeatStatusType.EMPTY);
+        seat = new ConcertSeat(concertSchedule.getId(), "A2",
+            BigDecimal.valueOf(150000),
+            SeatStatusType.RESERVED);
         List<ConcertSeat> seats = List.of(
-            new ConcertSeat(concertSchedule.getId(), "A1", BigDecimal.valueOf(150000), SeatStatusType.EMPTY),
-            new ConcertSeat(concertSchedule.getId(), "A2", BigDecimal.valueOf(150000), SeatStatusType.RESERVED)
+            seat1,
+            seat
         );
         concertSeatRepository.saveAll(seats);
 
-        ConcertReservation concertReservation = new ConcertReservation(user.getId(),
+        concertReservation = new ConcertReservation(user.getId(),
             302L, BigDecimal.valueOf(150000),
             ReservationStatusType.RESERVED);
         concertReservationRepository.save(concertReservation);
     }
 
     @Test
-    @Order(4)
+    @Order(1)
     @DisplayName("[성공] 콘서트 결제 테스트")
     void pay_success() {
 
@@ -114,5 +125,141 @@ class ConcertPaymentFacadeTest {
         // Then
         assertEquals(1L, result.paymentId());  // 결제가 성공했는지 확인
     }
+
+    @Test
+    @Order(1)
+    @DisplayName("[실패] 예약이 존재하지 않아 결제 실패")
+    void pay_failure_reservation_not_found() {
+        // Given
+        ConcertCriteria.Pay criteria = ConcertCriteria.Pay.builder()
+            .userId(user.getId())
+            .reservationId(999L)  // 존재하지 않는 예약 ID
+            .queueToken("queue-token")
+            .build();
+
+        // When / Then
+        CustomGlobalException exception = assertThrows(CustomGlobalException.class, () -> {
+            concertPaymentFacade.pay(criteria);
+        });
+
+        // 예외 코드 확인
+        assertEquals(ErrorCode.CONCERT_RESERVATION_NOT_FOUND, exception.getErrorCode());
+    }
+
+    @Test
+    @Order(2)
+    @DisplayName("[실패] 이미 결제된 예약으로 인한 결제 실패")
+    void pay_failure_already_paid_or_cancelled() {
+        // Given
+        concertReservation.confirmPayment(); // 예약 상태를 결제 완료로 변경
+
+        ConcertCriteria.Pay criteria = ConcertCriteria.Pay.builder()
+            .userId(user.getId())
+            .reservationId(concertReservation.getId())
+            .queueToken("queue-token")
+            .build();
+
+        // When / Then
+        CustomGlobalException exception = assertThrows(CustomGlobalException.class, () -> {
+            concertPaymentFacade.pay(criteria);
+        });
+
+        // 예외 코드 확인
+        assertEquals(ErrorCode.ALREADY_PAID_OR_CANCELLED, exception.getErrorCode());
+    }
+
+    @Test
+    @Order(3)
+    @DisplayName("[실패] 사용자 존재하지 않아 결제 실패")
+    void pay_failure_user_not_found() {
+        // Given
+        ConcertCriteria.Pay criteria = ConcertCriteria.Pay.builder()
+            .userId(123L) // 없는 유저.
+            .reservationId(concertReservation.getId())
+            .queueToken("queue-token")
+            .build();
+
+        // When / Then
+        CustomGlobalException exception = assertThrows(CustomGlobalException.class, () -> {
+            concertPaymentFacade.pay(criteria);
+        });
+
+        // 예외 코드 확인
+        assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode());
+    }
+
+
+    @Test
+    @Order(4)
+    @DisplayName("[실패] 잔액 부족으로 인한 결제 실패")
+    void pay_failure_not_enough_balance() {
+        // Given
+        concertReservation = new ConcertReservation(user.getId(),
+            302L, BigDecimal.valueOf(15000000),
+            ReservationStatusType.RESERVED);
+        concertReservationRepository.save(concertReservation);
+
+        ConcertCriteria.Pay criteria = ConcertCriteria.Pay.builder()
+            .userId(user.getId())
+            .reservationId(concertReservation.getId())
+            .queueToken("queue-token")
+            .build();
+
+        // When / Then
+        CustomGlobalException exception = assertThrows(CustomGlobalException.class, () -> {
+            concertPaymentFacade.pay(criteria);
+        });
+
+        // 예외 코드 확인
+        assertEquals(ErrorCode.NOT_ENOUGH_BALANCE, exception.getErrorCode());
+    }
+
+
+    @Test
+    @Order(5)
+    @DisplayName("[실패] 좌석을 찾을 수 없어 결제 실패")
+    void pay_failure_seat_not_found() {
+        // 없는 좌석 번호.
+        concertReservation = new ConcertReservation(user.getId(),
+            999L, BigDecimal.valueOf(150000),
+            ReservationStatusType.RESERVED);
+        concertReservationRepository.save(concertReservation);
+        // Given
+        ConcertCriteria.Pay criteria = ConcertCriteria.Pay.builder()
+            .userId(user.getId())
+            .reservationId(concertReservation.getId())
+            .queueToken("queue-token")
+            .build();
+
+        // When / Then
+        CustomGlobalException exception = assertThrows(CustomGlobalException.class, () -> {
+            concertPaymentFacade.pay(criteria);
+        });
+
+        // 예외 코드 확인
+        assertEquals(ErrorCode.CONCERT_SEAT_NOT_FOUND, exception.getErrorCode());
+    }
+
+    @Test
+    @Order(6)
+    @DisplayName("[실패] 좌석이 예약되지 않아 결제 실패")
+    void pay_failure_seat_not_reserved() {
+        // Given
+        seat.confirmSeatByPayment();
+        ConcertCriteria.Pay criteria = ConcertCriteria.Pay.builder()
+            .userId(user.getId())
+            .reservationId(concertReservation.getId())
+            .queueToken("queue-token")
+            .build();
+
+        // When / Then
+        CustomGlobalException exception = assertThrows(CustomGlobalException.class, () -> {
+            concertPaymentFacade.pay(criteria);
+        });
+
+        // 예외 코드 확인
+        assertEquals(ErrorCode.SEAT_NOT_RESERVED, exception.getErrorCode());
+    }
+
 
 }

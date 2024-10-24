@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -60,6 +61,8 @@ public class ConcertReservation extends BaseTimeEntity {
             throw new CustomGlobalException(ErrorCode.RESERVATION_NOT_RESERVED);
         }
     }
+
+
 
 
 }

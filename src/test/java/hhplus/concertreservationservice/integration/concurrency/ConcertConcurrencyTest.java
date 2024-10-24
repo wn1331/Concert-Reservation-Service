@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
-import hhplus.concertreservationservice.application.concert.facade.ConcertFacade;
 import hhplus.concertreservationservice.application.concert.facade.ConcertPaymentFacade;
 import hhplus.concertreservationservice.application.concert.facade.ConcertReservationFacade;
 import java.util.List;
