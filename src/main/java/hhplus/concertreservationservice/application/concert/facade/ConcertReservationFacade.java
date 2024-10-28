@@ -7,6 +7,9 @@ import hhplus.concertreservationservice.domain.concert.service.ConcertReservatio
 import hhplus.concertreservationservice.domain.concert.service.ConcertService;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +22,11 @@ public class ConcertReservationFacade {
 
 
     @Transactional
+    @Retryable(
+        retryFor = {ObjectOptimisticLockingFailureException.class},
+        maxAttempts = 100, // 재실행 횟수
+        backoff = @Backoff(100)// 0.1초 간격으로 재실행
+    )
     public ConcertResult.ReserveSeat reserveSeat(ConcertCriteria.ReserveSeat criteria) {
         // 좌석 관련 로직 서비스 호출
         BigDecimal seatPrice = concertService.changeSeatStatusAndReturnPrice(criteria.concertSeatId());

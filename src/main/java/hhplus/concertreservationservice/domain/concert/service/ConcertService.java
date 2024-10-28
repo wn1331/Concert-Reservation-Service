@@ -12,10 +12,12 @@ import hhplus.concertreservationservice.global.exception.CustomGlobalException;
 import hhplus.concertreservationservice.global.exception.ErrorCode;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ConcertService {
 
@@ -39,6 +41,7 @@ public class ConcertService {
     }
 
     public BigDecimal changeSeatStatusAndReturnPrice(Long concertSeatId){
+        log.info("start");
         // 좌석 조회( 낙관락 적용 )
         ConcertSeat concertSeat = concertSeatRepository.findById(concertSeatId)
             .orElseThrow(() -> new CustomGlobalException(ErrorCode.CONCERT_SEAT_NOT_FOUND));
