@@ -61,9 +61,6 @@ class PessimisticLockPerformanceTest {
                     ReserveSeat reserveSeat = reserveFacade.reserveSeat(reserveSeatCriteria);
                     log.info("좌석 예약 성공");
                     return reserveSeat;
-                } catch (OptimisticLockingFailureException e) {
-                    log.error("낙관락 예외 : {}", e.getMessage());
-                    return null;
                 } catch (Exception e) {
                     log.error("예외 : {}", e.getMessage());
                     return null;
@@ -110,7 +107,6 @@ class PessimisticLockPerformanceTest {
                     ConcertResult.Pay payResult = paymentFacade.pay(payCriteria);
                     log.info("결제 성공");
                     return payResult;
-                    // 재시도 로직으로 낙관락 예외는 잡히지 않는다.(재시도가 매우 빠르면 잡힌다. 대신 테스트도 실패할 것)
                 } catch (Exception e) {
                     log.error("예외 : {}", e.getMessage());
                     return null;
@@ -153,7 +149,6 @@ class PessimisticLockPerformanceTest {
                     UserResult.ChargeBalance chargeBalance = userFacade.chargeBalance(dto);
                     log.info("충전 성공");
                     return chargeBalance;
-                    // 재시도 로직으로 낙관락 예외는 잡히지 않는다.
                 } catch (Exception e) {
                     log.error("예외 : {}", e.getMessage());
                     return null;
