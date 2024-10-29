@@ -41,11 +41,11 @@ class PessimisticLockPerformanceTest {
     @Autowired
     private UserFacade userFacade;
 
-    private final Long THREAD_AMOUNT = 1000L;
+    private final Long REQUEST_AMOUNT = 1000L;
 
 
     @Test
-    @DisplayName("[비관락] 좌석 예약 동시성 테스트 - 1000개 쓰레드의 요청")
+    @DisplayName("[비관락] 좌석 예약 동시성 테스트 - 1000번 비동기 요청")
     void concurrencyReserveSeatTest() {
         ConcertCriteria.ReserveSeat reserveSeatCriteria = ConcertCriteria.ReserveSeat.builder()
             .userId(1L)
@@ -55,7 +55,7 @@ class PessimisticLockPerformanceTest {
         List<CompletableFuture<ConcertResult.ReserveSeat>> tasks = new ArrayList<>();
 
         // 동시에 1000번의 예약 요청을 수행
-        for (long i = 1; i <= THREAD_AMOUNT; i++) {
+        for (long i = 1; i <= REQUEST_AMOUNT; i++) {
             tasks.add(CompletableFuture.supplyAsync(() -> {
                 try {
                     ReserveSeat reserveSeat = reserveFacade.reserveSeat(reserveSeatCriteria);
@@ -81,7 +81,7 @@ class PessimisticLockPerformanceTest {
 
         // 시간 측정
         long endTime = System.currentTimeMillis();
-        log.info("좌석 예약 {}개의 쓰레드 총 수행 시간 : {}ms", THREAD_AMOUNT, endTime - startTime);
+        log.info("좌석 예약 {}개의 쓰레드 총 수행 시간 : {}ms", REQUEST_AMOUNT, endTime - startTime);
 
         // 성공한 예약 횟수 계산
         long successCount = getSuccessCount(tasks);
@@ -92,7 +92,7 @@ class PessimisticLockPerformanceTest {
     }
 
     @Test
-    @DisplayName("[비관락] 결제(포인트사용) 동시성 테스트 - 1000개 쓰레드의 요청")
+    @DisplayName("[비관락] 결제(포인트사용) 동시성 테스트 - 1000번 비동기 요청")
     void concurrencyPayTest() {
 
         ConcertCriteria.Pay payCriteria = ConcertCriteria.Pay.builder()
@@ -103,7 +103,7 @@ class PessimisticLockPerformanceTest {
         List<CompletableFuture<ConcertResult.Pay>> tasks = new ArrayList<>();
 
         // 동시에 10번의 충전 요청을 수행
-        for (long i = 1; i <= THREAD_AMOUNT; i++) {
+        for (long i = 1; i <= REQUEST_AMOUNT; i++) {
 
             tasks.add(CompletableFuture.supplyAsync(() -> {
                 try {
@@ -127,7 +127,7 @@ class PessimisticLockPerformanceTest {
 
         // 시간 측정
         long endTime = System.currentTimeMillis();
-        log.info("좌석 결제 {}개의 쓰레드 총 수행 시간 : {}ms", THREAD_AMOUNT, endTime - startTime);
+        log.info("좌석 결제 {}개의 쓰레드 총 수행 시간 : {}ms", REQUEST_AMOUNT, endTime - startTime);
 
         // 성공한 결제 횟수 계산
         long successCount = getSuccessCount(tasks);
@@ -137,7 +137,7 @@ class PessimisticLockPerformanceTest {
     }
 
     @Test
-    @DisplayName("[비관락] 포인트충전 동시성 테스트 - 1000번 충전")
+    @DisplayName("[비관락] 포인트충전 동시성 테스트 - 1000번 비동기 요청")
     void chargeBalance_concurrency_test() {
 
         ChargeBalance dto = ChargeBalance.builder().userId(1L).amount(BigDecimal.valueOf(10000))
@@ -146,7 +146,7 @@ class PessimisticLockPerformanceTest {
         List<CompletableFuture<UserResult.ChargeBalance>> tasks = new ArrayList<>();
 
         // 동시에 1000번의 충전 요청을 수행
-        for (long i = 1; i <= THREAD_AMOUNT; i++) {
+        for (long i = 1; i <= REQUEST_AMOUNT; i++) {
 
             tasks.add(CompletableFuture.supplyAsync(() -> {
                 try {
@@ -170,7 +170,7 @@ class PessimisticLockPerformanceTest {
 
         // 시간 측정
         long endTime = System.currentTimeMillis();
-        log.info("포인트 충전 {}개의 쓰레드 총 수행 시간 : {}ms", THREAD_AMOUNT, endTime - startTime);
+        log.info("포인트 충전 {}개의 쓰레드 총 수행 시간 : {}ms", REQUEST_AMOUNT, endTime - startTime);
 
         // 성공한 충전 횟수 계산
         long successCount = getSuccessCount(tasks);

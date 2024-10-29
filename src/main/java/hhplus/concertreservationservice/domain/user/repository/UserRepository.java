@@ -15,4 +15,6 @@ public interface UserRepository {
 
 
     boolean existsById(Long userId);
+
+    Optional<User> findByIdForChargePoint(Long aLong);
 }
