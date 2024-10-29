@@ -35,6 +35,9 @@ dependencies {
     // 재시도 처리를 위한 dependency
     implementation 'org.springframework.retry:spring-retry'
 
+    // redission
+    implementation 'org.redisson:redisson-spring-boot-starter:3.37.0'
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'

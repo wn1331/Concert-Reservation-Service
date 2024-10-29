@@ -10,8 +10,6 @@ import hhplus.concertreservationservice.domain.concert.service.ConcertService;
 import hhplus.concertreservationservice.domain.user.dto.UserCommand;
 import hhplus.concertreservationservice.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
