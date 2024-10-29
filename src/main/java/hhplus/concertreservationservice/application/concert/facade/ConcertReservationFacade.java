@@ -2,11 +2,17 @@ package hhplus.concertreservationservice.application.concert.facade;
 
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
+import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo;
 import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo.ReserveSeat;
 import hhplus.concertreservationservice.domain.concert.service.ConcertReservationService;
 import hhplus.concertreservationservice.domain.concert.service.ConcertService;
+import hhplus.concertreservationservice.global.exception.CustomGlobalException;
+import hhplus.concertreservationservice.global.exception.ErrorCode;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -14,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class ConcertReservationFacade {
 
@@ -24,17 +31,22 @@ public class ConcertReservationFacade {
     @Transactional
     @Retryable(
         retryFor = {ObjectOptimisticLockingFailureException.class},
-        maxAttempts = 100, // 재실행 횟수
-        backoff = @Backoff(100)// 0.1초 간격으로 재실행
+        maxAttempts = 5, // 재실행 횟수(낙관적 락 충돌시에만 재실행), default는 3회
+        backoff = @Backoff(1), // 0.001초 간격으로 재실행
+        listeners = {"reserveSeatRetryListener"} // 재시도 시 리스너(로그) 실행
     )
     public ConcertResult.ReserveSeat reserveSeat(ConcertCriteria.ReserveSeat criteria) {
+
         // 좌석 관련 로직 서비스 호출
-        BigDecimal seatPrice = concertService.changeSeatStatusAndReturnPrice(criteria.concertSeatId());
+        BigDecimal seatPrice = concertService.changeSeatStatusAndReturnPrice(
+            criteria.concertSeatId());
 
         // 예약 서비스 호출
-        ReserveSeat reserveSeatInfo = concertReservationService.reserveSeat(criteria.toCommand(seatPrice));
+        ReserveSeat reserveSeatInfo = concertReservationService.reserveSeat(
+            criteria.toCommand(seatPrice));
 
         return ConcertResult.ReserveSeat.fromInfo(reserveSeatInfo);
+
 
     }
 

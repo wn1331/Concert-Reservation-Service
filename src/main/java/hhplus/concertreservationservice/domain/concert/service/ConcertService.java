@@ -41,7 +41,6 @@ public class ConcertService {
     }
 
     public BigDecimal changeSeatStatusAndReturnPrice(Long concertSeatId){
-        log.info("start");
         // 좌석 조회( 낙관락 적용 )
         ConcertSeat concertSeat = concertSeatRepository.findById(concertSeatId)
             .orElseThrow(() -> new CustomGlobalException(ErrorCode.CONCERT_SEAT_NOT_FOUND));
