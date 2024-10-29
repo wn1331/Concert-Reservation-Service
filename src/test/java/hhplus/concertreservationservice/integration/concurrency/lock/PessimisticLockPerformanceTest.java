@@ -27,7 +27,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@DisplayName("비관락 테스트")
+@DisplayName("RedisPubSub 테스트")
 class PessimisticLockPerformanceTest {
 
     private static final Logger log = LoggerFactory.getLogger(PessimisticLockPerformanceTest.class);
@@ -61,9 +61,6 @@ class PessimisticLockPerformanceTest {
                     ReserveSeat reserveSeat = reserveFacade.reserveSeat(reserveSeatCriteria);
                     log.info("좌석 예약 성공");
                     return reserveSeat;
-                } catch (OptimisticLockingFailureException e) {
-                    log.error("낙관락 예외 : {}", e.getMessage());
-                    return null;
                 } catch (Exception e) {
                     log.error("예외 : {}", e.getMessage());
                     return null;
@@ -153,7 +150,6 @@ class PessimisticLockPerformanceTest {
                     UserResult.ChargeBalance chargeBalance = userFacade.chargeBalance(dto);
                     log.info("충전 성공");
                     return chargeBalance;
-                    // 재시도 로직으로 낙관락 예외는 잡히지 않는다.
                 } catch (Exception e) {
                     log.error("예외 : {}", e.getMessage());
                     return null;
