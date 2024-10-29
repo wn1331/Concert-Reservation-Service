@@ -25,9 +25,6 @@ public class User {
 
     private BigDecimal point;
 
-    @Version
-    private Integer version;
-
 
     @Builder
     public User(String name, BigDecimal point) {

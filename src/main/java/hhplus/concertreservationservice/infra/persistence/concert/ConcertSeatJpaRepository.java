@@ -5,7 +5,6 @@ import hhplus.concertreservationservice.domain.concert.entity.SeatStatusType;
 import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
-import org.hibernate.annotations.OptimisticLock;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 
@@ -15,6 +14,6 @@ public interface ConcertSeatJpaRepository extends JpaRepository<ConcertSeat,Long
 
     Optional<ConcertSeat> findByIdAndStatus(Long concertSeatId, SeatStatusType status);
 
-    @Lock(LockModeType.OPTIMISTIC)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<ConcertSeat> findById(Long concertSeatId);
 }

@@ -34,9 +34,6 @@ public class ConcertSeat extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private SeatStatusType status;
 
-    @Version
-    private Integer version;
-
     @Builder
     public ConcertSeat(Long concertScheduleId, String seatNum, BigDecimal price,
         SeatStatusType status) {

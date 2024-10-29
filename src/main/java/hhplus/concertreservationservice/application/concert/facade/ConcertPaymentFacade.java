@@ -10,7 +10,6 @@ import hhplus.concertreservationservice.domain.concert.service.ConcertService;
 import hhplus.concertreservationservice.domain.user.dto.UserCommand;
 import hhplus.concertreservationservice.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -26,12 +25,6 @@ public class ConcertPaymentFacade {
     private final UserService userService;
 
     @Transactional
-    @Retryable(
-        retryFor = {ObjectOptimisticLockingFailureException.class},
-        maxAttempts = 10, // 재실행 횟수(낙관적 락 충돌시에만 재실행), default는 3회
-        backoff = @Backoff(100), // 0.1초 간격으로 재실행
-        listeners = {"retryLoggingListener"} // 재시도 시 리스너(로그) 실행 - 한 개의 쓰레드를 점유한다.
-    )
     public ConcertResult.Pay pay(ConcertCriteria.Pay criteria) {
 
         // 예약 상태 변경.

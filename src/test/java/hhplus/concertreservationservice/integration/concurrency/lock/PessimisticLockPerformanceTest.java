@@ -27,10 +27,10 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@DisplayName("낙관락 테스트")
-class OptimisticLockPerformanceTest {
+@DisplayName("비관락 테스트")
+class PessimisticLockPerformanceTest {
 
-    private static final Logger log = LoggerFactory.getLogger(OptimisticLockPerformanceTest.class);
+    private static final Logger log = LoggerFactory.getLogger(PessimisticLockPerformanceTest.class);
 
     @Autowired
     private ConcertReservationFacade reserveFacade;
@@ -45,7 +45,7 @@ class OptimisticLockPerformanceTest {
 
 
     @Test
-    @DisplayName("[낙관락] 좌석 예약 동시성 테스트 - 1000개 쓰레드의 요청")
+    @DisplayName("[비관락] 좌석 예약 동시성 테스트 - 1000개 쓰레드의 요청")
     void concurrencyReserveSeatTest() {
         ConcertCriteria.ReserveSeat reserveSeatCriteria = ConcertCriteria.ReserveSeat.builder()
             .userId(1L)
@@ -92,7 +92,7 @@ class OptimisticLockPerformanceTest {
     }
 
     @Test
-    @DisplayName("[낙관락] 결제(포인트사용) 동시성 테스트 - 1000개 쓰레드의 요청")
+    @DisplayName("[비관락] 결제(포인트사용) 동시성 테스트 - 1000개 쓰레드의 요청")
     void concurrencyPayTest() {
 
         ConcertCriteria.Pay payCriteria = ConcertCriteria.Pay.builder()
@@ -137,7 +137,7 @@ class OptimisticLockPerformanceTest {
     }
 
     @Test
-    @DisplayName("[낙관락] 포인트충전 동시성 테스트 - 1000번 충전")
+    @DisplayName("[비관락] 포인트충전 동시성 테스트 - 1000번 충전")
     void chargeBalance_concurrency_test() {
 
         ChargeBalance dto = ChargeBalance.builder().userId(1L).amount(BigDecimal.valueOf(10000))

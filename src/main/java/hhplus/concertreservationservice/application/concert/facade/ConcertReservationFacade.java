@@ -8,15 +8,9 @@ import hhplus.concertreservationservice.domain.concert.service.ConcertReservatio
 import hhplus.concertreservationservice.domain.concert.service.ConcertService;
 import hhplus.concertreservationservice.global.exception.CustomGlobalException;
 import hhplus.concertreservationservice.global.exception.ErrorCode;
-import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,18 +27,15 @@ public class ConcertReservationFacade {
     public ConcertResult.ReserveSeat reserveSeat(ConcertCriteria.ReserveSeat criteria) {
 
         // 좌석 관련 로직 서비스 호출
-        try {
-            BigDecimal seatPrice = concertService.changeSeatStatusAndReturnPrice(
-                criteria.concertSeatId());
+        BigDecimal seatPrice = concertService.changeSeatStatusAndReturnPrice(
+            criteria.concertSeatId());
 
-            // 예약 서비스 호출
-            ReserveSeat reserveSeatInfo = concertReservationService.reserveSeat(
-                criteria.toCommand(seatPrice));
+        // 예약 서비스 호출
+        ReserveSeat reserveSeatInfo = concertReservationService.reserveSeat(
+            criteria.toCommand(seatPrice));
 
-            return ConcertResult.ReserveSeat.fromInfo(reserveSeatInfo);
-        }catch (OptimisticLockingFailureException e){
-            throw new CustomGlobalException(ErrorCode.OPTIMISTIC_EXCEPTION);
-        }
+        return ConcertResult.ReserveSeat.fromInfo(reserveSeatInfo);
+
 
     }
 
