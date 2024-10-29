@@ -81,7 +81,7 @@ class OptimisticLockPerformanceTest {
 
         // 시간 측정
         long endTime = System.currentTimeMillis();
-        log.info("{}개의 쓰레드 총 수행 시간 : {}ms", THREAD_AMOUNT, endTime - startTime);
+        log.info("좌석 예약 {}개의 쓰레드 총 수행 시간 : {}ms", THREAD_AMOUNT, endTime - startTime);
 
         // 성공한 예약 횟수 계산
         long successCount = getSuccessCount(tasks);
@@ -127,7 +127,7 @@ class OptimisticLockPerformanceTest {
 
         // 시간 측정
         long endTime = System.currentTimeMillis();
-        log.info("{}개의 쓰레드 총 수행 시간 : {}ms", THREAD_AMOUNT, endTime - startTime);
+        log.info("좌석 결제 {}개의 쓰레드 총 수행 시간 : {}ms", THREAD_AMOUNT, endTime - startTime);
 
         // 성공한 결제 횟수 계산
         long successCount = getSuccessCount(tasks);
@@ -170,7 +170,7 @@ class OptimisticLockPerformanceTest {
 
         // 시간 측정
         long endTime = System.currentTimeMillis();
-        log.info("{}개의 쓰레드 총 수행 시간 : {}ms", THREAD_AMOUNT, endTime - startTime);
+        log.info("포인트 충전 {}개의 쓰레드 총 수행 시간 : {}ms", THREAD_AMOUNT, endTime - startTime);
 
         // 성공한 충전 횟수 계산
         long successCount = getSuccessCount(tasks);
