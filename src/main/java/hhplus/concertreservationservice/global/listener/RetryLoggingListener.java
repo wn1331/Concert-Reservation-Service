@@ -6,12 +6,12 @@ import org.springframework.retry.RetryContext;
 import org.springframework.retry.RetryListener;
 
 @Slf4j
-public class ReserveSeatRetryListener implements RetryListener {
+public class RetryLoggingListener implements RetryListener {
 
     @Override
     public <T, E extends Throwable> boolean open(RetryContext context, RetryCallback<T, E> callback) {
         // 재시도 시작 시 호출됨
-        log.warn("Reserving Seat - Retry started...");
+        log.warn("Retry started...");
 
         return true; // true를 반환하여 재시도를 허용
     }

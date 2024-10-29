@@ -82,7 +82,7 @@ class ConcertConcurrencyTest {
     @DisplayName("[동시성 테스트] 사용자가 동시에 결제요청을 6번 했을 시 1번만 성공하는지 테스트")
     void pay_concurrency_test() {
         Long userId = 2L;
-        Long reservationId = 2L;
+        Long reservationId = 1L;
 
         List<CompletableFuture<ConcertResult.Pay>> tasks = IntStream.rangeClosed(1, 6)
             .mapToObj(i -> CompletableFuture.supplyAsync(() -> {

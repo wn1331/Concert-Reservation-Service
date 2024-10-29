@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -29,24 +30,21 @@ public class ConcertReservationFacade {
 
 
     @Transactional
-    @Retryable(
-        retryFor = {ObjectOptimisticLockingFailureException.class},
-        maxAttempts = 5, // 재실행 횟수(낙관적 락 충돌시에만 재실행), default는 3회
-        backoff = @Backoff(1), // 0.001초 간격으로 재실행
-        listeners = {"reserveSeatRetryListener"} // 재시도 시 리스너(로그) 실행
-    )
     public ConcertResult.ReserveSeat reserveSeat(ConcertCriteria.ReserveSeat criteria) {
 
         // 좌석 관련 로직 서비스 호출
-        BigDecimal seatPrice = concertService.changeSeatStatusAndReturnPrice(
-            criteria.concertSeatId());
+        try {
+            BigDecimal seatPrice = concertService.changeSeatStatusAndReturnPrice(
+                criteria.concertSeatId());
 
-        // 예약 서비스 호출
-        ReserveSeat reserveSeatInfo = concertReservationService.reserveSeat(
-            criteria.toCommand(seatPrice));
+            // 예약 서비스 호출
+            ReserveSeat reserveSeatInfo = concertReservationService.reserveSeat(
+                criteria.toCommand(seatPrice));
 
-        return ConcertResult.ReserveSeat.fromInfo(reserveSeatInfo);
-
+            return ConcertResult.ReserveSeat.fromInfo(reserveSeatInfo);
+        }catch (OptimisticLockingFailureException e){
+            throw new CustomGlobalException(ErrorCode.OPTIMISTIC_EXCEPTION);
+        }
 
     }
 

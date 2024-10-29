@@ -1,6 +1,6 @@
 package hhplus.concertreservationservice.global.config;
 
-import hhplus.concertreservationservice.global.listener.ReserveSeatRetryListener;
+import hhplus.concertreservationservice.global.listener.RetryLoggingListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.RetryListener;
@@ -9,8 +9,8 @@ import org.springframework.retry.RetryListener;
 public class RetryConfig {
 
     @Bean
-    public RetryListener reserveSeatRetryListener(){
-        return new ReserveSeatRetryListener();
+    public RetryListener retryLoggingListener(){
+        return new RetryLoggingListener();
     }
 
 }

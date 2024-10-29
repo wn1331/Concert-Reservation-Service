@@ -34,7 +34,6 @@ dependencies {
 
     // 재시도 처리를 위한 dependency
     implementation 'org.springframework.retry:spring-retry'
-    implementation 'org.springframework:spring-aspects'
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
