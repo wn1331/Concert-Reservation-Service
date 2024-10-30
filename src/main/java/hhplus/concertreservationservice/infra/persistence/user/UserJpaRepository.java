@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 public interface UserJpaRepository extends JpaRepository<User,Long> {
 
     @Query("SELECT u FROM User u WHERE u.id = :id")
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<User> findByIdForUsePoint(@Param(value = "id") Long userId);
 
     Optional<User> findUserById(Long userId);
