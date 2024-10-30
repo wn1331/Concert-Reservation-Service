@@ -1,12 +1,14 @@
 package hhplus.concertreservationservice.integration.concurrency.lock;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult.ReserveSeat;
 import hhplus.concertreservationservice.application.concert.facade.ConcertPaymentFacade;
 import hhplus.concertreservationservice.application.concert.facade.ConcertReservationFacade;
+import hhplus.concertreservationservice.application.user.dto.UserCriteria;
 import hhplus.concertreservationservice.application.user.dto.UserCriteria.ChargeBalance;
 import hhplus.concertreservationservice.application.user.dto.UserResult;
 import hhplus.concertreservationservice.application.user.facade.UserFacade;
@@ -20,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -28,9 +29,9 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @DisplayName("RedisPubSub 테스트")
-class PessimisticLockPerformanceTest {
+class RedissionPubSubPerformanceTest {
 
-    private static final Logger log = LoggerFactory.getLogger(PessimisticLockPerformanceTest.class);
+    private static final Logger log = LoggerFactory.getLogger(RedissionPubSubPerformanceTest.class);
 
     @Autowired
     private ConcertReservationFacade reserveFacade;
@@ -45,7 +46,7 @@ class PessimisticLockPerformanceTest {
 
 
     @Test
-    @DisplayName("[비관락] 좌석 예약 동시성 테스트 - 1000번 비동기 요청")
+    @DisplayName("[Pub/Sub] 좌석 예약 동시성 테스트 - 1000번 비동기 요청")
     void concurrencyReserveSeatTest() {
         ConcertCriteria.ReserveSeat reserveSeatCriteria = ConcertCriteria.ReserveSeat.builder()
             .userId(1L)
@@ -55,7 +56,7 @@ class PessimisticLockPerformanceTest {
         List<CompletableFuture<ConcertResult.ReserveSeat>> tasks = new ArrayList<>();
 
         // 동시에 1000번의 예약 요청을 수행
-        for (long i = 1; i <= REQUEST_AMOUNT; i++) {
+        for (long i = 1; i <= 1000; i++) {
             tasks.add(CompletableFuture.supplyAsync(() -> {
                 try {
                     ReserveSeat reserveSeat = reserveFacade.reserveSeat(reserveSeatCriteria);
@@ -78,7 +79,7 @@ class PessimisticLockPerformanceTest {
 
         // 시간 측정
         long endTime = System.currentTimeMillis();
-        log.info("좌석 예약 {}개의 쓰레드 총 수행 시간 : {}ms", REQUEST_AMOUNT, endTime - startTime);
+        log.info("좌석 예약 {}개의 비동기 요청 총 수행 시간 : {}ms", REQUEST_AMOUNT, endTime - startTime);
 
         // 성공한 예약 횟수 계산
         long successCount = getSuccessCount(tasks);
@@ -89,7 +90,7 @@ class PessimisticLockPerformanceTest {
     }
 
     @Test
-    @DisplayName("[비관락] 결제(포인트사용) 동시성 테스트 - 1000번 비동기 요청")
+    @DisplayName("[Pub/Sub] 결제(포인트사용) 동시성 테스트 - 1000번 비동기 요청")
     void concurrencyPayTest() {
 
         ConcertCriteria.Pay payCriteria = ConcertCriteria.Pay.builder()
@@ -107,7 +108,6 @@ class PessimisticLockPerformanceTest {
                     ConcertResult.Pay payResult = paymentFacade.pay(payCriteria);
                     log.info("결제 성공");
                     return payResult;
-                    // 재시도 로직으로 낙관락 예외는 잡히지 않는다.(재시도가 매우 빠르면 잡힌다. 대신 테스트도 실패할 것)
                 } catch (Exception e) {
                     log.error("예외 : {}", e.getMessage());
                     return null;
@@ -124,7 +124,7 @@ class PessimisticLockPerformanceTest {
 
         // 시간 측정
         long endTime = System.currentTimeMillis();
-        log.info("좌석 결제 {}개의 쓰레드 총 수행 시간 : {}ms", REQUEST_AMOUNT, endTime - startTime);
+        log.info("좌석 결제 {}개의 비동기 요청 총 수행 시간 : {}ms", REQUEST_AMOUNT, endTime - startTime);
 
         // 성공한 결제 횟수 계산
         long successCount = getSuccessCount(tasks);
@@ -134,7 +134,7 @@ class PessimisticLockPerformanceTest {
     }
 
     @Test
-    @DisplayName("[비관락] 포인트충전 동시성 테스트 - 1000번 비동기 요청")
+    @DisplayName("[Pub/Sub] 포인트충전 동시성 테스트 - 1000번 비동기 요청")
     void chargeBalance_concurrency_test() {
 
         ChargeBalance dto = ChargeBalance.builder().userId(1L).amount(BigDecimal.valueOf(10000))
@@ -166,14 +166,21 @@ class PessimisticLockPerformanceTest {
 
         // 시간 측정
         long endTime = System.currentTimeMillis();
-        log.info("포인트 충전 {}개의 쓰레드 총 수행 시간 : {}ms", REQUEST_AMOUNT, endTime - startTime);
+        log.info("포인트 충전 {}개의 비동기 요청 총 수행 시간 : {}ms", REQUEST_AMOUNT, endTime - startTime);
 
         // 성공한 충전 횟수 계산
         long successCount = getSuccessCount(tasks);
 
         // 성공한 횟수 확인
         assertThat(successCount).isEqualTo(1000);
+        // 충전 후의 최종 금액 확인 (Mock으로 가정)
+        BigDecimal expectedTotalAmount = new BigDecimal(10000000);  // 총 1000만원 (기존에 0원 있던 User 1번)
+        BigDecimal actualTotalAmount = userFacade.checkBalance(UserCriteria.CheckBalance.builder()
+            .userId(1L)
+            .build()).balance();  // 최종 잔액 확인
 
+        assertThat(successCount).isEqualTo(1000);
+        assertEquals(0, expectedTotalAmount.compareTo(actualTotalAmount));  // 최종 잔액 검증
 
     }
 

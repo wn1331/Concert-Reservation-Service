@@ -37,11 +37,10 @@ public record ConcertCriteria() {
         Long concertSeatId
     ) {
 
-        public ConcertCommand.ReserveSeat toCommand(BigDecimal price) {
+        public ConcertCommand.ReserveSeat toCommand() {
             return ConcertCommand.ReserveSeat.builder()
                 .userId(userId)
                 .concertSeatId(concertSeatId)
-                .price(price)
                 .build();
         }
     }
@@ -52,10 +51,9 @@ public record ConcertCriteria() {
         Long userId
     ) {
 
-        public ConcertCommand.Pay toCommand(BigDecimal price) {
+        public ConcertCommand.Pay toCommand() {
             return ConcertCommand.Pay.builder()
                 .reservationId(reservationId)
-                .price(price)
                 .build();
         }
     }

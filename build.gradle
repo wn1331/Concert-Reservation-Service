@@ -35,6 +35,9 @@ dependencies {
     // 재시도 처리를 위한 dependency
     implementation 'org.springframework.retry:spring-retry'
 
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
     // redission
     implementation 'org.redisson:redisson-spring-boot-starter:3.37.0'
 

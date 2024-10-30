@@ -4,6 +4,7 @@ import hhplus.concertreservationservice.application.user.dto.UserCriteria.Charge
 import hhplus.concertreservationservice.application.user.dto.UserCriteria.CheckBalance;
 import hhplus.concertreservationservice.application.user.dto.UserResult;
 import hhplus.concertreservationservice.domain.user.service.UserService;
+import hhplus.concertreservationservice.global.aspect.RedissionPubSubLock;
 import lombok.RequiredArgsConstructor;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -25,6 +26,7 @@ public class UserFacade {
     }
 
     // 잔액충전
+    @RedissionPubSubLock(value = "'chargeBalanceUserId-' + #criteria.userId", waitTime = 30, leaseTime = 10)
     public UserResult.ChargeBalance chargeBalance(ChargeBalance criteria){
         // 충전
         return UserResult.ChargeBalance.fromInfo(userService.chargeUserBalance(criteria.toCommand()));

@@ -6,11 +6,14 @@ import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo;
 import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo.ReserveSeat;
 import hhplus.concertreservationservice.domain.concert.service.ConcertReservationService;
 import hhplus.concertreservationservice.domain.concert.service.ConcertService;
+import hhplus.concertreservationservice.global.aspect.RedissionPubSubLock;
 import hhplus.concertreservationservice.global.exception.CustomGlobalException;
 import hhplus.concertreservationservice.global.exception.ErrorCode;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,19 +23,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class ConcertReservationFacade {
 
     private final ConcertReservationService concertReservationService;
-    private final ConcertService concertService;
 
-
-    @Transactional
+    @RedissionPubSubLock(value = "'reserveSeatId-' + #criteria.concertSeatId", waitTime = 30, leaseTime = 10)
     public ConcertResult.ReserveSeat reserveSeat(ConcertCriteria.ReserveSeat criteria) {
 
-        // 좌석 관련 로직 서비스 호출
-        BigDecimal seatPrice = concertService.changeSeatStatusAndReturnPrice(
-            criteria.concertSeatId());
-
-        // 예약 서비스 호출
+        // 좌석 관련 서비스 +  예약 서비스 호출(합치고, 서비스에 트랜잭션이 걸려있어야 동작한다.)
         ReserveSeat reserveSeatInfo = concertReservationService.reserveSeat(
-            criteria.toCommand(seatPrice));
+            criteria.toCommand());
 
         return ConcertResult.ReserveSeat.fromInfo(reserveSeatInfo);
 
