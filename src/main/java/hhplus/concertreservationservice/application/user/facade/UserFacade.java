@@ -26,7 +26,7 @@ public class UserFacade {
     }
 
     // 잔액충전
-    @RedissionPubSubLock(value = "'chargeBalanceUserId-' + #criteria.userId", waitTime = 30, leaseTime = 10)
+    @Transactional
     public UserResult.ChargeBalance chargeBalance(ChargeBalance criteria){
         // 충전
         return UserResult.ChargeBalance.fromInfo(userService.chargeUserBalance(criteria.toCommand()));

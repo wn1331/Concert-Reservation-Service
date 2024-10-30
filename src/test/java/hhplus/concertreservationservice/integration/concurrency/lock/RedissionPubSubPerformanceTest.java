@@ -2,6 +2,7 @@ package hhplus.concertreservationservice.integration.concurrency.lock;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
@@ -90,7 +91,7 @@ class RedissionPubSubPerformanceTest {
     }
 
     @Test
-    @DisplayName("[Pub/Sub] 결제(포인트사용) 동시성 테스트 - 1000번 비동기 요청")
+    @DisplayName("[비관락] 결제(포인트사용) 동시성 테스트 - 1000번 비동기 요청")
     void concurrencyPayTest() {
 
         ConcertCriteria.Pay payCriteria = ConcertCriteria.Pay.builder()
@@ -134,7 +135,7 @@ class RedissionPubSubPerformanceTest {
     }
 
     @Test
-    @DisplayName("[Pub/Sub] 포인트충전 동시성 테스트 - 1000번 비동기 요청")
+    @DisplayName("[낙관락(재시도x)] 포인트충전 동시성 테스트 - 1000번 비동기 요청")
     void chargeBalance_concurrency_test() {
 
         ChargeBalance dto = ChargeBalance.builder().userId(1L).amount(BigDecimal.valueOf(10000))
@@ -171,16 +172,9 @@ class RedissionPubSubPerformanceTest {
         // 성공한 충전 횟수 계산
         long successCount = getSuccessCount(tasks);
 
-        // 성공한 횟수 확인
-        assertThat(successCount).isEqualTo(1000);
-        // 충전 후의 최종 금액 확인 (Mock으로 가정)
-        BigDecimal expectedTotalAmount = new BigDecimal(10000000);  // 총 1000만원 (기존에 0원 있던 User 1번)
-        BigDecimal actualTotalAmount = userFacade.checkBalance(UserCriteria.CheckBalance.builder()
-            .userId(1L)
-            .build()).balance();  // 최종 잔액 확인
+        // 전부 성공할 수 없음
+        assertNotEquals(successCount,1000);
 
-        assertThat(successCount).isEqualTo(1000);
-        assertEquals(0, expectedTotalAmount.compareTo(actualTotalAmount));  // 최종 잔액 검증
 
     }
 
