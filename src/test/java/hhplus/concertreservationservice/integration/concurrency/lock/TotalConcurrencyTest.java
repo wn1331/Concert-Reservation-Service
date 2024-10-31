@@ -9,10 +9,11 @@ import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult.ReserveSeat;
 import hhplus.concertreservationservice.application.concert.facade.ConcertPaymentFacade;
 import hhplus.concertreservationservice.application.concert.facade.ConcertReservationFacade;
-import hhplus.concertreservationservice.application.user.dto.UserCriteria;
 import hhplus.concertreservationservice.application.user.dto.UserCriteria.ChargeBalance;
 import hhplus.concertreservationservice.application.user.dto.UserResult;
 import hhplus.concertreservationservice.application.user.facade.UserFacade;
+import hhplus.concertreservationservice.global.exception.CustomGlobalException;
+import hhplus.concertreservationservice.global.exception.ErrorCode;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -30,9 +32,9 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @DisplayName("RedisPubSub 테스트")
-class RedissionPubSubPerformanceTest {
+class TotalConcurrencyTest {
 
-    private static final Logger log = LoggerFactory.getLogger(RedissionPubSubPerformanceTest.class);
+    private static final Logger log = LoggerFactory.getLogger(TotalConcurrencyTest.class);
 
     @Autowired
     private ConcertReservationFacade reserveFacade;
@@ -47,7 +49,7 @@ class RedissionPubSubPerformanceTest {
 
 
     @Test
-    @DisplayName("[Pub/Sub] 좌석 예약 동시성 테스트 - 1000번 비동기 요청")
+    @DisplayName("[Pub/Sub] 좌석 예약 동시성 테스트 - 1000번 비동기 요청 시 1번만 성공한다.")
     void concurrencyReserveSeatTest() {
         ConcertCriteria.ReserveSeat reserveSeatCriteria = ConcertCriteria.ReserveSeat.builder()
             .userId(1L)
@@ -91,7 +93,7 @@ class RedissionPubSubPerformanceTest {
     }
 
     @Test
-    @DisplayName("[비관락] 결제(포인트사용) 동시성 테스트 - 1000번 비동기 요청")
+    @DisplayName("[비관락] 결제(포인트사용) 동시성 테스트 - 1000번 비동기 요청 시 1번만 성공한다.")
     void concurrencyPayTest() {
 
         ConcertCriteria.Pay payCriteria = ConcertCriteria.Pay.builder()
@@ -109,7 +111,10 @@ class RedissionPubSubPerformanceTest {
                     ConcertResult.Pay payResult = paymentFacade.pay(payCriteria);
                     log.info("결제 성공");
                     return payResult;
-                } catch (Exception e) {
+                }catch (OptimisticLockingFailureException e){
+                    throw new CustomGlobalException(ErrorCode.OPTIMISTIC_EXCEPTION);
+                }
+                catch (Exception e) {
                     log.error("예외 : {}", e.getMessage());
                     return null;
                 }
@@ -135,7 +140,7 @@ class RedissionPubSubPerformanceTest {
     }
 
     @Test
-    @DisplayName("[낙관락(재시도x)] 포인트충전 동시성 테스트 - 1000번 비동기 요청")
+    @DisplayName("[낙관락(재시도x)] 포인트충전 동시성 테스트 - 1000번 동시에 비동기 요청 시 1000번 모두 성공해서는 안 된다.")
     void chargeBalance_concurrency_test() {
 
         ChargeBalance dto = ChargeBalance.builder().userId(1L).amount(BigDecimal.valueOf(10000))
