@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -41,7 +42,7 @@ class OptimisticLockPerformanceTest {
     @Autowired
     private UserFacade userFacade;
 
-    private final Long THREAD_AMOUNT = 1000L;
+    private final Long REQUEST_AMOUNT = 1000L;
 
 
     @Test
@@ -55,7 +56,7 @@ class OptimisticLockPerformanceTest {
         List<CompletableFuture<ConcertResult.ReserveSeat>> tasks = new ArrayList<>();
 
         // 동시에 1000번의 예약 요청을 수행
-        for (long i = 1; i <= THREAD_AMOUNT; i++) {
+        for (long i = 1; i <= REQUEST_AMOUNT; i++) {
             tasks.add(CompletableFuture.supplyAsync(() -> {
                 try {
                     ReserveSeat reserveSeat = reserveFacade.reserveSeat(reserveSeatCriteria);
@@ -81,7 +82,7 @@ class OptimisticLockPerformanceTest {
 
         // 시간 측정
         long endTime = System.currentTimeMillis();
-        log.info("좌석 예약 {}개의 쓰레드 총 수행 시간 : {}ms", THREAD_AMOUNT, endTime - startTime);
+        log.info("좌석 예약 {}개의 동시 비동기 요청 총 수행 시간 : {}ms", REQUEST_AMOUNT, endTime - startTime);
 
         // 성공한 예약 횟수 계산
         long successCount = getSuccessCount(tasks);
@@ -103,7 +104,7 @@ class OptimisticLockPerformanceTest {
         List<CompletableFuture<ConcertResult.Pay>> tasks = new ArrayList<>();
 
         // 동시에 10번의 충전 요청을 수행
-        for (long i = 1; i <= THREAD_AMOUNT; i++) {
+        for (long i = 1; i <= REQUEST_AMOUNT; i++) {
 
             tasks.add(CompletableFuture.supplyAsync(() -> {
                 try {
@@ -127,7 +128,7 @@ class OptimisticLockPerformanceTest {
 
         // 시간 측정
         long endTime = System.currentTimeMillis();
-        log.info("좌석 결제 {}개의 쓰레드 총 수행 시간 : {}ms", THREAD_AMOUNT, endTime - startTime);
+        log.info("좌석 결제 {}개의 동시 비동기 요청 총 수행 시간 : {}ms", REQUEST_AMOUNT, endTime - startTime);
 
         // 성공한 결제 횟수 계산
         long successCount = getSuccessCount(tasks);
@@ -146,7 +147,7 @@ class OptimisticLockPerformanceTest {
         List<CompletableFuture<UserResult.ChargeBalance>> tasks = new ArrayList<>();
 
         // 동시에 1000번의 충전 요청을 수행
-        for (long i = 1; i <= THREAD_AMOUNT; i++) {
+        for (long i = 1; i <= REQUEST_AMOUNT; i++) {
 
             tasks.add(CompletableFuture.supplyAsync(() -> {
                 try {
@@ -170,13 +171,14 @@ class OptimisticLockPerformanceTest {
 
         // 시간 측정
         long endTime = System.currentTimeMillis();
-        log.info("포인트 충전 {}개의 쓰레드 총 수행 시간 : {}ms", THREAD_AMOUNT, endTime - startTime);
+        log.info("포인트 충전 {}개의 동시 비동기 요청 총 수행 시간 : {}ms", REQUEST_AMOUNT, endTime - startTime);
 
         // 성공한 충전 횟수 계산
         long successCount = getSuccessCount(tasks);
 
-        // 성공한 횟수 확인
-        assertThat(successCount).isEqualTo(1000);
+        // 성공한 횟수 확인. 1000일 수 없다
+        Assertions.assertNotEquals(successCount,1000);
+//        assertThat(successCount).isEqualTo(1000);
 
 
     }

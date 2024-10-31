@@ -28,7 +28,7 @@ public class ConcertPaymentFacade {
     @Transactional
     @Retryable(
         retryFor = {ObjectOptimisticLockingFailureException.class},
-        maxAttempts = 10, // 재실행 횟수(낙관적 락 충돌시에만 재실행), default는 3회
+        maxAttempts = 5, // 재실행 횟수(낙관적 락 충돌시에만 재실행), default는 3회
         backoff = @Backoff(100), // 0.1초 간격으로 재실행
         listeners = {"retryLoggingListener"} // 재시도 시 리스너(로그) 실행 - 한 개의 쓰레드를 점유한다.
     )
