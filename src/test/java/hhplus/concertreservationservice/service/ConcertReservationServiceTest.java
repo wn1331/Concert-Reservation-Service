@@ -119,7 +119,7 @@ class ConcertReservationServiceTest {
     @DisplayName("[성공] 좌석예약(reserveSeat 메서드)")
     void reserveSeat_shouldCreateNewReservation() {
         // Given
-        ReserveSeat command = new ReserveSeat(USER_ID, CONCERTSEAT_ID, SEAT_PRICE);
+        ReserveSeat command = new ReserveSeat(USER_ID, CONCERTSEAT_ID);
         ConcertReservation savedReservation = ConcertReservation.builder()
             .userId(USER_ID)
             .concertSeatId(CONCERTSEAT_ID)
@@ -144,7 +144,7 @@ class ConcertReservationServiceTest {
     @DisplayName("[실패] 좌석예약(reserveSeat 메서드) - 이미 판매된 좌석")
     void reserveSeat_shouldThrowExceptionWhenSeatAlreadySold() {
         // Given
-        ReserveSeat command = new ReserveSeat(USER_ID, CONCERTSEAT_ID, SEAT_PRICE);
+        ReserveSeat command = new ReserveSeat(USER_ID, CONCERTSEAT_ID);
 
         // 해당 좌석이 이미 예약된 상태로 리포지토리에서 조회되도록 설정
         when(concertReservationRepository.save(any(ConcertReservation.class)))

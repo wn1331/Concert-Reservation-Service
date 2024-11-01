@@ -17,14 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ConcertPaymentFacade {
 
+    private final UserService userService;
     private final ConcertService concertService;
     private final ConcertReservationService concertReservationService;
     private final ConcertPaymentService concertPaymentService;
-    private final UserService userService;
 
     @Transactional
     public ConcertResult.Pay pay(ConcertCriteria.Pay criteria) {
-
+        // 예약내용 결제
         // 예약 상태 변경.
         ReservationStatus reservationStatus = concertReservationService.changeReservationStatusPaid(
             criteria.reservationId());
@@ -42,7 +42,6 @@ public class ConcertPaymentFacade {
         // 예약내용 결제
         ConcertInfo.Pay pay = concertPaymentService.payReservation(criteria.toCommand(reservationStatus.price()));
 
-        return ConcertResult.Pay.fromInfo(pay);
-    }
+        return ConcertResult.Pay.fromInfo(pay);    }
 
 }

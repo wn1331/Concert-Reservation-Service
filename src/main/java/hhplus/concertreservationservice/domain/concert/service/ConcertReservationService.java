@@ -33,7 +33,19 @@ public class ConcertReservationService {
 
 
 
+    @Transactional
     public ConcertInfo.ReserveSeat reserveSeat(ReserveSeat command) {
+        // 좌석 조회( 낙관락 적용 )
+        ConcertSeat concertSeat = concertSeatRepository.findById(command.concertSeatId())
+            .orElseThrow(() -> new CustomGlobalException(ErrorCode.CONCERT_SEAT_NOT_FOUND));
+
+        // 좌석 상태 변경
+        switch (concertSeat.getStatus()) {
+            case EMPTY -> concertSeat.reserveSeat();
+            case RESERVED -> throw new CustomGlobalException(ErrorCode.ALREADY_RESERVED_SEAT);
+            case SOLD -> throw new CustomGlobalException(ErrorCode.ALREADY_SOLD_SEAT);
+        }
+
         // 예약 생성
         return ConcertInfo.ReserveSeat.builder()
             .reservationId(concertReservationRepository.save(
@@ -41,7 +53,7 @@ public class ConcertReservationService {
                         .userId(command.userId())
                         .concertSeatId(command.concertSeatId())
                         .status(ReservationStatusType.RESERVED)
-                        .price(command.price())
+                        .price(concertSeat.getPrice())
                         .build())
                 .getId())
             .build();

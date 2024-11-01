@@ -4,7 +4,10 @@ import hhplus.concertreservationservice.application.user.dto.UserCriteria.Charge
 import hhplus.concertreservationservice.application.user.dto.UserCriteria.CheckBalance;
 import hhplus.concertreservationservice.application.user.dto.UserResult;
 import hhplus.concertreservationservice.domain.user.service.UserService;
+import hhplus.concertreservationservice.global.aspect.RedissionPubSubLock;
 import lombok.RequiredArgsConstructor;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 

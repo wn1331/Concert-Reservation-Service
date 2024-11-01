@@ -43,7 +43,7 @@ public class UserService {
 
     @Transactional
     public UserInfo.ChargeBalance chargeUserBalance(UserCommand.ChargeBalance command){
-        User user = userRepository.findByIdForUsePoint(command.userId())
+        User user = userRepository.findByIdForChargePoint(command.userId())
            .orElseThrow(() -> new CustomGlobalException(ErrorCode.USER_NOT_FOUND));
 
         user.pointCharge(command.amount());
