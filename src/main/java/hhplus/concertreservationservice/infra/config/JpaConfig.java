@@ -1,4 +1,4 @@
-package hhplus.concertreservationservice.infra.persistence.config;
+package hhplus.concertreservationservice.infra.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
