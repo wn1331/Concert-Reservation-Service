@@ -40,11 +40,7 @@ public class ConcertReservationService {
             .orElseThrow(() -> new CustomGlobalException(ErrorCode.CONCERT_SEAT_NOT_FOUND));
 
         // 좌석 상태 변경
-        switch (concertSeat.getStatus()) {
-            case EMPTY -> concertSeat.reserveSeat();
-            case RESERVED -> throw new CustomGlobalException(ErrorCode.ALREADY_RESERVED_SEAT);
-            case SOLD -> throw new CustomGlobalException(ErrorCode.ALREADY_SOLD_SEAT);
-        }
+        concertSeat.reserveSeat();
 
         // 예약 생성
         return ConcertInfo.ReserveSeat.builder()
