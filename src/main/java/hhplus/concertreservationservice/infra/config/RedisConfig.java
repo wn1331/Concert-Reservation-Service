@@ -25,6 +25,9 @@ public class RedisConfig{
     @Value("${spring.data.redis.port}")
     private int port;
 
+    @Value("${spring.data.redis.ttlDay}")
+    private int ttlDay;
+
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         return new LettuceConnectionFactory(host, port);
@@ -45,7 +48,7 @@ public class RedisConfig{
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
-            .entryTtl(Duration.ofDays(3))// 유효기간 3일
+            .entryTtl(Duration.ofDays(ttlDay))// 유효기간 3일
             .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
             .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()))
             .disableCachingNullValues();
