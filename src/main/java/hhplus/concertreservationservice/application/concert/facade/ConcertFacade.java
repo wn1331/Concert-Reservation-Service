@@ -4,6 +4,7 @@ import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult.AvailableSchedules;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult.AvailableSeats;
+import hhplus.concertreservationservice.application.concert.dto.ConcertResult.GetConcertList;
 import hhplus.concertreservationservice.domain.concert.service.ConcertService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +17,10 @@ public class ConcertFacade {
 
     private final ConcertService concertService;
 
-    public List<ConcertResult.Concerts> getConcertList(){
-        return concertService.getConcertList().stream()
+    public ConcertResult.GetConcertList getConcertList(){
+        return new GetConcertList(concertService.getConcertList().concertInfoList().stream()
             .map(i->new ConcertResult.Concerts(i.id(),i.title()))
-            .toList();
+            .toList());
     }
 
     public ConcertResult.Create create(ConcertCriteria.Create criteria) {

@@ -43,7 +43,7 @@ public class ConcertController implements IConcertController {
     // 콘서트 조회 API
     @GetMapping
     public ResponseEntity<ConcertResponse.GetConcertList> getConcerts() {
-        return ok().body(new GetConcertList(concertFacade.getConcertList().stream()
+        return ok().body(new GetConcertList(concertFacade.getConcertList().concertsResultList().stream()
             .map(i -> new ConcertResponse.Concerts(i.id(), i.title()))
             .toList()));
     }

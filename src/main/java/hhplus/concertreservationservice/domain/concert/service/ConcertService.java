@@ -6,6 +6,7 @@ import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo;
 import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo.AvailableSchedules;
 import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo.AvailableSeats;
 import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo.Create;
+import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo.GetConcertList;
 import hhplus.concertreservationservice.domain.concert.entity.Concert;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertSchedule;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertSeat;
@@ -20,6 +21,8 @@ import java.util.List;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +36,7 @@ public class ConcertService {
     private final ConcertSeatRepository concertSeatRepository;
 
     @Transactional
+    @CacheEvict(value = "concerts", allEntries = true)
     public Create create(ConcertCommand.Create command) {
         // 콘서트 생성
         Concert concert = concertRepository.save(Concert.builder().title(command.title()).build());
@@ -99,7 +103,8 @@ public class ConcertService {
 
 
     @Transactional(readOnly = true)
-    public List<ConcertInfo.Concert> getConcertList() {
-        return concertRepository.findAll().stream().map(i->new ConcertInfo.Concert(i.getId(),i.getTitle())).toList();
+    @Cacheable(value = "concerts",key = "'all'")
+    public ConcertInfo.GetConcertList getConcertList() {
+        return new GetConcertList(concertRepository.findAll().stream().map(i->new ConcertInfo.Concert(i.getId(),i.getTitle())).toList());
     }
 }

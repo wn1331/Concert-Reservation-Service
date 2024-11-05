@@ -98,4 +98,8 @@ public record ConcertResult() {
 
 
     }
+
+    public record GetConcertList(List<ConcertResult.Concerts> concertsResultList) {
+
+    }
 }

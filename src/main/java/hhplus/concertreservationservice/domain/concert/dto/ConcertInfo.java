@@ -119,4 +119,10 @@ public record ConcertInfo() {
     ) {
 
     }
+
+    public record GetConcertList(
+        List<ConcertInfo.Concert> concertInfoList
+    ) {
+
+    }
 }
