@@ -2,9 +2,30 @@ package hhplus.concertreservationservice.application.concert.dto;
 
 import hhplus.concertreservationservice.domain.concert.dto.ConcertCommand;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.Builder;
 
 public record ConcertCriteria() {
+
+    @Builder
+    public record Create(
+        String title,
+        List<LocalDate> dates,
+        Integer seatAmount,
+        BigDecimal price
+
+    ){
+
+        public ConcertCommand.Create toCommand() {
+            return ConcertCommand.Create.builder()
+                .title(title)
+                .dates(dates)
+                .seatAmount(seatAmount)
+                .price(price)
+                .build();
+        }
+    }
 
     @Builder
     public record GetAvailableSchedules(

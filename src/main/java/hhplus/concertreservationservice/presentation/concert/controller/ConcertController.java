@@ -1,6 +1,8 @@
 package hhplus.concertreservationservice.presentation.concert.controller;
 
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.status;
 
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria.GetAvailableSchedules;
@@ -12,11 +14,13 @@ import hhplus.concertreservationservice.presentation.concert.dto.ConcertRequest;
 import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse;
 import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse.AvailableSchedules;
 import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse.AvailableSeats;
+import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse.GetConcertList;
 import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse.ReserveSeat;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,11 +33,30 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/concerts")
-public class ConcertController implements IConcertController{
+public class ConcertController implements IConcertController {
 
     private final ConcertFacade concertFacade;
     private final ConcertReservationFacade concertReservationFacade;
     private final ConcertPaymentFacade concertPaymentFacade;
+
+
+    // 콘서트 조회 API
+    @GetMapping
+    public ResponseEntity<ConcertResponse.GetConcertList> getConcerts() {
+        return ok().body(new GetConcertList(concertFacade.getConcertList().stream()
+            .map(i -> new ConcertResponse.Concerts(i.id(), i.title()))
+            .toList()));
+    }
+
+    // 콘서트 생성 API
+    @PostMapping("/create")
+    public ResponseEntity<ConcertResponse.Create> createConcert(
+        @RequestBody @Valid ConcertRequest.Create request
+    ) {
+
+        return status(CREATED).body(
+            ConcertResponse.Create.fromResult(concertFacade.create(request.toCriteria())));
+    }
 
 
     // 콘서트 스케줄(날짜) 조회 API
@@ -43,7 +66,8 @@ public class ConcertController implements IConcertController{
     ) {
 
         return ok(AvailableSchedules.fromResult(
-            concertFacade.getAvailableSchedules(new ConcertCriteria.GetAvailableSchedules(concertId))));
+            concertFacade.getAvailableSchedules(
+                new ConcertCriteria.GetAvailableSchedules(concertId))));
     }
 
     // 콘서트 좌석 조회 API
@@ -72,8 +96,9 @@ public class ConcertController implements IConcertController{
     public ResponseEntity<ConcertResponse.Pay> payConcert(
         @PathVariable(name = "reservationId") Long reservationId,
         @RequestBody @Valid ConcertRequest.Pay request
-    ){
-        return ok(ConcertResponse.Pay.fromResult(concertPaymentFacade.pay(request.toCriteria(reservationId))));
+    ) {
+        return ok(ConcertResponse.Pay.fromResult(
+            concertPaymentFacade.pay(request.toCriteria(reservationId))));
     }
 
 

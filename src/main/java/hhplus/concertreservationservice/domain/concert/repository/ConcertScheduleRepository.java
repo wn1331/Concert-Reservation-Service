@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ConcertScheduleRepository {
 
-    void save(ConcertSchedule schedule);
+    ConcertSchedule save(ConcertSchedule schedule);
 
     void saveAll(List<ConcertSchedule> schedules);
 

@@ -1,6 +1,8 @@
 package hhplus.concertreservationservice.presentation.concert.dto;
 
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
+import hhplus.concertreservationservice.application.concert.dto.ConcertResult.Create;
+import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo;
 import hhplus.concertreservationservice.domain.concert.entity.ScheduleStatusType;
 import hhplus.concertreservationservice.domain.concert.entity.SeatStatusType;
 import java.time.LocalDate;
@@ -8,6 +10,13 @@ import java.util.List;
 import lombok.Builder;
 
 public record ConcertResponse() {
+
+    public record Concerts(
+        Long id,
+        String title
+    ) {
+
+    }
 
     @Builder
     public record AvailableSchedules(
@@ -92,4 +101,19 @@ public record ConcertResponse() {
         }
     }
 
+    @Builder
+    public record Create(
+        Long id
+    ) {
+
+        public static ConcertResponse.Create fromResult(ConcertResult.Create result) {
+            return ConcertResponse.Create.builder().id(result.id()).build();
+        }
+    }
+
+    public record GetConcertList(
+        List<ConcertResponse.Concerts> concertsList
+    ) {
+
+    }
 }

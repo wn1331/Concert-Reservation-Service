@@ -107,4 +107,16 @@ public record ConcertInfo() {
     ){
     }
 
+    public record Create(
+        Long id
+    ) {
+
+    }
+
+    public record Concert(
+        Long id,
+        String title
+    ) {
+
+    }
 }
