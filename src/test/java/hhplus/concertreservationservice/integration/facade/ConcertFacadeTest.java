@@ -4,8 +4,7 @@ import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
 import hhplus.concertreservationservice.application.concert.facade.ConcertFacade;
 import hhplus.concertreservationservice.domain.concert.entity.SeatStatusType;
-import hhplus.concertreservationservice.domain.concert.repository.ConcertReservationRepository;
-import hhplus.concertreservationservice.domain.queue.repository.QueueRepository;
+
 import hhplus.concertreservationservice.domain.user.entity.User;
 import hhplus.concertreservationservice.domain.user.repository.UserRepository;
 import hhplus.concertreservationservice.domain.concert.entity.Concert;
@@ -45,9 +44,6 @@ class ConcertFacadeTest {
     private UserRepository userRepository;
 
     @Autowired
-    private QueueRepository queueRepository;
-
-    @Autowired
     private ConcertRepository concertRepository;
 
     @Autowired
@@ -56,13 +52,9 @@ class ConcertFacadeTest {
     @Autowired
     private ConcertSeatRepository concertSeatRepository;
 
-    @Autowired
-    private ConcertReservationRepository concertReservationRepository;
-
     private User user;
     private Concert concert;
     private ConcertSchedule concertSchedule;
-    private String queueToken = "3b93aaaf-0ea8-49e4-be70-574a1813167s";
 
     @BeforeEach
     void setup() {
@@ -121,5 +113,42 @@ class ConcertFacadeTest {
         assertEquals(1, result.seats().size());  // 2개의 좌석이 있어야 함
         assertEquals("A1", result.seats().get(0).seatNum());
     }
+
+    @Test
+    @Order(3)
+    @DisplayName("[성공] 콘서트 목록 조회 테스트")
+    void getConcertList_success() {
+        // Given - 이미 2개가 있음. + setUp에서 1개 만듦. = 3개
+
+        // When
+        ConcertResult.GetConcertList result = concertFacade.getConcertList();
+
+        // Then
+        assertEquals(3, result.concertsResultList().size());
+        assertEquals(concert.getId(), result.concertsResultList().get(2).id());
+        assertEquals(concert.getTitle(), result.concertsResultList().get(2).title());
+    }
+
+    @Test
+    @Order(4)
+    @DisplayName("[성공] 콘서트 생성 테스트")
+    void createConcert_success() {
+        // Given
+        ConcertCriteria.Create criteria = ConcertCriteria.Create.builder()
+            .title("새로운 콘서트")
+            .dates(List.of(LocalDate.of(2024, 12, 15)))
+            .seatAmount(100)
+            .price(BigDecimal.valueOf(200000))
+            .build();
+
+        // When
+        ConcertResult.Create result = concertFacade.create(criteria);
+
+        // Then
+        Concert createdConcert = concertRepository.findById(result.id()).orElse(null);
+        assertEquals(result.id(), createdConcert.getId());
+        assertEquals("새로운 콘서트", createdConcert.getTitle());
+    }
+
 
 }

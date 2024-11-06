@@ -49,9 +49,6 @@ class ConcertPaymentFacadeTest {
     private UserRepository userRepository;
 
     @Autowired
-    private QueueRepository queueRepository;
-
-    @Autowired
     private ConcertRepository concertRepository;
 
     @Autowired
@@ -68,7 +65,6 @@ class ConcertPaymentFacadeTest {
     private ConcertSeat seat;
     private ConcertReservation concertReservation;
     private ConcertSchedule concertSchedule;
-    private String queueToken = "3b93aaaf-0ea8-49e4-be70-574a1813167s";
 
 
     @BeforeEach

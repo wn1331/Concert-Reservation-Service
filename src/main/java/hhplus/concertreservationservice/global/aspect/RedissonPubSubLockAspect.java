@@ -47,11 +47,15 @@ public class RedissonPubSubLockAspect {
 
             // 비즈니스 로직 수행
             return joinPoint.proceed();
+        }catch (CustomGlobalException e) {
+            // CustomGlobalException을 그대로 던짐
+            log.info("Error Occurred CustomGlobalException!!:{} ", lockKey);
+            throw e;
         } catch (Exception e) {
-            // 락 작업 중 예외 발생 시 처리
+            // 그 외의 예외는 LOCK_INTERNAL_ERROR로 처리
             log.info("Lock Undefined Error!!: {}", lockKey);
             throw new CustomGlobalException(ErrorCode.LOCK_INTERNAL_ERROR);
-        } finally {
+        }finally {
             // 락 해제 및 해제 알림 발행
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
