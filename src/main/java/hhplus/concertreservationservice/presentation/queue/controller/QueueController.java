@@ -7,8 +7,11 @@ import hhplus.concertreservationservice.application.queue.dto.QueueCriteria.Orde
 import hhplus.concertreservationservice.application.queue.facade.QueueFacade;
 import hhplus.concertreservationservice.presentation.queue.dto.QueueRequest;
 import hhplus.concertreservationservice.presentation.queue.dto.QueueResponse;
+import hhplus.concertreservationservice.presentation.queue.dto.QueueResponse.Enqueue;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,10 +30,13 @@ public class QueueController implements IQueueController{
 
     // 대기열 생성 API
     @PostMapping("/enqueue")
-    public ResponseEntity<QueueResponse.Enqueue> enqueue(
+    public ResponseEntity<Void> enqueue(
         @RequestBody @Valid QueueRequest.Enqueue request
     ) {
-        return ok(QueueResponse.Enqueue.fromResult(queueFacade.enqueue(request.toCriteria())));
+        Enqueue response = Enqueue.fromResult(queueFacade.enqueue(request.toCriteria()));
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Access-Token",response.token());
+        return new ResponseEntity<>(headers,HttpStatus.CREATED);
     }
 
 
