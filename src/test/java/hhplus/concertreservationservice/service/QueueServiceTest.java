@@ -141,7 +141,7 @@ class QueueServiceTest {
     @Test
     @Order(3)
     @DisplayName("[성공] 대기열이 없을 때 (enqueueOrPoll 메서드) - 신규 대기열 생성 및 순번 반환")
-    void testEnqueueOrPoll_NewQueue() {
+    void testEnqueue_NewQueue() {
         // Given
         QueueCommand.Enqueue command = new QueueCommand.Enqueue(USER_ID);
         when(queueRepository.findByUserId(USER_ID)).thenReturn(Optional.empty());
@@ -157,7 +157,7 @@ class QueueServiceTest {
         when(queueRepository.countWaitingUsersBefore(newQueue.getId())).thenReturn(0L);  // 새로 생성된 대기열이 처음이므로 0명
 
         // When
-        QueueInfo.Enqueue result = queueService.enqueueOrPoll(command);
+        QueueInfo.Enqueue result = queueService.enqueue(command);
 
         // Then
         assertNotNull(result);
@@ -172,14 +172,14 @@ class QueueServiceTest {
     @Test
     @Order(4)
     @DisplayName("[성공] 대기열이 존재할 때, WAITING상태일 때(enqueueOrPoll 메서드) - 토큰값과 순번 반환")
-    void testEnqueueOrPoll_ExistingQueue_WaitingStatus() {
+    void testEnqueue_ExistingQueue_WaitingStatus() {
         // Given
         QueueCommand.Enqueue command = new QueueCommand.Enqueue(USER_ID);
         when(queueRepository.findByUserId(USER_ID)).thenReturn(Optional.of(queue));
         when(queueRepository.countWaitingUsersBefore(queue.getId())).thenReturn(5L);  // 앞선 대기열이 5명 있다고 가정
 
         // When
-        QueueInfo.Enqueue result = queueService.enqueueOrPoll(command);
+        QueueInfo.Enqueue result = queueService.enqueue(command);
 
         // Then
         assertNotNull(result);
@@ -192,14 +192,14 @@ class QueueServiceTest {
     @Test
     @Order(5)
     @DisplayName("[성공] 대기열이 존재할 때, PASS 상태일 때(enqueueOrPoll 메서드) - 토큰값과 순번 반환")
-    void testEnqueueOrPoll_ExistingQueue_PassStatus() {
+    void testEnqueue_ExistingQueue_PassStatus() {
         // Given
         queue.pass();
         QueueCommand.Enqueue command = new QueueCommand.Enqueue(USER_ID);
         when(queueRepository.findByUserId(USER_ID)).thenReturn(Optional.of(queue));
 
         // When
-        QueueInfo.Enqueue result = queueService.enqueueOrPoll(command);
+        QueueInfo.Enqueue result = queueService.enqueue(command);
 
         // Then
         assertNotNull(result);

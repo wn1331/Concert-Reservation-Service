@@ -27,7 +27,7 @@ public class QueueFacade {
         userService.existCheckUser(criteria.userId());
 
         // 대기열 등록및 폴링 분기처리
-        return QueueResult.Enqueue.fromInfo(queueService.enqueueOrPoll(criteria.toCommand()));
+        return QueueResult.Enqueue.fromInfo(queueService.enqueue());
 
     }
 
