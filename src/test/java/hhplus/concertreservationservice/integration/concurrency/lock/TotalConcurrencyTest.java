@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
+import hhplus.concertreservationservice.application.concert.dto.ConcertResult.Pay;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult.ReserveSeat;
 import hhplus.concertreservationservice.application.concert.facade.ConcertPaymentFacade;
 import hhplus.concertreservationservice.application.concert.facade.ConcertReservationFacade;
@@ -17,7 +18,12 @@ import hhplus.concertreservationservice.global.exception.ErrorCode;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -31,7 +37,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@DisplayName("RedisPubSub 테스트")
+@DisplayName("동시성 테스트")
 class TotalConcurrencyTest {
 
     private static final Logger log = LoggerFactory.getLogger(TotalConcurrencyTest.class);
@@ -182,6 +188,120 @@ class TotalConcurrencyTest {
 
 
     }
+
+    @Test
+    @DisplayName("[Pub/Sub - ExecutorService] 좌석 예약 동시성 테스트 - 1000번 비동기 요청 시 1번만 성공한다.")
+    void concurrencyReserveSeatTestWithExecutorService() throws InterruptedException{
+        ExecutorService executorService = Executors.newFixedThreadPool(100);
+        List<Callable<ConcertResult.ReserveSeat>> tasks = new ArrayList<>();
+        ConcertCriteria.ReserveSeat reserveSeatCriteria = ConcertCriteria.ReserveSeat.builder()
+            .userId(1L)
+            .concertSeatId(1L)
+            .build();
+
+        for (int i = 0; i < REQUEST_AMOUNT; i++) {
+            tasks.add(() -> {
+                try {
+                    return reserveFacade.reserveSeat(reserveSeatCriteria);
+                } catch (Exception e) {
+                    log.error("예외 : {}", e.getMessage());
+                    return null;
+                }
+            });
+        }
+
+        long startTime = System.currentTimeMillis();
+        List<Future<ConcertResult.ReserveSeat>> futures = executorService.invokeAll(tasks);
+        long endTime = System.currentTimeMillis();
+        log.info("좌석 예약 {}개의 비동기 요청 총 수행 시간 : {}ms", REQUEST_AMOUNT, endTime - startTime);
+
+        long successCount = futures.stream().filter(f -> {
+            try {
+                return f.get() != null;
+            } catch (Exception e) {
+                return false;
+            }
+        }).count();
+
+        assertThat(successCount).isEqualTo(1);
+        executorService.shutdown();
+    }
+
+    @Test
+    @DisplayName("[비관락 - ExecutorService] 결제 동시성 테스트 - 1000번 비동기 요청 시 1번만 성공한다.")
+    void concurrencyPayTestWithExecutorService() throws InterruptedException{
+        ExecutorService executorService = Executors.newFixedThreadPool(100);
+        List<Callable<Pay>> tasks = new ArrayList<>();
+        ConcertCriteria.Pay payCriteria = ConcertCriteria.Pay.builder()
+            .userId(2L)
+            .reservationId(1L)
+            .build();
+
+        for (int i = 0; i < REQUEST_AMOUNT; i++) {
+            tasks.add(() -> {
+                try {
+                    return paymentFacade.pay(payCriteria);
+                } catch (OptimisticLockingFailureException e) {
+                    throw new CustomGlobalException(ErrorCode.OPTIMISTIC_EXCEPTION);
+                } catch (Exception e) {
+                    log.error("예외 : {}", e.getMessage());
+                    return null;
+                }
+            });
+        }
+
+        long startTime = System.currentTimeMillis();
+        List<Future<Pay>> futures = executorService.invokeAll(tasks);
+        long endTime = System.currentTimeMillis();
+        log.info("결제 {}개의 비동기 요청 총 수행 시간 : {}ms", REQUEST_AMOUNT, endTime - startTime);
+
+        long successCount = futures.stream().filter(f -> {
+            try {
+                return f.get() != null;
+            } catch (Exception e) {
+                return false;
+            }
+        }).count();
+
+        assertThat(successCount).isEqualTo(1);
+        executorService.shutdown();
+    }
+
+    @Test
+    @DisplayName("[낙관락(재시도x) - ExecutorService] 포인트 충전 동시성 테스트 - 1000번 요청 중 일부는 실패한다.")
+    void chargeBalanceConcurrencyTestWithExecutorService() throws InterruptedException{
+        ExecutorService executorService = Executors.newFixedThreadPool(100);
+        List<Callable<UserResult.ChargeBalance>> tasks = new ArrayList<>();
+        ChargeBalance dto = ChargeBalance.builder().userId(1L).amount(BigDecimal.valueOf(10000)).build();
+
+        for (int i = 0; i < REQUEST_AMOUNT; i++) {
+            tasks.add(() -> {
+                try {
+                    return userFacade.chargeBalance(dto);
+                } catch (Exception e) {
+                    log.error("예외 : {}", e.getMessage());
+                    return null;
+                }
+            });
+        }
+
+        long startTime = System.currentTimeMillis();
+        List<Future<UserResult.ChargeBalance>> futures = executorService.invokeAll(tasks);
+        long endTime = System.currentTimeMillis();
+        log.info("포인트 충전 {}개의 비동기 요청 총 수행 시간 : {}ms", REQUEST_AMOUNT, endTime - startTime);
+
+        long successCount = futures.stream().filter(f -> {
+            try {
+                return f.get() != null;
+            } catch (Exception e) {
+                return false;
+            }
+        }).count();
+
+        assertNotEquals(successCount, 1000);
+        executorService.shutdown();
+    }
+
 
     private static <T> long getSuccessCount(List<CompletableFuture<T>> tasks) {
         return tasks.stream()
