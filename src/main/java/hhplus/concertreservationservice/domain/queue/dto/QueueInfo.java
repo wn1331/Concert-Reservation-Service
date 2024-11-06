@@ -6,11 +6,13 @@ public record QueueInfo() {
 
     @Builder
     public record Enqueue(
-        String queueToken,
-        Long order
+        String queueToken
     ){
 
     }
 
 
+    public record Order(Long id) {
+
+    }
 }

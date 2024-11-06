@@ -5,13 +5,13 @@ import java.util.Set;
 public interface QueueRepository {
 
     String findFromWaitingToken();
-    void save();
-    Boolean isActiveToken(String token);
+    String save();
+    Boolean existWaitingToken(String token);
+    Boolean existActiveToken(String token);
     void deleteActiveToken(String token);
     Long order(String token);
     Set<String> getWaitingTokens(Long start,Long end);
     void deleteWaitingToken(Set<String> tokens);
     void addActiveToken(String token);
-    Boolean existActiveToken(String token);
 
 }

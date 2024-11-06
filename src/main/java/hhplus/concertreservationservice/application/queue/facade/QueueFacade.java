@@ -37,24 +37,17 @@ public class QueueFacade {
     }
 
     @Transactional
-    public void expireProcess() {
-        queueService.expireProcess();
-    }
-
-    @Transactional
     public void queueValidation(VerifyQueue criteria){
         queueService.verifyQueue(criteria.toCommand());
     }
 
-
-    public void queueValidationForPay(VerifyQueueForPay criteria) {
-        // 대기열 검증 및 PASS된지 5분이 지났다면 제거 + 예약 만료 확인 (변경감지를 위한 트랜잭션 적용)
-        if(queueService.verifyQueueForPay(criteria.toCommand())){
-            throw new CustomGlobalException(ErrorCode.RESERVATION_TIMEOUT);
-        }
-    }
-
     public void expireToken(String queueToken){
         queueService.expireToken(queueToken);
+    }
+
+    // 토큰 폴링용
+    public QueueResult.Order getQueueOrder(QueueCriteria.Order criteria) {
+        return new QueueResult.Order(queueService.getQueueOrder(criteria.toCommand()).id());
+
     }
 }
