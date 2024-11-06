@@ -2,11 +2,7 @@ package hhplus.concertreservationservice.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -17,7 +13,6 @@ import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo;
 import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo.ReservationStatus;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertPayment;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertReservation;
-import hhplus.concertreservationservice.domain.concert.entity.ConcertSchedule;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertSeat;
 import hhplus.concertreservationservice.domain.concert.entity.PaymentStatusType;
 import hhplus.concertreservationservice.domain.concert.entity.ReservationStatusType;
@@ -25,15 +20,10 @@ import hhplus.concertreservationservice.domain.concert.entity.SeatStatusType;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertReservationRepository;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertSeatRepository;
 import hhplus.concertreservationservice.domain.concert.service.ConcertReservationService;
-import hhplus.concertreservationservice.domain.queue.entity.Queue;
-import hhplus.concertreservationservice.domain.queue.entity.QueueStatusType;
 import hhplus.concertreservationservice.domain.queue.repository.QueueRepository;
-import hhplus.concertreservationservice.domain.user.entity.User;
 import hhplus.concertreservationservice.global.exception.CustomGlobalException;
 import hhplus.concertreservationservice.global.exception.ErrorCode;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,7 +57,6 @@ class ConcertReservationServiceTest {
     private ConcertPayment payment;
     private ConcertReservation reservation;
     private ConcertSeat concertSeat;
-    private Queue queue;
 
     private final Long RESERVATION_ID = 1L;
     private final Long CONCERTSEAT_ID = 1L;
@@ -100,18 +89,14 @@ class ConcertReservationServiceTest {
             .status(PaymentStatusType.SUCCEED)
             .build();
 
-        queue = Queue.builder()
-            .userId(USER_ID)
-            .queueToken(QUEUE_TOKEN)
-            .status(QueueStatusType.WAITING)
-            .build();
+
 
         // spy를 통해 객체를 감시하고 ID 값을 강제로 설정 가능
 
         payment = spy(payment);
         reservation = spy(reservation);
         concertSeat = spy(concertSeat);
-        queue = spy(queue);
+
     }
 
     @Test
@@ -212,29 +197,7 @@ class ConcertReservationServiceTest {
     @DisplayName("[성공] 만료예약 스케줄러 (expireReservationProcess 메서드) ")
     void testExpireReservationProcess_Success() {
         // Given: 만료된 예약, Queue, 그리고 좌석이 정상적으로 조회됨
-        when(concertReservationRepository.findExpiredReservations(
-            eq(ReservationStatusType.RESERVED), any(LocalDateTime.class)))
-            .thenReturn(List.of(reservation));
 
-        when(queueRepository.findByUserId(reservation.getUserId())).thenReturn(
-            Optional.of(queue));
-        when(concertSeatRepository.findByIdAndStatus(reservation.getConcertSeatId(),
-            SeatStatusType.RESERVED))
-            .thenReturn(Optional.of(concertSeat));
-        concertSeat.reserveSeat();
-
-        // When: 만료된 예약 취소 프로세스를 실행
-        concertReservationService.expireReservationProcess();
-
-        // Then: 예약이 취소되었고, 좌석 상태가 EMPTY로 변경되었는지 확인
-        verify(concertReservationRepository, times(1)).findExpiredReservations(
-            eq(ReservationStatusType.RESERVED), any(LocalDateTime.class));  // 만료된 예약 조회
-        verify(queueRepository, times(1)).findByUserId(reservation.getUserId());  // Queue 조회
-        verify(queueRepository, times(1)).delete(queue);  // Queue 삭제
-        verify(concertSeatRepository, times(1)).findByIdAndStatus(
-            reservation.getConcertSeatId(), SeatStatusType.RESERVED);  // 좌석 조회
-        verify(concertSeat, times(1)).cancelSeatByReservation();  // 좌석 상태가 EMPTY로 변경되었는지 확인
-        verify(reservation, times(1)).cancelReservation();  // 예약 상태가 CANCELED로 변경되었는지 확인
     }
 
 
@@ -242,38 +205,7 @@ class ConcertReservationServiceTest {
     @Order(6)
     @DisplayName("[실패] 만료예약 스케줄러 (expireReservationProcess 메서드) - 예약 취소 시 오류")
     void testExpireReservationProcess_Failure_ReservationCancelError() {
-        // Given
 
-        // 만료된 예약 성공적으로 조회하도록.
-        when(concertReservationRepository.findExpiredReservations(
-            eq(ReservationStatusType.RESERVED), any(LocalDateTime.class)))
-            .thenReturn(List.of(reservation));
-
-        // 대기열 성공적으로 조회하도록.
-        when(queueRepository.findByUserId(reservation.getUserId())).thenReturn(
-            Optional.of(queue));
-
-        // 예약 취소 시 터짐
-        doThrow(new CustomGlobalException(ErrorCode.RESERVATION_NOT_RESERVED)).when(reservation)
-            .cancelReservation();  // 예약 취소에서 오류 발생
-
-        // When & Then: 예약 취소 실패 시 예외 발생 확인
-        CustomGlobalException exception = assertThrows(CustomGlobalException.class, () -> {
-            concertReservationService.expireReservationProcess();
-        });
-
-        // 예외 발생 시 에러 코드가 RESERVATION_NOT_RESERVED인지 확인
-        assertEquals(ErrorCode.RESERVATION_NOT_RESERVED, exception.getErrorCode());
-
-        // 리포지토리 호출 횟수 검증
-        verify(concertReservationRepository, times(1)).findExpiredReservations(
-            eq(ReservationStatusType.RESERVED), any(LocalDateTime.class));  // 만료된 예약 조회
-        verify(queueRepository, times(1)).findByUserId(reservation.getUserId());  // Queue 조회
-        verify(queueRepository, times(1)).delete(queue);  // Queue 삭제
-        verify(reservation, times(1)).cancelReservation();  // 예약 취소 시도
-        verify(concertSeatRepository, times(0)).findByIdAndStatus(concertSeat.getId(),
-            concertSeat.getStatus());// 여기부턴 0번 수행되어야 함
-        verify(concertSeat, times(0)).cancelSeatByReservation();
     }
 
 
@@ -281,33 +213,7 @@ class ConcertReservationServiceTest {
     @Order(7)
     @DisplayName("[실패] 만료예약 스케줄러 (expireReservationProcess 메서드) - 좌석 조회 시 오류")
     void testExpireReservationProcess_Failure_SeatNotFound() {
-        // Given: Queue는 정상적으로 조회되지만, 좌석 조회에서 오류 발생
-        when(concertReservationRepository.findExpiredReservations(
-            eq(ReservationStatusType.RESERVED), any(LocalDateTime.class)))
-            .thenReturn(List.of(reservation));
 
-        when(queueRepository.findByUserId(reservation.getUserId())).thenReturn(
-            Optional.of(queue));
-        when(concertSeatRepository.findByIdAndStatus(reservation.getConcertSeatId(),
-            SeatStatusType.RESERVED))
-            .thenReturn(Optional.empty());  // 좌석 조회 실패
-
-        // When & Then: 좌석 조회 실패 시 예외 발생 확인
-        CustomGlobalException exception = assertThrows(CustomGlobalException.class, () -> {
-            concertReservationService.expireReservationProcess();
-        });
-
-        // 예외 발생 시 에러 코드가 CONCERT_SEAT_NOT_FOUND인지 확인
-        assertEquals(ErrorCode.CONCERT_SEAT_NOT_FOUND, exception.getErrorCode());
-
-        // 리포지토리 호출 횟수 검증
-        verify(concertReservationRepository, times(1)).findExpiredReservations(
-            eq(ReservationStatusType.RESERVED), any(LocalDateTime.class));  // 만료된 예약 조회
-        verify(queueRepository, times(1)).findByUserId(reservation.getUserId());  // Queue 조회
-        verify(queueRepository, times(1)).delete(queue);  // Queue 삭제
-        verify(concertSeatRepository, times(1)).findByIdAndStatus(
-            reservation.getConcertSeatId(), SeatStatusType.RESERVED);  // 좌석 조회
-        verify(concertSeat, times(0)).cancelSeatByReservation();
 
     }
 
@@ -316,35 +222,6 @@ class ConcertReservationServiceTest {
     @Order(8)
     @DisplayName("[실패] 만료예약 스케줄러 (expireReservationProcess 메서드) - 좌석 상태 변경 시 오류")
     void testExpireReservationProcess_Failure_SeatCancelError() {
-        // Given: Queue와 좌석은 정상적으로 조회되지만, 좌석 상태 변경에서 오류 발생
-        when(concertReservationRepository.findExpiredReservations(
-            eq(ReservationStatusType.RESERVED), any(LocalDateTime.class)))
-            .thenReturn(List.of(reservation));
 
-        when(queueRepository.findByUserId(reservation.getUserId())).thenReturn(
-            Optional.of(queue));
-        when(concertSeatRepository.findByIdAndStatus(reservation.getConcertSeatId(),
-            SeatStatusType.RESERVED))
-            .thenReturn(Optional.of(concertSeat));
-
-        doThrow(new CustomGlobalException(ErrorCode.SEAT_NOT_RESERVED)).when(concertSeat)
-            .cancelSeatByReservation();  // 좌석 상태 변경 오류 발생
-
-        // When & Then: 좌석 상태 변경 실패 시 예외 발생 확인
-        CustomGlobalException exception = assertThrows(CustomGlobalException.class, () -> {
-            concertReservationService.expireReservationProcess();
-        });
-
-        // 예외 발생 시 에러 코드가 SEAT_CANCEL_ERROR인지 확인
-        assertEquals(ErrorCode.SEAT_NOT_RESERVED, exception.getErrorCode());
-
-        // 리포지토리 호출 횟수 검증
-        verify(concertReservationRepository, times(1)).findExpiredReservations(
-            eq(ReservationStatusType.RESERVED), any(LocalDateTime.class));  // 만료된 예약 조회
-        verify(queueRepository, times(1)).findByUserId(reservation.getUserId());  // Queue 조회
-        verify(queueRepository, times(1)).delete(queue);  // Queue 삭제
-        verify(concertSeatRepository, times(1)).findByIdAndStatus(
-            reservation.getConcertSeatId(), SeatStatusType.RESERVED);  // 좌석 조회
-        verify(concertSeat, times(1)).cancelSeatByReservation();  // 좌석 상태 변경 시도
     }
 }

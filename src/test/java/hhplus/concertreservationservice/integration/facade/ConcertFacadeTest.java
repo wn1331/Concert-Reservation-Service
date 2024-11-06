@@ -5,8 +5,6 @@ import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
 import hhplus.concertreservationservice.application.concert.facade.ConcertFacade;
 import hhplus.concertreservationservice.domain.concert.entity.SeatStatusType;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertReservationRepository;
-import hhplus.concertreservationservice.domain.queue.entity.Queue;
-import hhplus.concertreservationservice.domain.queue.entity.QueueStatusType;
 import hhplus.concertreservationservice.domain.queue.repository.QueueRepository;
 import hhplus.concertreservationservice.domain.user.entity.User;
 import hhplus.concertreservationservice.domain.user.repository.UserRepository;
@@ -73,8 +71,6 @@ class ConcertFacadeTest {
         userRepository.save(user);
 
         // 대기열 생성
-        Queue queue = new Queue(user.getId(), queueToken, QueueStatusType.PASS);
-        queueRepository.save(queue);
 
         // 콘서트와 스케줄, 좌석 생성
         concert = new Concert("테스트 콘서트");

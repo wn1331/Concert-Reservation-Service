@@ -2,7 +2,6 @@ package hhplus.concertreservationservice.infra.persistence.queue;
 
 import hhplus.concertreservationservice.domain.queue.repository.QueueRepository;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,8 +13,8 @@ import org.springframework.stereotype.Repository;
 public class QueueRedisRepositoryImpl implements QueueRepository {
 
     private final RedisTemplate<String, String> redisTemplate;
-    private final String WAITING_QUEUE_KEY = "waitingQueue";
-    private final String ACTIVE_QUEUE_KEY = "activeQueue";
+    private static final String WAITING_QUEUE_KEY = "waitingQueue";
+    private static final String ACTIVE_QUEUE_KEY = "activeQueue";
 
     private ZSetOperations<String, String> zSetOperations() {
         return redisTemplate.opsForZSet();

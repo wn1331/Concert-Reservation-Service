@@ -45,13 +45,11 @@ class QueueControllerTest {
 
         QueueResponse.Enqueue response = QueueResponse.Enqueue.builder()
             .token(queueToken)
-            .order(order)
             .build();
 
         // Mocking the response from queueFacade
         when(queueFacade.enqueue(any())).thenReturn(QueueResult.Enqueue.builder()
             .queueToken(queueToken)
-            .order(order)
             .build());
 
         // When & Then

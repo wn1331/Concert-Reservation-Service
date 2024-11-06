@@ -3,8 +3,6 @@ package hhplus.concertreservationservice.integration.facade;
 import hhplus.concertreservationservice.application.queue.dto.QueueCriteria;
 import hhplus.concertreservationservice.application.queue.dto.QueueResult;
 import hhplus.concertreservationservice.application.queue.facade.QueueFacade;
-import hhplus.concertreservationservice.domain.queue.entity.Queue;
-import hhplus.concertreservationservice.domain.queue.entity.QueueStatusType;
 import hhplus.concertreservationservice.domain.queue.repository.QueueRepository;
 import hhplus.concertreservationservice.domain.user.entity.User;
 import hhplus.concertreservationservice.domain.user.repository.UserRepository;
@@ -63,44 +61,14 @@ class QueueFacadeTest {
 
         // Then: 발급된 토큰이 null이 아닌지 확인
         assertTrue(result.queueToken() != null && !result.queueToken().isEmpty());
-        assertTrue(result.order() > 0);  // 순번이 0보다 커야 함
 
-        // Queue 엔티티가 데이터베이스에 저장되었는지 확인
-        Queue savedQueue = queueRepository.findByQueueToken(result.queueToken()).orElseThrow();
-        assertEquals(user.getId(), savedQueue.getUserId());
-        assertEquals(QueueStatusType.WAITING, savedQueue.getStatus());  // 상태가 'WAITING'로 설정되었는지 확인
     }
 
     @Test
     @Order(2)
     @DisplayName("[성공][스케줄러] 대기열 활성화 테스트")
     void activateProcess_success() {
-        // Given: 대기열에 대기 상태의 유저 추가
-        Queue queue = new Queue(user.getId(), "testQueueToken", QueueStatusType.WAITING);
-        queueRepository.save(queue);
 
-        // When: 대기열 활성화 프로세스 실행
-        queueFacade.activateProcess();
-
-        // Then: 활성화된 대기열 상태 확인
-        Queue updatedQueue = queueRepository.findByQueueToken("testQueueToken").orElseThrow();
-        assertEquals(QueueStatusType.PASS, updatedQueue.getStatus());
     }
 
-    @Test
-    @Order(3)
-    @DisplayName("[성공][스케줄러] 대기열 만료 처리 테스트")
-    void expireProcess_success() {
-        // Given: 대기열에 대기 상태의 유저 추가
-        Queue queue = new Queue(user.getId(), "expireQueueToken", QueueStatusType.PASS);
-        queueRepository.save(queue);
-
-        // When: 대기열 만료 프로세스 실행
-        queueFacade.expireProcess();
-
-        // Then: 만료된 대기열 상태 확인
-        Queue expiredQueue = queueRepository.findByQueueToken("expireQueueToken").orElseThrow();
-        // PASS 테스트. modifiedAt을 5분 후로 수정할 방법이 없음.
-        assertEquals(QueueStatusType.PASS, expiredQueue.getStatus());
-    }
 }

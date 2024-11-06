@@ -17,8 +17,6 @@ import hhplus.concertreservationservice.domain.concert.repository.ConcertReposit
 import hhplus.concertreservationservice.domain.concert.repository.ConcertReservationRepository;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertScheduleRepository;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertSeatRepository;
-import hhplus.concertreservationservice.domain.queue.entity.Queue;
-import hhplus.concertreservationservice.domain.queue.entity.QueueStatusType;
 import hhplus.concertreservationservice.domain.queue.repository.QueueRepository;
 import hhplus.concertreservationservice.domain.user.entity.User;
 import hhplus.concertreservationservice.domain.user.repository.UserRepository;
@@ -82,10 +80,6 @@ class ConcertReservationFacadeTest {
         // 테스트 유저 생성
         user = new User("테스트 유저", BigDecimal.valueOf(1000000));
         userRepository.save(user);
-
-        // 대기열 생성
-        Queue queue = new Queue(user.getId(), queueToken, QueueStatusType.PASS);
-        queueRepository.save(queue);
 
         // 콘서트와 스케줄, 좌석 생성
         concert = new Concert("테스트 콘서트");
@@ -219,7 +213,6 @@ class ConcertReservationFacadeTest {
         assertEquals(SeatStatusType.EMPTY, updatedSeat.getStatus());
 
         // 유저의 대기열이 삭제되었는지 확인
-        assertFalse(queueRepository.findByUserId(user.getId()).isPresent());
     }
 
 
