@@ -15,6 +15,7 @@ import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse
 import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse.AvailableSchedules;
 import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse.AvailableSeats;
 import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse.GetConcertList;
+import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse.Pay;
 import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse.ReserveSeat;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -91,14 +92,16 @@ public class ConcertController implements IConcertController {
 
     }
 
+
     // 콘서트 좌석 결제 API
     @PostMapping("/reservations/{reservationId}/pay")
     public ResponseEntity<ConcertResponse.Pay> payConcert(
         @PathVariable(name = "reservationId") Long reservationId,
+        @RequestHeader(value = "X-Access-Token", required = true) String token,
         @RequestBody @Valid ConcertRequest.Pay request
     ) {
         return ok(ConcertResponse.Pay.fromResult(
-            concertPaymentFacade.pay(request.toCriteria(reservationId))));
+            concertPaymentFacade.pay(request.toCriteria(reservationId,token))));
     }
 
 

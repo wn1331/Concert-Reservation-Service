@@ -7,6 +7,7 @@ import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo.Reservati
 import hhplus.concertreservationservice.domain.concert.service.ConcertPaymentService;
 import hhplus.concertreservationservice.domain.concert.service.ConcertReservationService;
 import hhplus.concertreservationservice.domain.concert.service.ConcertService;
+import hhplus.concertreservationservice.domain.queue.service.QueueService;
 import hhplus.concertreservationservice.domain.user.dto.UserCommand;
 import hhplus.concertreservationservice.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class ConcertPaymentFacade {
     private final ConcertService concertService;
     private final ConcertReservationService concertReservationService;
     private final ConcertPaymentService concertPaymentService;
+    private final QueueService queueService;
 
     @Transactional
     public ConcertResult.Pay pay(ConcertCriteria.Pay criteria) {
@@ -42,6 +44,9 @@ public class ConcertPaymentFacade {
         // 예약내용 결제
         ConcertInfo.Pay pay = concertPaymentService.payReservation(
             criteria.toCommand(reservationStatus.price()));
+
+        // 대기열 만료처리
+        queueService.expireToken(criteria.token());
 
         return ConcertResult.Pay.fromInfo(pay);
     }

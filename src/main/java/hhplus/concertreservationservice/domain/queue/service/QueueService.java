@@ -8,6 +8,7 @@ import hhplus.concertreservationservice.global.exception.CustomGlobalException;
 import hhplus.concertreservationservice.global.exception.ErrorCode;
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,12 +29,12 @@ public class QueueService {
     public void verifyQueue(QueueCommand.VerifyQueue command) {
         String queueToken = command.queueToken();
         // 액티브토큰에 있으면 early return
-        if (queueRepository.existActiveToken(queueToken)) {
+        if (Boolean.TRUE.equals(queueRepository.existActiveToken(queueToken))) {
             return;
         }
 
         // waiting토큰에 있으면 Exception
-        if (queueRepository.existWaitingToken(queueToken)) {
+        if (Boolean.TRUE.equals(queueRepository.existWaitingToken(queueToken))) {
             throw new CustomGlobalException(ErrorCode.QUEUE_STILL_WAITING);
         }
         // 둘다 없으면 Exception
@@ -42,13 +43,15 @@ public class QueueService {
 
     // 대기열 생성
     public QueueInfo.Enqueue enqueue() {
-        return new Enqueue(queueRepository.save());
+        String token = UUID.randomUUID().toString();
+        queueRepository.save(token,System.currentTimeMillis());
+        return new Enqueue(token);
     }
 
     // 대기열 활성화
     public void activateProcess() {
         // 대기중 토큰 가져와서
-        Set<String> waitingTokens = queueRepository.getWaitingTokens(1L, batchSize);
+        Set<String> waitingTokens = queueRepository.getWaitingTokens(0L, batchSize);
         // 제거하고
         queueRepository.deleteWaitingToken(waitingTokens);
         // 그 토큰들 액티브에 넣기

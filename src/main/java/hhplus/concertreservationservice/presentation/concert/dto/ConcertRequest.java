@@ -36,10 +36,11 @@ public record ConcertRequest() {
         Long userId
     ) {
 
-        public ConcertCriteria.Pay toCriteria(Long reservationId) {
+        public ConcertCriteria.Pay toCriteria(Long reservationId,String token) {
             return ConcertCriteria.Pay.builder()
                 .reservationId(reservationId)
                 .userId(userId)
+                .token(token)
                 .build();
         }
     }

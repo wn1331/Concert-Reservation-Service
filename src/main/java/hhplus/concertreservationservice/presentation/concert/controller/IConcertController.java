@@ -90,7 +90,9 @@ public interface IConcertController {
             content = @Content(mediaType = "application/json",
                 schema = @Schema(example = "{\n"
                     + "  \"userId\": 1\n"
-                    + "}")))        @Valid @RequestBody ConcertRequest.Pay request
+                    + "}")))
+        @RequestHeader(value = "X-Access-Token", required = true) String token,
+        @Valid @RequestBody ConcertRequest.Pay request
     );
 }
 

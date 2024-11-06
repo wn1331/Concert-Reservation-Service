@@ -19,30 +19,26 @@ public class QueueFacade {
 
     private final QueueService queueService;
     private final UserService userService;
+
     // 대기열 토큰 발급
-    @Transactional
     public QueueResult.Enqueue enqueue(QueueCriteria.Enqueue criteria){
 
         // 해당 유저아이디가 유효한지 확인
         userService.existCheckUser(criteria.userId());
 
-        // 대기열 등록및 폴링 분기처리
+        // 대기열 등록
         return QueueResult.Enqueue.fromInfo(queueService.enqueue());
 
     }
 
-    @Transactional
+    // 대기열 활성화 스케줄러 퍼사드
     public void activateProcess() {
         queueService.activateProcess();
     }
 
-    @Transactional
+    // 대기열 검증 퍼사드
     public void queueValidation(VerifyQueue criteria){
         queueService.verifyQueue(criteria.toCommand());
-    }
-
-    public void expireToken(String queueToken){
-        queueService.expireToken(queueToken);
     }
 
     // 토큰 폴링용

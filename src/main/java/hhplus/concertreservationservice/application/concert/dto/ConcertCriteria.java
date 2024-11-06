@@ -69,6 +69,7 @@ public record ConcertCriteria() {
     @Builder
     public record Pay(
         Long reservationId,
+        String token,
         Long userId
     ) {
 
