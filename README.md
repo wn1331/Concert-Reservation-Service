@@ -167,7 +167,7 @@ Service 클래스 내부에 inner class로 Command/Info를 구현 예정입니�
 
 <details><summary></summary>
 
-[콘서트 예약 서비스 API 명세서](docs%2FAPISPECS.md)
+[Caching.md](docs%2FCaching.md)
 
 </details>
 
