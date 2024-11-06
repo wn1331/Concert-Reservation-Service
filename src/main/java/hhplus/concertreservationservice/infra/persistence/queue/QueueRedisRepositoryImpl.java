@@ -46,12 +46,12 @@ public class QueueRedisRepositoryImpl implements QueueRepository {
     @Override
     public Long order(String token) {
         Long rank = zSetOperations().rank(WAITING_QUEUE_KEY, token);
-        return rank != null ? rank + 1 : null;
+        return rank != null ? rank + 1 : 0;
     }
 
     @Override
     public Set<String> getWaitingTokens(Long start, Long end) {
-        return zSetOperations().range(WAITING_QUEUE_KEY, start, end);
+        return zSetOperations().range(WAITING_QUEUE_KEY, start, end-1);
     }
 
     @Override
