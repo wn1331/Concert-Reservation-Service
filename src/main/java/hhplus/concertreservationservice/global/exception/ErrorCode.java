@@ -27,7 +27,8 @@ public enum ErrorCode {
     OPTIMISTIC_EXCEPTION("E15", HttpStatus.CONFLICT,"요청 충돌." ),
     PUBSUB_LOCK_KEY_NOT_NULL("E16", HttpStatus.INTERNAL_SERVER_ERROR, "PUB/SUB 락 키 할당이 잘못됐습니다."),
     CANNOT_ACQUIRE_LOCK("E17",HttpStatus.INTERNAL_SERVER_ERROR ,"락 키를 획득할 수 없습니다." ),
-    LOCK_INTERNAL_ERROR("E18",HttpStatus.INTERNAL_SERVER_ERROR, "락 획득 중 예기치 못한 오류가 나타났습니다.");
+    LOCK_INTERNAL_ERROR("E18",HttpStatus.INTERNAL_SERVER_ERROR, "락 획득 중 예기치 못한 오류가 나타났습니다."),
+    CONCERT_SCHEDULE_IS_EMPTY("E19",HttpStatus.BAD_REQUEST , "콘서트 스케줄은 빈값일 수 없습니다.");
 
 
     private final String code;

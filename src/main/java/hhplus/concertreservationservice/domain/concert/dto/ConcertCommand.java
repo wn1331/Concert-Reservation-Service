@@ -2,6 +2,8 @@ package hhplus.concertreservationservice.domain.concert.dto;
 
 import hhplus.concertreservationservice.domain.user.entity.UserPointHistoryType;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.Builder;
 
 public record ConcertCommand() {
@@ -33,6 +35,16 @@ public record ConcertCommand() {
     @Builder
     public record Pay(
         Long reservationId,
+        BigDecimal price
+    ) {
+
+    }
+
+    @Builder
+    public record Create(
+        String title,
+        List<LocalDate> dates,
+        Integer seatAmount,
         BigDecimal price
     ) {
 

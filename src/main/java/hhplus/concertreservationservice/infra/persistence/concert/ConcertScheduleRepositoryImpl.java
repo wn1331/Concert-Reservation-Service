@@ -14,8 +14,8 @@ public class ConcertScheduleRepositoryImpl implements ConcertScheduleRepository 
 
 
     @Override
-    public void save(ConcertSchedule schedule) {
-        jpaRepository.save(schedule);
+    public ConcertSchedule save(ConcertSchedule schedule) {
+        return jpaRepository.save(schedule);
     }
 
     @Override

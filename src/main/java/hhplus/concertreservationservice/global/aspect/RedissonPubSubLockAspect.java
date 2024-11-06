@@ -49,6 +49,7 @@ public class RedissonPubSubLockAspect {
             return joinPoint.proceed();
         } catch (Exception e) {
             // 락 작업 중 예외 발생 시 처리
+            log.info("Lock Undefined Error!!: {}", lockKey);
             throw new CustomGlobalException(ErrorCode.LOCK_INTERNAL_ERROR);
         } finally {
             // 락 해제 및 해제 알림 발행

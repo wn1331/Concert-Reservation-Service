@@ -40,8 +40,10 @@ public class ConcertPaymentFacade {
         concertService.changeSeatStatusPaid(reservationStatus.concertSeatId());
 
         // 예약내용 결제
-        ConcertInfo.Pay pay = concertPaymentService.payReservation(criteria.toCommand(reservationStatus.price()));
+        ConcertInfo.Pay pay = concertPaymentService.payReservation(
+            criteria.toCommand(reservationStatus.price()));
 
-        return ConcertResult.Pay.fromInfo(pay);    }
+        return ConcertResult.Pay.fromInfo(pay);
+    }
 
 }

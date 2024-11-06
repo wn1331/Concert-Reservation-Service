@@ -44,10 +44,10 @@ public class ConcertSeat extends BaseTimeEntity {
     }
 
     public void reserveSeat() {
-        if (this.status == SeatStatusType.EMPTY) {
-            this.status = SeatStatusType.RESERVED;
-        } else {
-            throw new CustomGlobalException(ErrorCode.SEAT_NOT_EMPTY);
+        switch (this.status) {
+            case EMPTY -> this.status = SeatStatusType.RESERVED;
+            case RESERVED -> throw new CustomGlobalException(ErrorCode.ALREADY_RESERVED_SEAT);
+            case SOLD -> throw new CustomGlobalException(ErrorCode.ALREADY_SOLD_SEAT);
         }
     }
 

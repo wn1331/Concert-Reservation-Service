@@ -41,6 +41,10 @@ dependencies {
     // redission
     implementation 'org.redisson:redisson-spring-boot-starter:3.37.0'
 
+    // prometheus
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'

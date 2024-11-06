@@ -11,6 +11,14 @@ import lombok.Builder;
 
 public record ConcertResult() {
 
+    public record Create(
+        Long id
+    ){
+        public static Create fromInfo(ConcertInfo.Create info){
+            return new Create(info.id());
+        }
+    }
+
     @Builder
     public record AvailableSchedules(List<ScheduleDetail> schedules) {
 
@@ -80,5 +88,18 @@ public record ConcertResult() {
                .paymentId(pay.paymentId())
                .build();
         }
+    }
+
+    public record Concerts(
+        Long id,
+        String title
+
+    ) {
+
+
+    }
+
+    public record GetConcertList(List<ConcertResult.Concerts> concertsResultList) {
+
     }
 }
