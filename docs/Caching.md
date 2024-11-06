@@ -192,7 +192,19 @@ TTL은 캐시 키(Key)가 `자연스럽게 만료`되어 없어지도록 하는 
 
 결과적으로 Redis를 활용하여 `캐시 적용 전후 부하 테스트` 결과는, <span style="color:red"> TPS가 약 1.48배 증가했고, 1.42배만큼의 테스트 수행횟수 증가 </span>가 있었다.
 
+### Node Exporter + Prometheus + Grafana를 사용하여 부하테스트를 모니터링 해보자.
+#### 콘서트 조회 API 부하테스트 모니터링
 
+
+![changedCacheNonCache.png](images/changedCacheNonCache.png)
+캐시를 사용하지 않았을 때와, 캐시를 사용했을 때의 CPU 사용량과 메모리 사용량은 큰 차이가 없다.  
+하지만, Memory Pages In/Out을 보면, 캐시를 사용했을 때의 pages_in 그래프가 솟아있지 않은 것을 볼 수 있다.  
+![img_20.png](images/img_20.png)  
+`Pagesin이란?` : 디스크에서 메모리로 페이지가 이동되는 것을 의미   
+`Pagesout이란?` : 메모리에서 디스크로 페이지가 이동되는 것을 의미   
+
++추가로, 캐시를 사용했을 때의 Redis Dashboard는 hits수가 증가한 것을 볼 수 있다.
+![useCacheRedis.png](images/useCacheRedis.png)
 
 # 대기열을 RDB 테이블이 아닌 Redis로 이관
 

@@ -30,6 +30,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(queueValidationInterceptor)
             .addPathPatterns("/**")
+            .excludePathPatterns("/actuator/**")
             .excludePathPatterns("/concerts/reservations/*/pay")
             .excludePathPatterns("/concerts/create")
             .excludePathPatterns("/swagger-ui/**")
