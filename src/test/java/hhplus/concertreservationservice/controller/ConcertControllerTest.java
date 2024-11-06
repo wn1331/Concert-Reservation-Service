@@ -15,6 +15,7 @@ import hhplus.concertreservationservice.domain.concert.entity.ScheduleStatusType
 import hhplus.concertreservationservice.domain.concert.entity.SeatStatusType;
 import hhplus.concertreservationservice.global.interceptor.QueueValidationInterceptor;
 import hhplus.concertreservationservice.presentation.concert.controller.ConcertController;
+import hhplus.concertreservationservice.presentation.concert.dto.ConcertRequest;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
@@ -61,28 +62,29 @@ class ConcertControllerTest {
         String queueToken = "validToken";
 
         // Mocking the facade response
-        when(concertFacade.getAvailableSchedules(any())).thenReturn(ConcertResult.AvailableSchedules.builder()
-            .schedules(List.of(
-                ConcertResult.AvailableSchedules.ScheduleDetail.builder()
-                    .id(1L)
-                    .date(LocalDate.now())
-                    .status(ScheduleStatusType.AVAILABLE)
-                    .build()
-            ))
-            .build());
+        when(concertFacade.getAvailableSchedules(any())).thenReturn(
+            ConcertResult.AvailableSchedules.builder()
+                .schedules(List.of(
+                    ConcertResult.AvailableSchedules.ScheduleDetail.builder()
+                        .id(1L)
+                        .date(LocalDate.now())
+                        .status(ScheduleStatusType.AVAILABLE)
+                        .build()
+                ))
+                .build());
 
         // JSON String 직접 작성
         String expectedResponse = """
-        {
-            "schedules": [
-                {
-                    "id": 1,
-                    "date": "%s",
-                    "status": "AVAILABLE"
-                }
-            ]
-        }
-        """.formatted(LocalDate.now());  // date 부분에 동적인 날짜 값 처리
+            {
+                "schedules": [
+                    {
+                        "id": 1,
+                        "date": "%s",
+                        "status": "AVAILABLE"
+                    }
+                ]
+            }
+            """.formatted(LocalDate.now());  // date 부분에 동적인 날짜 값 처리
 
         mockMvc.perform(get("/concerts/{concertId}/schedules", concertId)
                 .header("X-Access-Token", queueToken))
@@ -108,15 +110,16 @@ class ConcertControllerTest {
         Long concertScheduleId = 1L;
         String queueToken = "validToken";
 
-        when(concertFacade.getAvailableSeats(any())).thenReturn(ConcertResult.AvailableSeats.builder()
-            .seats(List.of(
-                ConcertResult.AvailableSeats.SeatDetail.builder()
-                    .id(1L)
-                    .seatNum("A1")
-                    .status(SeatStatusType.EMPTY)
-                    .build()
-            ))
-            .build());
+        when(concertFacade.getAvailableSeats(any())).thenReturn(
+            ConcertResult.AvailableSeats.builder()
+                .seats(List.of(
+                    ConcertResult.AvailableSeats.SeatDetail.builder()
+                        .id(1L)
+                        .seatNum("A1")
+                        .status(SeatStatusType.EMPTY)
+                        .build()
+                ))
+                .build());
 
         String expectedResponse = """
             {
@@ -154,9 +157,10 @@ class ConcertControllerTest {
         Long userId = 1L;
         Long concertSeatId = 1L;
 
-        when(concertReservationFacade.reserveSeat(any())).thenReturn(ConcertResult.ReserveSeat.builder()
-            .reservationId(1L)
-            .build());
+        when(concertReservationFacade.reserveSeat(any())).thenReturn(
+            ConcertResult.ReserveSeat.builder()
+                .reservationId(1L)
+                .build());
 
         String requestBody = """
             {
@@ -178,6 +182,7 @@ class ConcertControllerTest {
             .andExpect(status().isOk())
             .andExpect(content().json(expectedResponse));
     }
+
     @Test
     @Order(6)
     @DisplayName("[실패] 콘서트 예약 실패 - 유효성 검증 실패 (userId null)")
@@ -249,5 +254,139 @@ class ConcertControllerTest {
                 .content(requestBody))
             .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @Order(9)
+    @DisplayName("[성공] 콘서트 목록 조회 성공")
+    void getConcerts_Success() throws Exception {
+        String queueToken = "validToken";
+
+        when(concertFacade.getConcertList()).thenReturn(ConcertResult.GetConcertList.builder()
+            .concertsResultList(List.of(
+                ConcertResult.Concerts.builder()
+                    .id(1L)
+                    .title("Concert 1")
+                    .build(),
+                ConcertResult.Concerts.builder()
+                    .id(2L)
+                    .title("Concert 2")
+                    .build()
+            ))
+            .build());
+
+        String expectedResponse = """
+        {
+            "concertsList": [
+                {
+                    "id": 1,
+                    "title": "Concert 1"
+                },
+                {
+                    "id": 2,
+                    "title": "Concert 2"
+                }
+            ]
+        }
+        """;
+
+        mockMvc.perform(get("/concerts")
+                .contentType("application/json")
+                .header("X-Access-Token", queueToken)
+
+            )
+            .andExpect(status().isOk())
+            .andExpect(content().json(expectedResponse));
+    }
+
+
+    @Test
+    @Order(10)
+    @DisplayName("[성공] 콘서트 생성 성공")
+    void createConcert_Success() throws Exception {
+        when(concertFacade.create(any())).thenReturn(ConcertResult.Create.builder()
+            .id(1L)
+            .build());
+
+        String requestBody = """
+            {
+                "title": "New Concert",
+                "dates": ["%s"],
+                "seatAmount": 100,
+                "price": 50.0
+            }
+            """.formatted(LocalDate.now());
+
+        String expectedResponse = """
+            {
+                "id": 1
+            }
+            """;
+
+        mockMvc.perform(post("/concerts/create")
+                .contentType("application/json")
+                .content(requestBody))
+            .andExpect(status().isCreated())
+            .andExpect(content().json(expectedResponse));
+    }
+
+    @Test
+    @Order(11)
+    @DisplayName("[실패] 콘서트 생성 실패 - 유효성 검증 실패 (빈 타이틀)")
+    void createConcert_Fail_InvalidTitle() throws Exception {
+        String requestBody = """
+            {
+                "title": "",
+                "dates": ["%s"],
+                "seatAmount": 100,
+                "price": 50.0
+            }
+            """.formatted(LocalDate.now());
+
+        mockMvc.perform(post("/concerts/create")
+                .contentType("application/json")
+                .content(requestBody))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message").value("콘서트 타이틀은 빈값이거나 null일 수 없습니다."));
+    }
+
+    @Test
+    @Order(12)
+    @DisplayName("[실패] 콘서트 생성 실패 - 유효성 검증 실패 (좌석 수 누락)")
+    void createConcert_Fail_MissingSeatAmount() throws Exception {
+        String requestBody = """
+            {
+                "title": "New Concert",
+                "dates": ["%s"],
+                "price": 50.0
+            }
+            """.formatted(LocalDate.now());
+
+        mockMvc.perform(post("/concerts/create")
+                .contentType("application/json")
+                .content(requestBody))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message").value("콘서트 좌석 수는 null일 수 없습니다."));
+    }
+
+    @Test
+    @Order(13)
+    @DisplayName("[실패] 콘서트 생성 실패 - 유효성 검증 실패 (음수 가격)")
+    void createConcert_Fail_InvalidPrice() throws Exception {
+        String requestBody = """
+            {
+                "title": "New Concert",
+                "dates": ["%s"],
+                "seatAmount": 100,
+                "price": -50.0
+            }
+            """.formatted(LocalDate.now());
+
+        mockMvc.perform(post("/concerts/create")
+                .contentType("application/json")
+                .content(requestBody))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message").value("양수인 실수를 입력해야 합니다."));
+    }
+
 
 }

@@ -11,6 +11,7 @@ import lombok.Builder;
 
 public record ConcertResult() {
 
+    @Builder
     public record Create(
         Long id
     ){
@@ -90,6 +91,7 @@ public record ConcertResult() {
         }
     }
 
+    @Builder
     public record Concerts(
         Long id,
         String title
@@ -99,6 +101,7 @@ public record ConcertResult() {
 
     }
 
+    @Builder
     public record GetConcertList(List<ConcertResult.Concerts> concertsResultList) {
 
     }

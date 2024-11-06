@@ -16,6 +16,7 @@ public record QueueResult() {
         }
     }
 
+    @Builder
     public record Order(
         Long order
     ) {
