@@ -269,6 +269,16 @@ Redis로 대기열을 이관한 후, 기존 H2 기반의 대기열 요청 API에
 ![MYSQLQUEUE.png](images/MYSQLQUEUE.png)
 MySQL에서는 대기열 요청의 TPS가 1257.6이 나타났으며, Redis는 이에 비해 무려 `3배정도의 성능`을 보여준다.  
 
+그리고, `대기열 순번조회`는 RDBMS에서는 대기열테이블의 id로 조회해서(id가 순서대로 적재됨), 순번을 직접 계산하는 거였다면, Redis에서는 SortedSet으로 바로 순번조회가 가능하기 때문에 성능차이가 꽤 날것이라 예상했다.  
+그래서 대기열 순번조회 API 또한 성능 테스트를 해 보았다.  
+
+![h2order.png](images/h2order.png)  
+![redisorder.png](images/redisorder.png)  
+
+대기열 등록API와는 다르게 대기열 순번조회는 성능차이가 꽤(?) 나는 것을 볼 수 있다.
+Redis 대기열 순번조회가 H2 대기열 순번조회보다 801.6TPS나 더 많다.
+
+
 ### Grafana 모니터링
 ![GrafanaDB별.png](images/GrafanaDB별.png)
 위 모니터링 그래프에서는 Redis와 H2는 CPU사용량과 메모리 사용량에서 차이가 거의 없는 것을 볼 수 있지만, Mysql에서는 나머지 두 그래프와는 다르게 메모리 사용량이 조금 더 적은 것을 볼 수 있다.  
