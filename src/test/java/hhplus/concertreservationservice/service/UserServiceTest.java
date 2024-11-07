@@ -138,7 +138,8 @@ class UserServiceTest {
         // Given
         UserCommand.ChargeBalance command = new UserCommand.ChargeBalance(USER_ID,
             BigDecimal.valueOf(10000));
-        when(userRepository.findByIdForUsePoint(USER_ID)).thenReturn(Optional.of(user));
+
+        when(userRepository.findByIdForChargePoint(USER_ID)).thenReturn(Optional.of(user));
 
 
         // When
@@ -158,7 +159,7 @@ class UserServiceTest {
         assertEquals(BigDecimal.valueOf(10000), savedHistory.getRequestPoint());
         assertEquals(UserPointHistoryType.CHARGE, savedHistory.getType());
 
-        verify(userRepository, times(1)).findByIdForUsePoint(USER_ID);
+        verify(userRepository, times(1)).findByIdForChargePoint(USER_ID);
     }
 
     @Test
@@ -167,14 +168,14 @@ class UserServiceTest {
     void testChargeUserBalance_UserNotFound() {
         // Given
         UserCommand.ChargeBalance command = new UserCommand.ChargeBalance(USER_ID, BigDecimal.valueOf(10000));
-        when(userRepository.findByIdForUsePoint(USER_ID)).thenReturn(Optional.empty());
+        when(userRepository.findByIdForChargePoint(USER_ID)).thenReturn(Optional.empty());
 
         // When & Then
         CustomGlobalException exception = assertThrows(CustomGlobalException.class, () -> {
             userService.chargeUserBalance(command);
         });
         assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode());
-        verify(userRepository, times(1)).findByIdForUsePoint(USER_ID);
+        verify(userRepository, times(1)).findByIdForChargePoint(USER_ID);
         verify(userPointHistoryRepository, never()).save(any(UserPointHistory.class));
     }
 

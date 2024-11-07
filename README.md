@@ -165,9 +165,9 @@ Service 클래스 내부에 inner class로 Command/Info를 구현 예정입니�
 
 </details>
 
-<details><summary></summary>
+<details><summary>캐시 보고서 및 대기열 성능개선 보고서</summary>
 
-[Caching.md](docs%2FCaching.md)
+[Caching.md](docs/CachingAndPerformanceTest)
 
 </details>
 

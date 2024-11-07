@@ -1,27 +1,16 @@
 package hhplus.concertreservationservice.domain.queue.repository;
 
-import hhplus.concertreservationservice.domain.queue.entity.Queue;
-import hhplus.concertreservationservice.domain.queue.entity.QueueStatusType;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import org.springframework.data.domain.Pageable;
+import java.util.Set;
 
 public interface QueueRepository {
 
-    Queue save(Queue queue);
+    void save(String token, long nowMilliseconds);
+    Boolean existWaitingToken(String token);
+    Boolean existActiveToken(String token);
+    void deleteActiveToken(String token);
+    Long order(String token);
+    Set<String> getWaitingTokens(Long start,Long end);
+    void deleteWaitingToken(Set<String> tokens);
+    void addActiveToken(String token);
 
-    Optional<Queue> findByUserId(Long userId);
-
-    Optional<Queue> findByQueueToken(String token);
-
-    void delete(Queue queue);
-
-    long countWaitingUsersBefore(Long id);
-
-    List<Queue> findByStatusOrderByIdAsc(QueueStatusType queueStatusType, Pageable pageable);
-
-    List<Queue> findExpiredQueues(QueueStatusType queueStatusType, LocalDateTime now);
-
-    void deleteAllInBatch(List<Queue> expiredQueues);
 }

@@ -25,4 +25,7 @@ public record QueueCommand(
 
     }
 
+    public record Order(String token) {
+
+    }
 }

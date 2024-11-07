@@ -5,7 +5,6 @@ import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
 
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
-import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria.GetAvailableSchedules;
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria.GetAvailableSeats;
 import hhplus.concertreservationservice.application.concert.facade.ConcertFacade;
 import hhplus.concertreservationservice.application.concert.facade.ConcertPaymentFacade;
@@ -17,10 +16,7 @@ import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse
 import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse.GetConcertList;
 import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse.ReserveSeat;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -91,14 +87,16 @@ public class ConcertController implements IConcertController {
 
     }
 
+
     // 콘서트 좌석 결제 API
     @PostMapping("/reservations/{reservationId}/pay")
     public ResponseEntity<ConcertResponse.Pay> payConcert(
         @PathVariable(name = "reservationId") Long reservationId,
+        @RequestHeader(value = "X-Access-Token", required = true) String token,
         @RequestBody @Valid ConcertRequest.Pay request
     ) {
         return ok(ConcertResponse.Pay.fromResult(
-            concertPaymentFacade.pay(request.toCriteria(reservationId))));
+            concertPaymentFacade.pay(request.toCriteria(reservationId,token))));
     }
 
 

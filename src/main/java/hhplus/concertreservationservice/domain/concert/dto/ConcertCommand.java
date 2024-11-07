@@ -1,6 +1,5 @@
 package hhplus.concertreservationservice.domain.concert.dto;
 
-import hhplus.concertreservationservice.domain.user.entity.UserPointHistoryType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;

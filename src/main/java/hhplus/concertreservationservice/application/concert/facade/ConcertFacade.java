@@ -6,7 +6,6 @@ import hhplus.concertreservationservice.application.concert.dto.ConcertResult.Av
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult.AvailableSeats;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult.GetConcertList;
 import hhplus.concertreservationservice.domain.concert.service.ConcertService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

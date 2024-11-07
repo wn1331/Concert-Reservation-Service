@@ -9,9 +9,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import jakarta.validation.Valid;
 
 public interface IQueueController {
 
@@ -25,7 +25,7 @@ public interface IQueueController {
                 schema = @Schema(implementation = ErrorResponse.class))),
     })
     @PostMapping("/enqueue")
-    ResponseEntity<QueueResponse.Enqueue> enqueue(
+    ResponseEntity<Void> enqueue(
         @RequestBody(description = "대기열 생성 요청 정보", required = true,
             content = @Content(mediaType = "application/json",
                 schema = @Schema(example = "{\n"

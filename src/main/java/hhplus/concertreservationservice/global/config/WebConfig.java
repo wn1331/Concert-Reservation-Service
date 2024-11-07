@@ -1,7 +1,6 @@
 package hhplus.concertreservationservice.global.config;
 
 import hhplus.concertreservationservice.global.filter.LoggingFilter;
-import hhplus.concertreservationservice.global.interceptor.QueueValidationForPayInterceptor;
 import hhplus.concertreservationservice.global.interceptor.QueueValidationInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -15,7 +14,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
     private final QueueValidationInterceptor queueValidationInterceptor;
-    private final QueueValidationForPayInterceptor queueValidationForPayInterceptor;
 
     @Bean
     public FilterRegistrationBean<LoggingFilter> loggingFilter() {
@@ -36,8 +34,6 @@ public class WebConfig implements WebMvcConfigurer {
             .excludePathPatterns("/swagger-ui/**")
             .excludePathPatterns("/v3/api-docs/**")
             .excludePathPatterns("/queues/**");
-        registry.addInterceptor(queueValidationForPayInterceptor)
-            .addPathPatterns("/concerts/reservations/*/pay");
     }
 
 }

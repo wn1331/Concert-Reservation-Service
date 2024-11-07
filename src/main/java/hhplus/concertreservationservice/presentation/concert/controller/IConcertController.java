@@ -10,7 +10,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 public interface IConcertController {
 
@@ -90,7 +94,9 @@ public interface IConcertController {
             content = @Content(mediaType = "application/json",
                 schema = @Schema(example = "{\n"
                     + "  \"userId\": 1\n"
-                    + "}")))        @Valid @RequestBody ConcertRequest.Pay request
+                    + "}")))
+        @RequestHeader(value = "X-Access-Token", required = true) String token,
+        @Valid @RequestBody ConcertRequest.Pay request
     );
 }
 

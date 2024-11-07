@@ -9,13 +9,11 @@ import hhplus.concertreservationservice.domain.concert.entity.ReservationStatusT
 import hhplus.concertreservationservice.domain.concert.entity.SeatStatusType;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertReservationRepository;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertSeatRepository;
-import hhplus.concertreservationservice.domain.queue.entity.Queue;
 import hhplus.concertreservationservice.domain.queue.repository.QueueRepository;
 import hhplus.concertreservationservice.global.exception.CustomGlobalException;
 import hhplus.concertreservationservice.global.exception.ErrorCode;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -85,15 +83,6 @@ public class ConcertReservationService {
 
         // 만료된 예약 for루프 돌기
         expiredReservations.forEach(reservation -> {
-            // 유저의 대기열 조회
-            Optional<Queue> optionalQueue = queueRepository.findByUserId(reservation.getUserId());
-
-            if (optionalQueue.isPresent()) {
-                // 대기열 제거
-                queueRepository.delete(optionalQueue.get());
-            } else {
-                log.warn("User not found for reservation id: {}. Skipping queue deletion.", reservation.getId());
-            }
 
             //예약 취소 (RESERVED -> CANCELED)
             reservation.cancelReservation();

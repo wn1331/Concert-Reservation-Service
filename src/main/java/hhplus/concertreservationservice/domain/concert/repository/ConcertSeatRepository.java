@@ -2,10 +2,8 @@ package hhplus.concertreservationservice.domain.concert.repository;
 
 import hhplus.concertreservationservice.domain.concert.entity.ConcertSeat;
 import hhplus.concertreservationservice.domain.concert.entity.SeatStatusType;
-import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.Lock;
 
 public interface ConcertSeatRepository {
 

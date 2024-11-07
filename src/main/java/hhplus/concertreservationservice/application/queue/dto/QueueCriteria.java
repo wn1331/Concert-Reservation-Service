@@ -44,4 +44,11 @@ public record QueueCriteria() {
     }
 
 
+    public record Order(String token) {
+
+        public QueueCommand.Order toCommand() {
+            return new QueueCommand.Order(token);
+        }
+    }
+
 }

@@ -18,12 +18,5 @@ public class QueueSchedular {
         queueFacade.activateProcess();
     }
 
-    // 1분마다
-    // 대기열 만료 스케줄러
-    @Scheduled(cron = "0 */1 * * * *")
-    public void expiredProcess(){
-        queueFacade.expireProcess();
-    }
-
 
 }

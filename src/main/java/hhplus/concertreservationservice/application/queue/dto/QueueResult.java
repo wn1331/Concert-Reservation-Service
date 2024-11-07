@@ -7,15 +7,19 @@ public record QueueResult() {
 
     @Builder
     public record Enqueue(
-        String queueToken,
-        Long order
+        String queueToken
     ){
         public static QueueResult.Enqueue fromInfo(QueueInfo.Enqueue info){
             return Enqueue.builder()
                 .queueToken(info.queueToken())
-                .order(info.order())
                 .build();
         }
     }
 
+    @Builder
+    public record Order(
+        Long order
+    ) {
+
+    }
 }

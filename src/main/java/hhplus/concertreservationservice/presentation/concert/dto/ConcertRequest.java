@@ -1,11 +1,8 @@
 package hhplus.concertreservationservice.presentation.concert.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
-import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria.Pay;
 import hhplus.concertreservationservice.global.exception.CustomGlobalException;
 import hhplus.concertreservationservice.global.exception.ErrorCode;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -36,10 +33,11 @@ public record ConcertRequest() {
         Long userId
     ) {
 
-        public ConcertCriteria.Pay toCriteria(Long reservationId) {
+        public ConcertCriteria.Pay toCriteria(Long reservationId,String token) {
             return ConcertCriteria.Pay.builder()
                 .reservationId(reservationId)
                 .userId(userId)
+                .token(token)
                 .build();
         }
     }

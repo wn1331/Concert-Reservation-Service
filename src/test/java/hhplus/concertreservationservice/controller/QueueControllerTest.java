@@ -2,6 +2,7 @@ package hhplus.concertreservationservice.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -39,28 +40,19 @@ class QueueControllerTest {
     @DisplayName("[성공] 대기열 생성 성공")
     void enqueue_Success() throws Exception {
         // Given
-        Long userId = 1L;
         String queueToken = "valid-token";
-        Long order = 5L;
-
-        QueueResponse.Enqueue response = QueueResponse.Enqueue.builder()
-            .token(queueToken)
-            .order(order)
-            .build();
 
         // Mocking the response from queueFacade
         when(queueFacade.enqueue(any())).thenReturn(QueueResult.Enqueue.builder()
             .queueToken(queueToken)
-            .order(order)
             .build());
 
         // When & Then
         mockMvc.perform(post("/queues/enqueue")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"userId\": " + userId + "}"))  // 유효한 요청 본문
-            .andExpect(status().isOk())  // 기대 상태: 200 OK
-            .andExpect(jsonPath("$.token").value(queueToken))  // token 확인
-            .andExpect(jsonPath("$.order").value(order));  // order 확인
+                .content("{\"userId\": 1}"))  // 유효한 요청 본문
+            .andExpect(status().isCreated())  // 기대 상태: 201 Created
+            .andExpect(header().string("X-Access-Token", queueToken));  // 헤더에 토큰 확인
     }
 
     @Test
@@ -83,5 +75,34 @@ class QueueControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"userId\": null}"))  // userId 누락
             .andExpect(status().isBadRequest()); // 400 Bad Request 기대
+    }
+
+    @Test
+    @Order(4)
+    @DisplayName("[성공] 대기열 순번 조회 성공")
+    void getQueueStatus_Success() throws Exception {
+        // Given
+        String queueToken = "valid-token";
+        Long order = 5L;
+
+        // Mocking the response from queueFacade
+        when(queueFacade.getQueueOrder(any())).thenReturn(QueueResult.Order.builder()
+            .order(order)
+            .build());
+
+        // When & Then
+        mockMvc.perform(get("/queues/order")
+                .header("X-Access-Token", queueToken))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.order").value(order));  // 순번 확인
+    }
+
+    @Test
+    @Order(5)
+    @DisplayName("[실패] 대기열 순번 조회 실패 - 토큰 누락")
+    void getQueueStatus_Fail_MissingToken() throws Exception {
+        // When & Then
+        mockMvc.perform(get("/queues/order"))
+            .andExpect(status().isBadRequest());  // 400 Bad Request 기대
     }
 }

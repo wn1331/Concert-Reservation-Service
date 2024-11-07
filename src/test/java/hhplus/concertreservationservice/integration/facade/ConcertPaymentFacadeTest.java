@@ -16,8 +16,6 @@ import hhplus.concertreservationservice.domain.concert.repository.ConcertReposit
 import hhplus.concertreservationservice.domain.concert.repository.ConcertReservationRepository;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertScheduleRepository;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertSeatRepository;
-import hhplus.concertreservationservice.domain.queue.entity.Queue;
-import hhplus.concertreservationservice.domain.queue.entity.QueueStatusType;
 import hhplus.concertreservationservice.domain.queue.repository.QueueRepository;
 import hhplus.concertreservationservice.domain.user.entity.User;
 import hhplus.concertreservationservice.domain.user.repository.UserRepository;
@@ -35,10 +33,12 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
+@ActiveProfiles("test")
 @DisplayName("[통합 테스트] ConcertPaymentFacade 테스트")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -49,9 +49,6 @@ class ConcertPaymentFacadeTest {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private QueueRepository queueRepository;
 
     @Autowired
     private ConcertRepository concertRepository;
@@ -70,7 +67,6 @@ class ConcertPaymentFacadeTest {
     private ConcertSeat seat;
     private ConcertReservation concertReservation;
     private ConcertSchedule concertSchedule;
-    private String queueToken = "3b93aaaf-0ea8-49e4-be70-574a1813167s";
 
 
     @BeforeEach
@@ -78,10 +74,6 @@ class ConcertPaymentFacadeTest {
         // 테스트 유저 생성
         user = new User("테스트 유저", BigDecimal.valueOf(1000000));
         userRepository.save(user);
-
-        // 대기열 생성
-        Queue queue = new Queue(user.getId(), queueToken, QueueStatusType.PASS);
-        queueRepository.save(queue);
 
         // 콘서트와 스케줄, 좌석 생성
         concert = new Concert("테스트 콘서트");
@@ -104,7 +96,7 @@ class ConcertPaymentFacadeTest {
         concertSeatRepository.saveAll(seats);
 
         concertReservation = new ConcertReservation(user.getId(),
-            302L, BigDecimal.valueOf(150000),
+            4L, BigDecimal.valueOf(150000),
             ReservationStatusType.RESERVED);
         concertReservationRepository.save(concertReservation);
     }

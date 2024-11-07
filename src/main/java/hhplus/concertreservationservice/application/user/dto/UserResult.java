@@ -1,7 +1,6 @@
 package hhplus.concertreservationservice.application.user.dto;
 
 import hhplus.concertreservationservice.domain.user.dto.UserInfo;
-import hhplus.concertreservationservice.domain.user.dto.UserInfo.CheckBalance;
 import java.math.BigDecimal;
 import lombok.Builder;
 
