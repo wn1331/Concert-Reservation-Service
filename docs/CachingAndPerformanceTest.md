@@ -255,6 +255,7 @@ key와 value의 관계는 1:1이고, key는 중복될 수 없으며, 이미 존�
 
 ## 대기열 이관 작업 후 부하테스트 및 Grafana 모니터링 비교
 
+### 대기열 요청(생성) API 성능비교. Redis vs H2 (vs MySQL)
 Redis로 대기열을 이관한 후, 기존 H2 기반의 대기열 요청 API에 대해 부하 테스트를 수행한 결과 Redis 대기열이 약 295 TPS 더 높은 성능을 보였다.  
 (부하테스트를 하기 위해 대기열 요청 API와 대기열 순번조회(폴링용)을 분리했다.)
 ![REDISQUEUE.png](images/REDISQUEUE.png)   
@@ -269,7 +270,8 @@ Redis로 대기열을 이관한 후, 기존 H2 기반의 대기열 요청 API에
 ![MYSQLQUEUE.png](images/MYSQLQUEUE.png)
 MySQL에서는 대기열 요청의 TPS가 1257.6이 나타났으며, Redis는 이에 비해 무려 `3배정도의 성능`을 보여준다.  
 
-그리고, `대기열 순번조회`는 RDBMS에서는 대기열테이블의 id로 조회해서(id가 순서대로 적재됨), 순번을 직접 계산하는 거였다면, Redis에서는 SortedSet으로 바로 순번조회가 가능하기 때문에 성능차이가 꽤 날것이라 예상했다.  
+### 그렇다면 대기열 순번조회 API를 비교해보자.
+ `대기열 순번조회`는 RDBMS에서는 대기열테이블의 id로 조회해서(id가 순서대로 적재됨), 순번을 직접 계산하는 거였다면, Redis에서는 SortedSet으로 바로 순번조회가 가능하기 때문에 성능차이가 꽤 날것이라 예상했다.  
 그래서 대기열 순번조회 API 또한 성능 테스트를 해 보았다.  
 
 ![h2order.png](images/h2order.png)  
