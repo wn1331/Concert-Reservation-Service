@@ -17,15 +17,15 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 @RequiredArgsConstructor
-public class RedissonPubSubLockAspect {
+public class RedissonDistributedLockAspect {
 
     private final RedissonClient redissonClient;
     private static final String TOPIC_NAME = "lockTopic";  // 락 상태를 전달하는 Pub/Sub 토픽 이름
 
-    @Around("@annotation(redissionPubSubLock)")
-    public Object handleRedissionPubSubLock(ProceedingJoinPoint joinPoint, RedissionPubSubLock redissionPubSubLock) throws Throwable {
+    @Around("@annotation(distributedLock)")
+    public Object handleRedissionPubSubLock(ProceedingJoinPoint joinPoint, DistributedLock distributedLock) throws Throwable {
         // 락 키 생성 및 검증
-        String lockKey = CustomSpringELParser.parseKey(joinPoint, redissionPubSubLock.value());
+        String lockKey = CustomSpringELParser.parseKey(joinPoint, distributedLock.value());
         if (lockKey == null) {
             throw new CustomGlobalException(ErrorCode.PUBSUB_LOCK_KEY_NOT_NULL);  // 락 키가 없을 경우 예외 발생
         }
@@ -35,7 +35,7 @@ public class RedissonPubSubLockAspect {
 
         try {
             // 락 획득 시도: 지정된 시간 동안 락을 시도하고, 실패 시 경고 및 예외 처리
-            boolean isLocked = lock.tryLock(redissionPubSubLock.waitTime(), redissionPubSubLock.leaseTime(), redissionPubSubLock.timeUnit());
+            boolean isLocked = lock.tryLock(distributedLock.waitTime(), distributedLock.leaseTime(), distributedLock.timeUnit());
             if (!isLocked) {
                 log.warn("Failed to acquire lock: {}", lockKey);
                 throw new CustomGlobalException(ErrorCode.CANNOT_ACQUIRE_LOCK);
