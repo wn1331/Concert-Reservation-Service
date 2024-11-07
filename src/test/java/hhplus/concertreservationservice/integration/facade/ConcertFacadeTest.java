@@ -22,6 +22,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -32,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @Transactional
+@ActiveProfiles("test")
 @DisplayName("[통합 테스트] ConcertFacade 테스트")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -82,7 +84,7 @@ class ConcertFacadeTest {
 
     @Test
     @Order(1)
-    @DisplayName("[성공] 콘서트 스케줄 조회 테스트")
+    @DisplayName("[성공] 콘서트 스케줄 조회 테스트. 개수는 3개가 조회되어야 한다.")
     void getAvailableSchedules_success() {
         // Given
         ConcertCriteria.GetAvailableSchedules criteria = ConcertCriteria.GetAvailableSchedules.builder()
@@ -93,8 +95,9 @@ class ConcertFacadeTest {
         ConcertResult.AvailableSchedules result = concertFacade.getAvailableSchedules(criteria);
 
         // Then
-        assertEquals(1, result.schedules().size());
-        assertEquals(concertSchedule.getId(), result.schedules().get(0).id());
+        // 기존에 2개(data.sql) 있음 + setup에서 1개 만듦
+        assertEquals(3, result.schedules().size());
+        assertEquals(concertSchedule.getId(), result.schedules().get(2).id());
     }
 
     @Test
@@ -118,15 +121,14 @@ class ConcertFacadeTest {
     @Order(3)
     @DisplayName("[성공] 콘서트 목록 조회 테스트")
     void getConcertList_success() {
-        // Given - 이미 2개가 있음. + setUp에서 1개 만듦. = 3개
 
         // When
         ConcertResult.GetConcertList result = concertFacade.getConcertList();
 
         // Then
-        assertEquals(3, result.concertsResultList().size());
-        assertEquals(concert.getId(), result.concertsResultList().get(2).id());
-        assertEquals(concert.getTitle(), result.concertsResultList().get(2).title());
+        assertEquals(1, result.concertsResultList().size());
+        assertEquals(concert.getId(), result.concertsResultList().get(0).id());
+        assertEquals(concert.getTitle(), result.concertsResultList().get(0).title());
     }
 
     @Test

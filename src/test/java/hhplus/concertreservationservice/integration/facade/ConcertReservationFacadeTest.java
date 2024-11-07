@@ -36,10 +36,12 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
+@ActiveProfiles("test")
 @DisplayName("[통합 테스트] ConcertReservationFacade 테스트")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -50,9 +52,6 @@ class ConcertReservationFacadeTest {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private QueueRepository queueRepository;
 
     @Autowired
     private ConcertRepository concertRepository;
@@ -72,7 +71,6 @@ class ConcertReservationFacadeTest {
     private User user;
     private Concert concert;
     private ConcertSchedule concertSchedule;
-    private String queueToken = "exampleToken";
 
 
     @BeforeEach
@@ -122,7 +120,7 @@ class ConcertReservationFacadeTest {
         ConcertResult.ReserveSeat result = concertReservationFacade.reserveSeat(criteria);
 
         // Then
-        assertEquals(2L, result.reservationId());
+        assertEquals(3L, result.reservationId());
     }
 
     @Test
@@ -151,7 +149,7 @@ class ConcertReservationFacadeTest {
         // Given
         ConcertCriteria.ReserveSeat criteria = ConcertCriteria.ReserveSeat.builder()
             .userId(1L)
-            .concertSeatId(302L)  // (1~300번 좌석은 local 어플리케이션 실행할 때 생성합니다. 301(empty)~302(reserved)번 좌석은 test 어플리케이션 실행 시 생성합니다)
+            .concertSeatId(4L)
             .build();
 
         // When & Then
@@ -167,10 +165,10 @@ class ConcertReservationFacadeTest {
     @Order(4)
     @DisplayName("[실패] 이미 판매 완료된 좌석을 예약 시도")
     void reserveSeat_fail_whenSeatAlreadySold() {
-        // Given: SOLD된 좌석 ID : 303
+        // Given: SOLD된 좌석 ID :5
         ConcertCriteria.ReserveSeat criteria = ConcertCriteria.ReserveSeat.builder()
             .userId(1L)
-            .concertSeatId(303L)  // A3 좌석 (SOLD 상태)
+            .concertSeatId(5L)  // 좌석 (SOLD 상태)
             .build();
 
         // When & Then
@@ -188,7 +186,7 @@ class ConcertReservationFacadeTest {
     void expireReservationProcess_success() {
         // Given: 테스트 데이터를 만료된 예약 상태로 설정
         ConcertReservation expiredReservation = new ConcertReservation(
-            user.getId(), 302L, BigDecimal.valueOf(150000), ReservationStatusType.RESERVED);
+            user.getId(), 2L, BigDecimal.valueOf(150000), ReservationStatusType.RESERVED);
         concertReservationRepository.save(expiredReservation);
 
         // 기존 비즈니스 로직을 변경하지 않고 created_at을 10분 이전으로 생성하는 방법. -> entityManager 사용해서 update친다.
@@ -209,10 +207,9 @@ class ConcertReservationFacadeTest {
         assertEquals(ReservationStatusType.CANCELED, updatedReservation.getStatus());
 
         // 좌석 상태가 EMPTY로 변경되었는지 확인
-        ConcertSeat updatedSeat = concertSeatRepository.findById(302L).orElseThrow();
+        ConcertSeat updatedSeat = concertSeatRepository.findById(2L).orElseThrow();
         assertEquals(SeatStatusType.EMPTY, updatedSeat.getStatus());
 
-        // 유저의 대기열이 삭제되었는지 확인
     }
 
 

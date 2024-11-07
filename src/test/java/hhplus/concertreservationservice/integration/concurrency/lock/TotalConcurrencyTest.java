@@ -37,7 +37,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@DisplayName("동시성 테스트")
+@DisplayName("[통합 테스트] 동시성 테스트 모음")
 class TotalConcurrencyTest {
 
     private static final Logger log = LoggerFactory.getLogger(TotalConcurrencyTest.class);
