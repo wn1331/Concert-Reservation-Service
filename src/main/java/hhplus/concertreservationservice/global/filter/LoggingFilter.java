@@ -39,18 +39,22 @@ public class LoggingFilter implements Filter {
             (HttpServletRequest) request);
         ContentCachingResponseWrapper wrappedResponse = new ContentCachingResponseWrapper(
             (HttpServletResponse) response);
+        String path = wrappedRequest.getRequestURI();
 
         try {
             chain.doFilter(wrappedRequest, wrappedResponse);
         } finally {
-            loggingRequest(wrappedRequest);
-            loggingResponse(wrappedResponse);
+            if (!path.startsWith("/actuator")) {
 
-            // 응답 내용을 클라이언트로 전달해야 한다. 전달 이후에는 본문을 확인할 수 없다는 것이 특징.
-            wrappedResponse.copyBodyToResponse();
+                loggingRequest(wrappedRequest);
+                loggingResponse(wrappedResponse);
 
-            // 응답 헤더는 전달 이후에 확인 가능하다.
-            loggingResponseHeaders(wrappedResponse);
+                // 응답 내용을 클라이언트로 전달해야 한다. 전달 이후에는 본문을 확인할 수 없다는 것이 특징.
+                wrappedResponse.copyBodyToResponse();
+
+                // 응답 헤더는 전달 이후에 확인 가능하다.
+                loggingResponseHeaders(wrappedResponse);
+            }
 
         }
 
