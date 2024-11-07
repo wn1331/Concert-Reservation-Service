@@ -17,7 +17,6 @@ import hhplus.concertreservationservice.domain.concert.repository.ConcertSeatRep
 import hhplus.concertreservationservice.global.exception.CustomGlobalException;
 import hhplus.concertreservationservice.global.exception.ErrorCode;
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

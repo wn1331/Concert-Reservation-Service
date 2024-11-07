@@ -5,7 +5,6 @@ import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
 
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
-import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria.GetAvailableSchedules;
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria.GetAvailableSeats;
 import hhplus.concertreservationservice.application.concert.facade.ConcertFacade;
 import hhplus.concertreservationservice.application.concert.facade.ConcertPaymentFacade;
@@ -15,13 +14,9 @@ import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse
 import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse.AvailableSchedules;
 import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse.AvailableSeats;
 import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse.GetConcertList;
-import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse.Pay;
 import hhplus.concertreservationservice.presentation.concert.dto.ConcertResponse.ReserveSeat;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

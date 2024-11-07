@@ -2,7 +2,6 @@ package hhplus.concertreservationservice.presentation.queue.controller;
 
 import static org.springframework.http.ResponseEntity.ok;
 
-import hhplus.concertreservationservice.application.queue.dto.QueueCriteria;
 import hhplus.concertreservationservice.application.queue.dto.QueueCriteria.Order;
 import hhplus.concertreservationservice.application.queue.facade.QueueFacade;
 import hhplus.concertreservationservice.presentation.queue.dto.QueueRequest;

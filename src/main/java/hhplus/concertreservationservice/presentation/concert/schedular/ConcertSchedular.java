@@ -1,7 +1,6 @@
 package hhplus.concertreservationservice.presentation.concert.schedular;
 
 
-import hhplus.concertreservationservice.application.concert.facade.ConcertFacade;
 import hhplus.concertreservationservice.application.concert.facade.ConcertReservationFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
