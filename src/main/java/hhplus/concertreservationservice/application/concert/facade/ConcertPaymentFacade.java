@@ -45,7 +45,8 @@ public class ConcertPaymentFacade {
         ConcertInfo.Pay pay = concertPaymentService.payReservation(
             criteria.toCommand(reservationStatus.price()));
 
-        // 대기열 만료처리
+
+        // 대기열 만료처리. 이미 대기열이 만료가 되어있더라도 Exception이 발생하지는 않음.
         queueService.expireToken(criteria.token());
 
         return ConcertResult.Pay.fromInfo(pay);
