@@ -1,8 +1,6 @@
 package hhplus.concertreservationservice.application.concert.dto;
 
 import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo;
-import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo.Pay;
-import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo.ReserveSeat;
 import hhplus.concertreservationservice.domain.concert.entity.ScheduleStatusType;
 import hhplus.concertreservationservice.domain.concert.entity.SeatStatusType;
 import java.time.LocalDate;

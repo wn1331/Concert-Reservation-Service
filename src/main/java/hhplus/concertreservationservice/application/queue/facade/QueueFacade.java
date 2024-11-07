@@ -3,15 +3,11 @@ package hhplus.concertreservationservice.application.queue.facade;
 
 import hhplus.concertreservationservice.application.queue.dto.QueueCriteria;
 import hhplus.concertreservationservice.application.queue.dto.QueueCriteria.VerifyQueue;
-import hhplus.concertreservationservice.application.queue.dto.QueueCriteria.VerifyQueueForPay;
 import hhplus.concertreservationservice.application.queue.dto.QueueResult;
 import hhplus.concertreservationservice.domain.queue.service.QueueService;
 import hhplus.concertreservationservice.domain.user.service.UserService;
-import hhplus.concertreservationservice.global.exception.CustomGlobalException;
-import hhplus.concertreservationservice.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor

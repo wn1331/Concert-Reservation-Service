@@ -1,7 +1,6 @@
 package hhplus.concertreservationservice.presentation.user.dto;
 
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 
 public record UserRequest() {

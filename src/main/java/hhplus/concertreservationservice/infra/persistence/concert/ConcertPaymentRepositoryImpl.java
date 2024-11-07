@@ -2,8 +2,6 @@ package hhplus.concertreservationservice.infra.persistence.concert;
 
 import hhplus.concertreservationservice.domain.concert.entity.ConcertPayment;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertPaymentRepository;
-import java.util.Optional;
-import java.util.OptionalInt;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
