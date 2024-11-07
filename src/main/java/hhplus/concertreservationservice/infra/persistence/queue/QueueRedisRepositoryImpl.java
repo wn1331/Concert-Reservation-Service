@@ -66,6 +66,6 @@ public class QueueRedisRepositoryImpl implements QueueRepository {
         // Strings 자료구조에 ActiveToken 저장 및 만료 시간 설정
         String key = ACTIVE_QUEUE_KEY + ":" + token;
         redisTemplate.opsForValue().set(key, token);
-        redisTemplate.expire(key, 10, TimeUnit.MINUTES); // 10분 만료 시간 설정
+        redisTemplate.expire(key, 5, TimeUnit.MINUTES); // 5분 만료 시간 설정
         }
 }
