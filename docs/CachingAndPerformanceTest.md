@@ -224,16 +224,16 @@ Redis를 사용하는 가장 큰 이유는 바로 데이터 처리 속도와 효
 ### 성능 개선점 파악
 현재 콘서트 예약 서비스의 대기열 시스템은 RDBMS 기반으로 구현되어 있다.    
 이 시스템은 총 4가지 로직이 수행된다.    
-`대기열 생성 요청했을 때 대기열이 존재하지 않을 시` 대기열 요청을 보내면 테이블에 대기열을 적재한다.  
-`대기열 생성 요청했을 때 대기열이 존재한다면(폴링 겸용)` 해당 대기열의 순번을 조회한다.(PASS상태면 0번)  
-`waiting 상태에서 10분이 지나면` 스케줄러에 의해 대기열을 PASS 상태로 전환한다.  
-`PASS 상태에서 10분이 지나면` 스케줄러에 의해 대기열을 삭제한다.  
+`대기열 생성 요청` : 대기열 요청을 보내면 테이블에 대기열을 적재한다.  
+`대기열 순번 조회(폴링)` : 해당 대기열의 순번을 조회한다.(PASS상태면 0번)  
+`waiting 상태에서 5분이 지나면` : 스케줄러에 의해 대기열을 PASS 상태로 전환한다.  
+`PASS 상태에서 5분이 지나면` : 스케줄러에 의해 대기열을 삭제한다.  
 
 이 로직을 레디스로 이관하게 된다면 아래와 같이 개선할 수 있다.   
-`대기열 생성 요청했을 때 대기열이 존재하지 않을 시` RDBMS가 아닌, NoSQL(Redis)의 waitqueue에 대기열을 Sorted-Sets구조로 적재한다.(zadd)     
-`대기열 생성 요청했을 때 대기열이 존재한다면(폴링 겸용)` waitqueue에 존재한다면 순번 반환(zrank), activequeue에 존재한다면 순번 -1을 반환한다.   
-`waiting 상태에서 5분이 지나면` 스케줄러에 의해 대기열을 activequeue로 이동시킨다.(waitqueue 삭제, activequeue 추가)   
-`PASS 상태에서 5분이 지나면` 스케줄러 없이, activequeue에 등록된 대기열들에 expire명령을 사용해서 자체적으로 만료가 되도록 설정한다.   
+`대기열 생성 요청` : RDBMS가 아닌, NoSQL(Redis)의 waitqueue에 대기열을 Sorted-Sets구조로 적재한다.(zadd)     
+`대기열 순번 조회(폴링)` : waitqueue에 존재한다면 순번 반환(zrank), activequeue에 존재한다면 순번 -1을 반환한다.   
+`waitqueue에서 5분이 지나면` : 스케줄러에 의해 대기열을 activequeue로 이동시킨다.(waitqueue 삭제, activequeue 추가)   
+`activequeue에서 5분이 지나면` : 스케줄러 없이, activequeue에 등록된 대기열들에 expire명령을 사용해서 자체적으로 만료가 되도록 설정한다.(대기열을 waitqueue에서 activequeue로 옮겨줄 때 expire명령 써서 만료시간 설정)   
 
 위 개선된 로직에 쓰이는 Redis 자료구조는 Sorted-Sets와, Strings이다.  
 ### Sorted-Sets
