@@ -13,6 +13,9 @@ public interface QueueRepository {
 
     Optional<Queue> findByUserId(Long userId);
 
+    Optional<Queue> findFirstByUserIdOrderById(Long userId);
+
+
     Optional<Queue> findByQueueToken(String token);
 
     void delete(Queue queue);

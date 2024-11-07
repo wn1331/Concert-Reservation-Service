@@ -14,6 +14,8 @@ public interface QueueJpaRepository extends JpaRepository<Queue,Long> {
 
     Optional<Queue> findByUserId(Long userId);
 
+    Optional<Queue> findFirstByUserIdOrderById(Long userId);
+
     Optional<Queue> findByQueueToken(String token);
 
     @Query("SELECT COUNT(q) FROM Queue q WHERE q.id < :id AND q.status = 'WAITING'")

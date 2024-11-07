@@ -27,6 +27,12 @@ public class QueueRepositoryImpl implements QueueRepository {
     }
 
     @Override
+    public Optional<Queue> findFirstByUserIdOrderById(Long userId){
+        return jpaRepository.findFirstByUserIdOrderById(userId);
+    }
+
+
+    @Override
     public Optional<Queue> findByQueueToken(String queueToken) {
         return jpaRepository.findByQueueToken(queueToken);
     }

@@ -20,5 +20,7 @@ public record QueueInfo() {
 
     }
 
+    public record Order(Long id) {
 
+    }
 }

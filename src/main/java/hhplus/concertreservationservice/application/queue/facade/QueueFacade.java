@@ -2,6 +2,7 @@ package hhplus.concertreservationservice.application.queue.facade;
 
 
 import hhplus.concertreservationservice.application.queue.dto.QueueCriteria;
+import hhplus.concertreservationservice.application.queue.dto.QueueCriteria.Enqueue;
 import hhplus.concertreservationservice.application.queue.dto.QueueCriteria.VerifyQueue;
 import hhplus.concertreservationservice.application.queue.dto.QueueCriteria.VerifyQueueForPay;
 import hhplus.concertreservationservice.application.queue.dto.QueueResult;
@@ -54,5 +55,11 @@ public class QueueFacade {
 
     public void expireToken(String queueToken){
         queueService.expireToken(queueToken);
+    }
+
+    // 토큰 폴링용
+    public QueueResult.Order getQueueOrder(QueueCriteria.Enqueue criteria) {
+        return new QueueResult.Order(queueService.getQueueOrder(criteria.toCommand()).id());
+
     }
 }

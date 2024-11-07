@@ -131,5 +131,25 @@ public class QueueService {
         queueRepository.delete(queue);
 
     }
+
+
+    // 대기열 순번 조회
+    public QueueInfo.Order getQueueOrder(QueueCommand.Enqueue command){
+
+        // 값이 있을 때는 있는거 반환
+        Queue queue = queueRepository.findFirstByUserIdOrderById(command.userId())
+            // 값이 없을 때는 새로운 큐 생성하고 반환
+            .orElseThrow(()->new CustomGlobalException(ErrorCode.QUEUE_NOT_FOUND));
+
+        // 폴링시 순번 계산. Pass면 대기자수 -1번
+        if (queue.getStatus() == QueueStatusType.PASS) {
+            return new QueueInfo.Order(-1L);
+        } else {
+            // 해당 대기열보다 앞선 대기열(WAITING 상태) 수를 카운트
+            long order = queueRepository.countWaitingUsersBefore(queue.getId());
+            return new QueueInfo.Order(order + 1L);
+        }
+    }
+
 }
 

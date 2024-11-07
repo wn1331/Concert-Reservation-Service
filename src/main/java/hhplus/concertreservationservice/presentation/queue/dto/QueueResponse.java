@@ -20,4 +20,14 @@ public record QueueResponse() {
     }
 
 
+
+    @Builder
+    public record Order(
+        Long order
+    ) {
+
+        public static Order fromResult(QueueResult.Order result) {
+            return new Order(result.order());
+        }
+    }
 }
