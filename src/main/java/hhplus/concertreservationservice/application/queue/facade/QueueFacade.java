@@ -21,13 +21,11 @@ public class QueueFacade {
     private final UserService userService;
     // 대기열 토큰 발급
     @Transactional
-    public QueueResult.Enqueue enqueue(QueueCriteria.Enqueue criteria){
+    public void enqueue(QueueCriteria.Enqueue criteria){
 
         // 해당 유저아이디가 유효한지 확인
         userService.existCheckUser(criteria.userId());
-
-        // 대기열 등록및 폴링 분기처리
-        return QueueResult.Enqueue.fromInfo(queueService.enqueueOrPoll(criteria.toCommand()));
+        queueService.enqueueOrPoll(criteria.toCommand());
 
     }
 

@@ -25,7 +25,7 @@ public interface IQueueController {
                 schema = @Schema(implementation = ErrorResponse.class))),
     })
     @PostMapping("/enqueue")
-    ResponseEntity<QueueResponse.Enqueue> enqueue(
+    ResponseEntity<Void> enqueue(
         @RequestBody(description = "대기열 생성 요청 정보", required = true,
             content = @Content(mediaType = "application/json",
                 schema = @Schema(example = "{\n"
