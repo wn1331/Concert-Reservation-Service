@@ -59,6 +59,35 @@ services:
       - "9100:9100"
     networks:
       - promnet
+  db:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      TZ: Asia/Seoul
+    volumes:
+      - ./db/mysql/data:/var/lib/mysql
+      - ./db/mysql/init:/docker-entrypoint-initdb.d
+    platform: linux/x86_64
+  mysql-exporter:
+    container_name: mysql-exporter
+    image: prom/mysqld-exporter:latest
+    environment:
+      - DATA_SOURCE_NAME= concert
+    command:
+      - "--mysqld.username=root:1234"
+      - "--mysqld.address=host.docker.internal:3306"
+    ports:
+      - "9104:9104"
+    depends_on:
+      - db
+    networks:
+      - app-network
 networks:
   promnet:
+    driver: bridge
+  app-network:
     driver: bridge
