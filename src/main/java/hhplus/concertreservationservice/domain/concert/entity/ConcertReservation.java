@@ -16,11 +16,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(name = "RESERVATION")
+@DynamicUpdate
 public class ConcertReservation extends BaseTimeEntity {
 
     @Id
