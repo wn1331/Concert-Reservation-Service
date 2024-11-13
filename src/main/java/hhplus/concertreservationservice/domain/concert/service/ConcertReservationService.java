@@ -2,7 +2,7 @@ package hhplus.concertreservationservice.domain.concert.service;
 
 import hhplus.concertreservationservice.domain.concert.dto.ConcertCommand.ReserveSeat;
 import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo;
-import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo.ReservationStatus;
+import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo.ReservationStatusInfo;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertReservation;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertSeat;
 import hhplus.concertreservationservice.domain.concert.entity.ReservationStatusType;
@@ -54,7 +54,7 @@ public class ConcertReservationService {
     }
 
 
-    public ReservationStatus changeReservationStatusPaid(Long reservationId) {
+    public ReservationStatusInfo changeReservationStatusPaid(Long reservationId) {
         ConcertReservation reservation = concertReservationRepository.findById(
                 reservationId)
             .orElseThrow(() -> new CustomGlobalException(ErrorCode.CONCERT_RESERVATION_NOT_FOUND));
@@ -63,7 +63,7 @@ public class ConcertReservationService {
         reservation.confirmPayment();
 
         // dto(info) 반환
-        return ReservationStatus.builder()
+        return ReservationStatusInfo.builder()
             .reservationId(reservation.getId())
             .concertSeatId(reservation.getConcertSeatId())
             .price(reservation.getPrice())

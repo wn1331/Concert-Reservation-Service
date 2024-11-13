@@ -100,7 +100,7 @@ public record ConcertInfo() {
     }
 
     @Builder
-    public record ReservationStatus(
+    public record ReservationStatusInfo(
         Long reservationId,
         Long concertSeatId,
         BigDecimal price
