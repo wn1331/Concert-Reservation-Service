@@ -1,7 +1,9 @@
 package hhplus.concertreservationservice.application.concert.facade;
 
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
+import hhplus.concertreservationservice.domain.concert.dto.ConcertPaymentSuccessEvent;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
+import hhplus.concertreservationservice.domain.concert.publisher.ConcertPaymentEventPublisher;
 import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo;
 import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo.ReservationStatusInfo;
 import hhplus.concertreservationservice.domain.concert.service.ConcertPaymentService;
@@ -23,6 +25,7 @@ public class ConcertPaymentFacade {
     private final ConcertReservationService concertReservationService;
     private final ConcertPaymentService concertPaymentService;
     private final QueueService queueService;
+    private final ConcertPaymentEventPublisher paymentEventPublisher;
 
     @Transactional
     public ConcertResult.Pay pay(ConcertCriteria.Pay criteria) {
@@ -30,7 +33,8 @@ public class ConcertPaymentFacade {
         ReservationStatusInfo reservationStatusInfo = concertReservationService.changeReservationStatusPaid(
             criteria.reservationId());
 
-        // 유저 잔액 차감 및 히스토리 저장.
+        // 유저 잔액 차감
+        // 히스토리 저장은 event로 실행 (외부 데이터 플랫폼이라 가정, 이벤트 발행으로 변경)
         userService.userPayReservation(UserCommand.UserPay.builder()
             .userId(criteria.userId())
             .price(reservationStatusInfo.price())
@@ -44,9 +48,15 @@ public class ConcertPaymentFacade {
         ConcertInfo.Pay pay = concertPaymentService.payReservation(
             criteria.toCommand(reservationStatusInfo.price()));
 
-
         // 대기열 만료처리. 이미 대기열이 만료가 되어있더라도 Exception이 발생하지는 않음.
         queueService.expireToken(criteria.token());
+
+        // 결제완료 이벤트 발행
+        paymentEventPublisher.success(ConcertPaymentSuccessEvent.builder()
+                .userId(criteria.userId())
+                .price(reservationStatusInfo.price())
+                .paymentId(pay.paymentId())
+            .build());
 
         return ConcertResult.Pay.fromInfo(pay);
     }
