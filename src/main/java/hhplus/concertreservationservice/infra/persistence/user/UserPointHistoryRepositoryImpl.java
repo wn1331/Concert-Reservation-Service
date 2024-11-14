@@ -15,4 +15,9 @@ public class UserPointHistoryRepositoryImpl implements UserPointHistoryRepositor
     public void save(UserPointHistory userPointHistory) {
         jpaRepository.save(userPointHistory);
     }
+
+    @Override
+    public boolean existsByUserId(Long id) {
+        return jpaRepository.existsByUserId(id);
+    }
 }

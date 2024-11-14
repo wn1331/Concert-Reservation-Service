@@ -55,6 +55,7 @@ public class ConcertPaymentFacade {
         paymentEventPublisher.success(ConcertPaymentSuccessEvent.builder()
                 .userId(criteria.userId())
                 .price(reservationStatusInfo.price())
+                .reservationId(reservationStatusInfo.reservationId())
                 .paymentId(pay.paymentId())
             .build());
 

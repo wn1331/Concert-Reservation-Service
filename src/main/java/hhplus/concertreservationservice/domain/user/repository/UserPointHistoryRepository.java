@@ -6,4 +6,6 @@ import hhplus.concertreservationservice.domain.user.entity.UserPointHistory;
 public interface UserPointHistoryRepository {
 
     void save(UserPointHistory userPointHistory);
+
+    boolean existsByUserId(Long id);
 }

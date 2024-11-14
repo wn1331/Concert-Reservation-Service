@@ -2,10 +2,12 @@ package hhplus.concertreservationservice.integration.facade;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
 import hhplus.concertreservationservice.application.concert.facade.ConcertPaymentFacade;
+import hhplus.concertreservationservice.domain.concert.dto.ConcertPaymentSuccessEvent;
 import hhplus.concertreservationservice.domain.concert.entity.Concert;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertReservation;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertSchedule;
@@ -18,6 +20,7 @@ import hhplus.concertreservationservice.domain.concert.repository.ConcertSchedul
 import hhplus.concertreservationservice.domain.concert.repository.ConcertSeatRepository;
 import hhplus.concertreservationservice.domain.queue.repository.QueueRepository;
 import hhplus.concertreservationservice.domain.user.entity.User;
+import hhplus.concertreservationservice.domain.user.repository.UserPointHistoryRepository;
 import hhplus.concertreservationservice.domain.user.repository.UserRepository;
 import hhplus.concertreservationservice.global.exception.CustomGlobalException;
 import hhplus.concertreservationservice.global.exception.ErrorCode;
@@ -32,12 +35,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
-@Transactional
 @ActiveProfiles("test")
 @DisplayName("[통합 테스트] ConcertPaymentFacade 테스트")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -61,6 +64,9 @@ class ConcertPaymentFacadeTest {
 
     @Autowired
     private ConcertReservationRepository concertReservationRepository;
+
+    @Autowired
+    private UserPointHistoryRepository userPointHistoryRepository;
 
     private User user;
     private Concert concert;
@@ -113,6 +119,7 @@ class ConcertPaymentFacadeTest {
             .build();
         // When
         ConcertResult.Pay result = concertPaymentFacade.pay(criteria);
+
         // Then
         assertEquals(1L, result.paymentId());  // 결제가 성공했는지 확인
     }
@@ -138,6 +145,7 @@ class ConcertPaymentFacadeTest {
 
     @Test
     @Order(2)
+    @Transactional
     @DisplayName("[실패] 이미 결제된 예약으로 인한 결제 실패")
     void pay_failure_already_paid_or_cancelled() {
         // Given
@@ -179,6 +187,7 @@ class ConcertPaymentFacadeTest {
 
     @Test
     @Order(4)
+    @Transactional
     @DisplayName("[실패] 잔액 부족으로 인한 결제 실패")
     void pay_failure_not_enough_balance() {
         // Given
@@ -228,6 +237,7 @@ class ConcertPaymentFacadeTest {
 
     @Test
     @Order(6)
+    @Transactional
     @DisplayName("[실패] 좌석이 예약되지 않아 결제 실패")
     void pay_failure_seat_not_reserved() {
         // Given
@@ -244,6 +254,30 @@ class ConcertPaymentFacadeTest {
 
         // 예외 코드 확인
         assertEquals(ErrorCode.SEAT_NOT_RESERVED, exception.getErrorCode());
+    }
+
+    @Test
+    @Order(7)
+    @DisplayName("[성공] 트랜잭션 커밋 후에 유저 결제 이력 저장 이벤트 리스너가 호출되는지 검증")
+    void testSaveUserPaymentHistoryAfterCommit() {
+
+        // Given
+        ConcertCriteria.Pay criteria = ConcertCriteria.Pay.builder()
+            .userId(user.getId())
+            .reservationId(1L)
+            .build();
+        // When
+        ConcertResult.Pay result = concertPaymentFacade.pay(criteria);
+
+
+        // Then
+        assertEquals(1L, result.paymentId());  // 결제가 성공했는지 확인
+
+
+        // 유저 결제 이력 저장 이벤트 리스너가 결제 이력을 저장했는지 확인
+        assertTrue(userPointHistoryRepository.existsByUserId(user.getId()),
+            "이벤트 리스너가 결제 이력을 저장해야 합니다.");
+
     }
 
 
