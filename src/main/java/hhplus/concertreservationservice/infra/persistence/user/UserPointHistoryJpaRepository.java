@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserPointHistoryJpaRepository extends JpaRepository<UserPointHistory,Long> {
 
+    boolean existsByUserId(Long id);
 }

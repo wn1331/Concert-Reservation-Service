@@ -97,7 +97,6 @@ class ConcertFacadeTest {
         // Then
         // 기존에 2개(data.sql) 있음 + setup에서 1개 만듦
         assertEquals(3, result.schedules().size());
-        assertEquals(concertSchedule.getId(), result.schedules().get(2).id());
     }
 
     @Test

@@ -195,7 +195,6 @@ class UserServiceTest {
 
         // Then
         verify(user, times(1)).pointUse(BigDecimal.valueOf(30000));
-        verify(userPointHistoryRepository, times(1)).save(any(UserPointHistory.class));
     }
 
     @Test

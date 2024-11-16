@@ -1,5 +1,6 @@
 package hhplus.concertreservationservice.domain.user.service;
 
+import hhplus.concertreservationservice.domain.concert.dto.ConcertPaymentSuccessEvent;
 import hhplus.concertreservationservice.domain.user.dto.UserCommand;
 import hhplus.concertreservationservice.domain.user.dto.UserCommand.UserPay;
 import hhplus.concertreservationservice.domain.user.dto.UserInfo;
@@ -66,13 +67,16 @@ public class UserService {
         } else {
             throw new CustomGlobalException(ErrorCode.NOT_ENOUGH_BALANCE);
         }
-        // 포인트 사용내역 저장
+    }
+
+    public void saveUserPaymentHistory(ConcertPaymentSuccessEvent event){
         userPointHistoryRepository.save(UserPointHistory.builder()
-            .userId(user.getId())
-            .requestPoint(command.price())
+            .userId(event.userId())
+            .requestPoint(event.price())
             .type(UserPointHistoryType.PAY)
             .build()
         );
+
     }
 
 }
