@@ -45,6 +45,11 @@ dependencies {
     implementation 'io.micrometer:micrometer-registry-prometheus'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
+    // kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+    testImplementation 'org.testcontainers:kafka'
+
     compileOnly 'org.projectlombok:lombok'
 //    runtimeOnly 'com.h2database:h2'
     testImplementation 'com.h2database:h2'
