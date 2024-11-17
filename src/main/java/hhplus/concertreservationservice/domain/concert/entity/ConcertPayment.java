@@ -11,6 +11,7 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,6 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(name = "PAYMENT")
+@EqualsAndHashCode(callSuper = false) // 객체 비교를 위해 필요함.(Equals, HashCode 재설정)
 public class ConcertPayment extends BaseTimeEntity {
 
     @Id
