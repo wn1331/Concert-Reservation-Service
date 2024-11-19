@@ -1,6 +1,6 @@
 package hhplus.concertreservationservice.infra.common;
 
-import hhplus.concertreservationservice.domain.concert.dto.ConcertPaymentSuccessEvent;
+import hhplus.concertreservationservice.domain.concert.event.ConcertPaymentSuccessEvent;
 import hhplus.concertreservationservice.domain.common.notification.NotificationClient;
 import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;

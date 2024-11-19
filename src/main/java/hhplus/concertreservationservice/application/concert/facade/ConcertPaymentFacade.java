@@ -1,9 +1,9 @@
 package hhplus.concertreservationservice.application.concert.facade;
 
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
-import hhplus.concertreservationservice.domain.concert.dto.ConcertPaymentSuccessEvent;
+import hhplus.concertreservationservice.domain.concert.event.ConcertPaymentSuccessEvent;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
-import hhplus.concertreservationservice.domain.concert.publisher.ConcertPaymentEventPublisher;
+import hhplus.concertreservationservice.domain.concert.event.publisher.ConcertPaymentEventPublisher;
 import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo;
 import hhplus.concertreservationservice.domain.concert.dto.ConcertInfo.ReservationStatusInfo;
 import hhplus.concertreservationservice.domain.concert.service.ConcertPaymentService;

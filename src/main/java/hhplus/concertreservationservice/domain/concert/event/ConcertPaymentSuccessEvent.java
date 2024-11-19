@@ -1,4 +1,4 @@
-package hhplus.concertreservationservice.domain.concert.dto;
+package hhplus.concertreservationservice.domain.concert.event;
 
 import java.math.BigDecimal;
 import lombok.Builder;

@@ -1,7 +1,7 @@
-package hhplus.concertreservationservice.domain.concert.subscriber;
+package hhplus.concertreservationservice.domain.concert.event.subscriber;
 
 import hhplus.concertreservationservice.domain.common.notification.NotificationClient;
-import hhplus.concertreservationservice.domain.concert.dto.ConcertPaymentSuccessEvent;
+import hhplus.concertreservationservice.domain.concert.event.ConcertPaymentSuccessEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;

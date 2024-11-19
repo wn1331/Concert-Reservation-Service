@@ -1,7 +1,7 @@
 package hhplus.concertreservationservice.subscriber;
-import hhplus.concertreservationservice.domain.concert.dto.ConcertPaymentSuccessEvent;
+import hhplus.concertreservationservice.domain.concert.event.ConcertPaymentSuccessEvent;
 import hhplus.concertreservationservice.domain.user.service.UserService;
-import hhplus.concertreservationservice.domain.user.subscriber.UserPointHistoryEventListener;
+import hhplus.concertreservationservice.domain.user.event.subscriber.UserPointHistoryEventListener;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

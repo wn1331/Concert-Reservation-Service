@@ -1,6 +1,6 @@
 package hhplus.concertreservationservice.domain.user.service;
 
-import hhplus.concertreservationservice.domain.concert.dto.ConcertPaymentSuccessEvent;
+import hhplus.concertreservationservice.domain.concert.event.ConcertPaymentSuccessEvent;
 import hhplus.concertreservationservice.domain.user.dto.UserCommand;
 import hhplus.concertreservationservice.domain.user.dto.UserCommand.UserPay;
 import hhplus.concertreservationservice.domain.user.dto.UserInfo;

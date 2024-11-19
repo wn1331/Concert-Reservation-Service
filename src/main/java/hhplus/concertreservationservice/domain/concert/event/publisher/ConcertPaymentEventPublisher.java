@@ -1,6 +1,6 @@
-package hhplus.concertreservationservice.domain.concert.publisher;
+package hhplus.concertreservationservice.domain.concert.event.publisher;
 
-import hhplus.concertreservationservice.domain.concert.dto.ConcertPaymentSuccessEvent;
+import hhplus.concertreservationservice.domain.concert.event.ConcertPaymentSuccessEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
