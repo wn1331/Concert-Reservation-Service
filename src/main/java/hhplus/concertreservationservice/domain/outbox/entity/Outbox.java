@@ -1,11 +1,15 @@
 package hhplus.concertreservationservice.domain.outbox.entity;
 
 import hhplus.concertreservationservice.domain.BaseTimeEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,17 +22,24 @@ public class Outbox extends BaseTimeEntity {
     @GeneratedValue(strategy=GenerationType.UUID)
     private String id;
 
-    private Long targetId;
+    @Column(name = "`topic`")
+    private String topic;
 
+    @Column(name = "`key`")
+    private String key;
+
+    @Enumerated(EnumType.STRING)
     private OutboxType type;
 
+    @Enumerated(EnumType.STRING)
     private OutboxStatus status;
-
-    private String topic;
 
     private String payload;
 
-    private String key;
+
+    public void processSuccess() {
+        this.status = OutboxStatus.SUCCESS;
+    }
 
 
     public enum OutboxType{
@@ -38,8 +49,16 @@ public class Outbox extends BaseTimeEntity {
 
     public enum OutboxStatus {
         INIT,
-        RECEIVED,
         SUCCESS
     }
 
+    @Builder
+    public Outbox(OutboxType type, OutboxStatus status, String topic, String payload,
+        String key) {
+        this.type = type;
+        this.status = status;
+        this.topic = topic;
+        this.payload = payload;
+        this.key = key;
+    }
 }

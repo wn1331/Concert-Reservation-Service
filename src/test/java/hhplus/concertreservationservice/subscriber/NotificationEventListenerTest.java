@@ -1,7 +1,7 @@
 package hhplus.concertreservationservice.subscriber;
 import hhplus.concertreservationservice.domain.common.notification.NotificationClient;
 import hhplus.concertreservationservice.domain.concert.event.ConcertPaymentSuccessEvent;
-import hhplus.concertreservationservice.domain.concert.event.subscriber.NotificationEventSubscriber;
+import hhplus.concertreservationservice.domain.concert.event.subscriber.PaymentEventSubscriber;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +19,7 @@ class NotificationEventListenerTest {
     private NotificationClient notificationClient;
 
     @InjectMocks
-    private NotificationEventSubscriber eventSubscriber;
+    private PaymentEventSubscriber eventSubscriber;
 
     @BeforeEach
     void setUp() {

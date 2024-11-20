@@ -1,5 +1,8 @@
 package hhplus.concertreservationservice.domain.concert.event;
 
+import static hhplus.concertreservationservice.global.utils.JsonUtil.toJson;
+
+import hhplus.concertreservationservice.domain.outbox.dto.OutboxCommand;
 import java.math.BigDecimal;
 import lombok.Builder;
 
@@ -9,7 +12,8 @@ public record ConcertPaymentSuccessEvent(
     Long userId,
     BigDecimal price,
     Long reservationId,
-    Long paymentId
+    Long paymentId,
+    String token
 ) {
 
 }
