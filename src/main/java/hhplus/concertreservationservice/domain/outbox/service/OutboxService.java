@@ -35,11 +35,6 @@ public class OutboxService {
         outboxRepository.save(outbox);
     }
 
-    public List<Outbox> getOutboxesForRetry() {
-        // 성공하지 못한 아웃박스들을 조회하는 로직
-        return null;
-    }
-
 
     public List<Outbox> findFailedOutbox() {
         LocalDateTime validationType = LocalDateTime.now().minusMinutes(3);
