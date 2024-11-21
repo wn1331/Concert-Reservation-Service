@@ -29,7 +29,7 @@ class UserPointHistoryEventListenerTest {
     @DisplayName("유저 결제 이력 저장 이벤트 리스너 메서드 호출 테스트")
     void testSaveUserPaymentHistoryListener() {
         // Given
-        ConcertPaymentSuccessEvent event = new ConcertPaymentSuccessEvent(1L, BigDecimal.valueOf(1000), 1L,1L);
+        ConcertPaymentSuccessEvent event = new ConcertPaymentSuccessEvent(1L, BigDecimal.valueOf(1000), 1L,1L, "EXAMPLE-TOKEN");
 
         // When
         eventListener.saveUserPaymentHistory(event); // 직접 메서드 호출

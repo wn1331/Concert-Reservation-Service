@@ -41,7 +41,6 @@ public class PaymentEventSubscriber {
             .build());
 
         concertPaymentMessageProducer.sendSuccessMessage(event.paymentId().toString(), outboxId);
-//        notificationClient.sendPaymentNotification(event);
     }
 
 

@@ -22,8 +22,8 @@ public class OutboxRepositoryImpl implements OutboxRepository {
     }
 
     @Override
-    public Optional<Outbox> findByIdAndStatus(String id) {
-        return jpaRepository.findByIdAndStatus(id, OutboxStatus.INIT);
+    public Optional<Outbox> findByIdAndStatus(String id, OutboxStatus status) {
+        return jpaRepository.findByIdAndStatus(id, status);
     }
 
     @Override

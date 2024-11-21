@@ -80,6 +80,22 @@ create table if not exists user_point_history
     type          enum ('CHARGE', 'PAY') null
 );
 
+create table if not exists outbox
+(
+    created_at  datetime(6)                          null,
+    modified_at datetime(6)                          null,
+    target_id   bigint                               null,
+    id          varchar(255)                         not null
+        primary key,
+    `key`       varchar(255)                         null,
+    payload     varchar(255)                         null,
+    topic       varchar(255)                         null,
+    status      enum ('INIT', 'RECEIVED', 'SUCCESS') null,
+    type        enum ('PAYMENT', 'RESERVATION')      null
+);
+
+
+
 
 
 
@@ -97,3 +113,7 @@ INSERT INTO PUBLIC.CONCERT_SEAT (PRICE, CONCERT_SCHEDULE_ID, CREATED_AT, MODIFIE
 INSERT INTO PUBLIC.CONCERT_SEAT (PRICE, CONCERT_SCHEDULE_ID, CREATED_AT, MODIFIED_AT, SEAT_NUM, STATUS) VALUES (150000.00, 1, '2024-10-17 21:01:57.217771', null, 'A2', 'RESERVED');
 INSERT INTO RESERVATION (CONCERT_SEAT_ID, CREATED_AT, MODIFIED_AT, USER_ID, STATUS,PRICE) VALUES (2, NOW(), NULL, 2, 'RESERVED',150000);
 
+
+INSERT INTO PAYMENT (price, created_at, id, modified_at, reservation_id, status) VALUES (150000.00, '2024-11-21 17:58:09.498742', 1, null, 1, 'SUCCEED');
+
+INSERT INTO OUTBOX (created_at, modified_at, id, `key`, payload, topic, status, type) VALUES ('2024-11-21 17:58:09.527198', '2023-11-21 17:58:09.601629', '71b3feb7-d139-45ad-a080-fd9f15773e66', '1', '{"userId":1,"price":150000.00,"reservationId":1,"paymentId":1,"token":"68cf2c00-088e-4e81-ab15-98c9ccd2bfad"}', 'PAYMENT-SUCCESS', 'INIT', 'PAYMENT');

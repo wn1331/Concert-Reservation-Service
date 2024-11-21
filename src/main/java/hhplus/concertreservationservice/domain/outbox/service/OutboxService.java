@@ -2,6 +2,7 @@ package hhplus.concertreservationservice.domain.outbox.service;
 
 import hhplus.concertreservationservice.domain.outbox.dto.OutboxCommand;
 import hhplus.concertreservationservice.domain.outbox.entity.Outbox;
+import hhplus.concertreservationservice.domain.outbox.entity.Outbox.OutboxStatus;
 import hhplus.concertreservationservice.domain.outbox.repository.OutboxRepository;
 import hhplus.concertreservationservice.global.exception.CustomGlobalException;
 import hhplus.concertreservationservice.global.exception.ErrorCode;
@@ -17,7 +18,7 @@ public class OutboxService {
     private final OutboxRepository outboxRepository;
 
     public Outbox findOutbox(String outboxId) {
-        return outboxRepository.findByIdAndStatus(outboxId)
+        return outboxRepository.findByIdAndStatus(outboxId, OutboxStatus.INIT)
             .orElseThrow(() -> new CustomGlobalException(
                 ErrorCode.OUTBOX_NOT_FOUND));
 

@@ -51,7 +51,6 @@ dependencies {
     testImplementation 'org.testcontainers:kafka'
 
     compileOnly 'org.projectlombok:lombok'
-//    runtimeOnly 'com.h2database:h2'
     testImplementation 'com.h2database:h2'
     implementation 'mysql:mysql-connector-java:8.0.32'
     annotationProcessor 'org.projectlombok:lombok'
