@@ -1,6 +1,6 @@
 package hhplus.concertreservationservice.domain.common.notification;
 
-import hhplus.concertreservationservice.domain.concert.dto.ConcertPaymentSuccessEvent;
+import hhplus.concertreservationservice.domain.concert.event.ConcertPaymentSuccessEvent;
 
 public interface NotificationClient {
 

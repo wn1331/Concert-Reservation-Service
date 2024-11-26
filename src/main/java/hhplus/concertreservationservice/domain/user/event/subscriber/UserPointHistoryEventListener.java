@@ -1,6 +1,6 @@
-package hhplus.concertreservationservice.domain.user.subscriber;
+package hhplus.concertreservationservice.domain.user.event.subscriber;
 
-import hhplus.concertreservationservice.domain.concert.dto.ConcertPaymentSuccessEvent;
+import hhplus.concertreservationservice.domain.concert.event.ConcertPaymentSuccessEvent;
 import hhplus.concertreservationservice.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

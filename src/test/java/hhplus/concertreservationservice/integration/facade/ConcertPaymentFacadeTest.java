@@ -1,5 +1,7 @@
 package hhplus.concertreservationservice.integration.facade;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -7,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import hhplus.concertreservationservice.application.concert.dto.ConcertCriteria;
 import hhplus.concertreservationservice.application.concert.dto.ConcertResult;
 import hhplus.concertreservationservice.application.concert.facade.ConcertPaymentFacade;
-import hhplus.concertreservationservice.domain.concert.dto.ConcertPaymentSuccessEvent;
 import hhplus.concertreservationservice.domain.concert.entity.Concert;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertReservation;
 import hhplus.concertreservationservice.domain.concert.entity.ConcertSchedule;
@@ -18,15 +19,24 @@ import hhplus.concertreservationservice.domain.concert.repository.ConcertReposit
 import hhplus.concertreservationservice.domain.concert.repository.ConcertReservationRepository;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertScheduleRepository;
 import hhplus.concertreservationservice.domain.concert.repository.ConcertSeatRepository;
-import hhplus.concertreservationservice.domain.queue.repository.QueueRepository;
+import hhplus.concertreservationservice.domain.outbox.entity.Outbox;
+import hhplus.concertreservationservice.domain.outbox.entity.Outbox.OutboxStatus;
+import hhplus.concertreservationservice.domain.outbox.entity.Outbox.OutboxType;
+import hhplus.concertreservationservice.domain.outbox.repository.OutboxRepository;
+import hhplus.concertreservationservice.domain.outbox.service.OutboxService;
 import hhplus.concertreservationservice.domain.user.entity.User;
 import hhplus.concertreservationservice.domain.user.repository.UserPointHistoryRepository;
 import hhplus.concertreservationservice.domain.user.repository.UserRepository;
 import hhplus.concertreservationservice.global.exception.CustomGlobalException;
 import hhplus.concertreservationservice.global.exception.ErrorCode;
+import hhplus.concertreservationservice.infra.persistence.outbox.OutboxJpaRepository;
+import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -35,7 +45,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +55,7 @@ import org.springframework.transaction.annotation.Transactional;
 @DisplayName("[통합 테스트] ConcertPaymentFacade 테스트")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9093", "port=9093"})
 class ConcertPaymentFacadeTest {
 
     @Autowired
@@ -52,6 +63,9 @@ class ConcertPaymentFacadeTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private OutboxRepository outboxRepository;
 
     @Autowired
     private ConcertRepository concertRepository;
@@ -278,6 +292,30 @@ class ConcertPaymentFacadeTest {
         assertTrue(userPointHistoryRepository.existsByUserId(user.getId()),
             "이벤트 리스너가 결제 이력을 저장해야 합니다.");
 
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("[성공][스케줄러] 실패한 아웃박스 메시지 재발행")
+    void retryMessage_Success() {
+        // Given
+        // data.sql에 미발행 메시지 존재.
+
+        // When
+        concertPaymentFacade.retryMessage();
+
+        // Then
+        await()
+            .atMost(Duration.ofSeconds(5)) // 최대 대기 시간
+            .pollInterval(Duration.ofMillis(100)) // 대기 중 검증 간격
+            .untilAsserted(() -> {
+                Optional<Outbox> retriedOutbox = outboxRepository.findByIdAndStatus(
+                    "71b3feb7-d139-45ad-a080-fd9f15773e66",
+                    OutboxStatus.SUCCESS
+                );
+                assertThat(retriedOutbox).isPresent();
+                assertThat(retriedOutbox.get().getStatus()).isEqualTo(OutboxStatus.SUCCESS);
+            });
     }
 
 
