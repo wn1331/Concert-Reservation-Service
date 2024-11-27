@@ -13,8 +13,8 @@
 위와 같은 API에서 부하
 
 ## 부하 테스트 환경 (Docker 리소스 동적할당.)
-CPU : Docker Custom (2~6 core)  
-RAM : 4~8GB  
+CPU : Docker Custom (2 core)  
+RAM : 4GB  
 **위 spec 범위가 변동되는 것은 Scale-up과는 다른 개념**
 
 `실제 배포할 때를 예시로 들어, 테스트 환경을 매우 작게 두었다`
