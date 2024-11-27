@@ -9,8 +9,8 @@ BEGIN
 END WHILE;
 END;
 
--- ConcertSchedule 데이터 삽입 (각 콘서트에 대해 10개의 스케줄)
-CREATE PROCEDURE InsertConcertSchedules()
+-- ConcertSchedule 데이터 삽입 (각 콘서트에 대해 10000개의 스케줄)
+CREATE PROCEDURE InsertConcertSchedules2()
 BEGIN
     DECLARE i INT DEFAULT 1;
     DECLARE j INT DEFAULT 1;
@@ -19,7 +19,7 @@ BEGIN
 
     WHILE i <= 100 DO
         SET j = 1;
-        WHILE j <= 10000 DO
+        WHILE j <= 100 DO
             INSERT INTO concert_schedule (concert_id, concert_date)
             VALUES (i, DATE_ADD(concert_date, INTERVAL j DAY));
             SET j = j + 1;
@@ -29,22 +29,18 @@ END WHILE;
 END;
 
 -- ConcertSeat 데이터 삽입 (각 스케줄에 대해 1500개의 좌석)
-CREATE PROCEDURE InsertConcertSeats()
+CREATE PROCEDURE InsertConcertSeats3()
 BEGIN
     DECLARE i INT DEFAULT 1;
     DECLARE seat_number INT DEFAULT 1;
     DECLARE price DECIMAL(10, 2) DEFAULT 150000;
     DECLARE seat_status ENUM('EMPTY', 'RESERVED', 'SOLD');
 
-    WHILE i <= 1000 DO  -- 총 100 * 10개의 스케줄 = 1000 스케줄
+    WHILE i <= 10000 DO  -- 총 10000개의 스케줄 * 150좌석 = 1500000 스케줄
         SET seat_number = 1;
-        WHILE seat_number <= 1500 DO
+        WHILE seat_number <= 150 DO
             -- 랜덤하게 상태 설정 (0: EMPTY, 1: RESERVED, 2: SOLD)
-            SET seat_status = CASE FLOOR(RAND() * 3)
-                WHEN 0 THEN 'EMPTY'
-                WHEN 1 THEN 'RESERVED'
-                ELSE 'SOLD'
-END;
+            SET seat_status = 'EMPTY';
 INSERT INTO concert_seat (concert_schedule_id, seat_num, price, status)
 VALUES (i, CONCAT('A', seat_number), price, seat_status);
 SET seat_number = seat_number + 1;
@@ -54,11 +50,15 @@ END WHILE;
 END;
 
 -- User 데이터 2명 삽입
-CREATE PROCEDURE InsertUsers()
+CREATE PROCEDURE InsertUsers2()
 BEGIN
-INSERT INTO User (name,point) VALUES ('주종훈', 1000000);
-INSERT INTO User (name, point) VALUES ('김영한', 1000000);
-END;
+    DECLARE i INT DEFAULT 1; -- 반복을 위한 변수
+    WHILE i <= 1000000 DO
+            INSERT INTO User (name,version, point)
+            VALUES (CONCAT('User_', i),0, 1000000); -- name은 User_1, User_2, ... 형태로 생성
+            SET i = i + 1; -- i 값을 증가
+        END WHILE;
+    END;
 
 -- ConcertReservation 데이터 100만 개 삽입
 CREATE PROCEDURE InsertConcertReservations()
@@ -92,9 +92,35 @@ END;
 
 DELIMITER ;
 
+
+DELIMITER $$
+
+CREATE PROCEDURE InsertReservations()
+BEGIN
+    DECLARE i INT DEFAULT 1;
+
+    START TRANSACTION;
+
+    WHILE i <= 1000000 DO
+            INSERT INTO concert.reservation (price, concert_seat_id, created_at, modified_at, user_id, status)
+            VALUES (50000, i, NOW(), NOW(), i, 'RESERVED');
+            SET i = i + 1;
+
+            -- 10,000개씩 커밋하여 메모리 사용량 관리
+            IF i % 10000 = 0 THEN
+                COMMIT;
+                START TRANSACTION;
+            END IF;
+        END WHILE;
+
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+
 -- 각 프로시저 호출하여 데이터 삽입 실행
 CALL InsertConcerts();
-CALL InsertConcertSchedules();
-CALL InsertConcertSeats();
-CALL InsertUsers();
-CALL InsertConcertReservations();
+CALL InsertConcertSchedules2();
+CALL InsertConcertSeats3();
+CALL InsertUsers2();

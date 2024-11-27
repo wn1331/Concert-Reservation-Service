@@ -58,7 +58,13 @@ dependencies {
     testImplementation "org.testcontainers:junit-jupiter:1.20.3"
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
-
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'hhplus.concertreservationservice.ConcertReservationServiceApplication' // 메인 클래스의 패키지 경로
+        )
+    }
+}
 tasks.named('test') {
     useJUnitPlatform()
 }
