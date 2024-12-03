@@ -1,0 +1,24 @@
+scrape_configs:
+  - job_name: 'prometheus' # 잡 이름
+    static_configs:
+      - targets: [ 'localhost:9090' ]
+    scrape_interval: 1s
+
+  - job_name: 'concert-reservation-server'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'host.docker.internal:8080' ]
+    scrape_interval: 1s
+
+  - job_name: 'node-exporter'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: [ 'host.docker.internal:9100' ]
+    scrape_interval: 1s
+
+  - job_name: 'mysql-exporter'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: [ 'host.docker.internal:9104' ]
+    scrape_interval: 1s
+

@@ -7,6 +7,7 @@ plugins {
 group = 'hhplus'
 version = '0.0.1-SNAPSHOT'
 
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
@@ -24,15 +25,46 @@ repositories {
 }
 
 dependencies {
+
+    // Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // 재시도 처리를 위한 dependency
+    implementation 'org.springframework.retry:spring-retry'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // redission
+    implementation 'org.redisson:redisson-spring-boot-starter:3.37.0'
+
+    // prometheus
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+    testImplementation 'org.testcontainers:kafka'
+
     compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'com.h2database:h2'
+    testImplementation 'com.h2database:h2'
+    implementation 'mysql:mysql-connector-java:8.0.32'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation "org.testcontainers:junit-jupiter:1.20.3"
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
-
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'hhplus.concertreservationservice.ConcertReservationServiceApplication' // 메인 클래스의 패키지 경로
+        )
+    }
+}
 tasks.named('test') {
     useJUnitPlatform()
 }
