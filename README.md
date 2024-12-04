@@ -171,5 +171,23 @@ Service 클래스 내부에 inner class로 Command/Info를 구현 예정입니�
 
 </details>
 
+<details><summary>인덱스 성능개선 보고서</summary>
+
+[Index Blog Post](https://wn1331.tistory.com/289)
+
+</details>
+
+<details><summary>부하테스트 보고서</summary>
+
+[StressTest.md](docs/StressTest.md)
+
+</details>
+
+<details><summary>결제 시나리오 장애대응 보고서</summary>
+
+[DisasterRecovery.md](docs/DisasterRecovery.md)
+
+</details>
+
 
 
